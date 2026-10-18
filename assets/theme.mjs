@@ -10,14 +10,18 @@ export function setBrowserTheme(document, theme) {
 // Reveal the new appearance over the old page from the theme button's center.
 export function createThemeSwitcher({document, window, applyTheme, saveTheme, commitTheme = () => {}, reducedMotion = () => false}) {
   const root = document.documentElement;
-  let busy = false;
+  let revision = 0, activeTransition, requestedTheme;
   return async function switchTheme(button) {
-    if (busy) return false;
-    busy = true;
-    const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    const token = ++revision;
+    const theme = (requestedTheme || root.dataset.theme) === 'dark' ? 'light' : 'dark';
+    requestedTheme = theme;
+    // Every click counts, including clicks before the capture callback runs.
+    // Superseded callbacks and finalizers may never overwrite the latest intent.
+    activeTransition?.skipTransition();
+    activeTransition = undefined;
     let applied = false, transition;
     const update = () => {
-      if (applied) return;
+      if (applied || token !== revision) return;
       applied = true;
       applyTheme(theme);
       saveTheme(theme);
@@ -44,8 +48,9 @@ export function createThemeSwitcher({document, window, applyTheme, saveTheme, co
       const backdrop = window.getComputedStyle(root).getPropertyValue('--bg').trim();
       root.style.setProperty('--theme-reveal-backdrop', backdrop);
       root.classList.add('theme-revealing');
-      transition = document.startViewTransition(update);
+      transition = activeTransition = document.startViewTransition(update);
       await transition.ready;
+      if (token !== revision) return true;
       // Mobile snapshots can extend beneath retractable browser toolbars, beyond
       // innerHeight. Measure the actual snapshot before its first painted frame.
       try {
@@ -62,10 +67,13 @@ export function createThemeSwitcher({document, window, applyTheme, saveTheme, co
       return true;
     } finally {
       // A system/storage change during the capture may supersede this request.
-      if (applied) commitTheme(root.dataset.theme);
-      root.classList.remove('theme-revealing');
-      properties.forEach(property => root.style.removeProperty(property));
-      busy = false;
+      if (token === revision) {
+        if (applied) commitTheme(root.dataset.theme);
+        root.classList.remove('theme-revealing');
+        properties.forEach(property => root.style.removeProperty(property));
+        activeTransition = undefined;
+        requestedTheme = undefined;
+      }
     }
   };
 }

@@ -20,13 +20,14 @@
   <meta property="og:title" content="Apple Trivia · 来点苹果冷知识">
   <meta property="og:description" content="你以为你很懂 Apple？5 题一局，猜完再说。">
   <title>Apple Trivia · 来点苹果冷知识</title>
-  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=3.1.0">
-  <link rel="stylesheet" href="./assets/style.css?v=3.1.0">
-  <link rel="stylesheet" href="./assets/motion.css?v=3.1.0">
-  <script type="module" src="./assets/app.mjs?v=3.1.0"></script>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg?v=3.2.0">
+  <link rel="stylesheet" href="./assets/style.css?v=3.2.0">
+  <link rel="stylesheet" href="./assets/motion.css?v=3.2.0">
+  <script type="module" src="./assets/app.mjs?v=3.2.0"></script>
 </head>
 <body>
-  <div id="hello-intro" class="hello-intro" role="dialog" aria-modal="true" aria-label="hello 开场动画，播放完成后自动进入" aria-busy="true" tabindex="-1">
+  <div id="hello-intro" class="hello-intro" role="dialog" aria-modal="true" aria-label="hello 开场动画，可跳过" aria-busy="true" tabindex="-1">
+    <button type="button" id="hello-skip" class="hello-skip" aria-label="跳过 hello 开场动画">skip <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true"><path d="m7 5 5 5-5 5m7-10v10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <svg class="hello-word" xmlns="http://www.w3.org/2000/svg" viewBox="-12 -14 662 228" fill="none" stroke="url(#hello-colors)" stroke-width="14.8883" stroke-linecap="round" aria-label="hello" role="img">
       <defs><linearGradient id="hello-colors" x1="0" y1="200" x2="638" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#527ee8"/><stop offset=".2" stop-color="#a66bdd"/><stop offset=".4" stop-color="#ef6391"/><stop offset=".6" stop-color="#f38b49"/><stop offset=".8" stop-color="#d8b444"/><stop offset="1" stop-color="#61af87"/></linearGradient></defs>
       <path class="hello-stroke hello-first" d="M8.69214 166.553C36.2393 151.239 61.3409 131.548 89.8191 98.0295C109.203 75.1488 119.625 49.0228 120.122 31.0026C120.37 17.6036 113.836 7.43883 101.759 7.43883C88.3598 7.43883 79.9231 17.6036 74.7122 40.9363C69.005 66.5793 64.7866 96.0036 54.1166 190.356"/>
@@ -36,7 +37,7 @@
   <div id="site-content" inert>
   <a class="skip-link" href="#main">跳至主要内容</a>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="Apple Trivia 首页"><span class="brand-symbol" aria-hidden="true"><img src="./assets/logo.svg?v=3.1.0" width="36" height="36" alt=""></span>Apple <b>Trivia</b></a>
+    <a class="brand" href="./" aria-label="Apple Trivia 首页"><span class="brand-symbol" aria-hidden="true"><img src="./assets/logo.svg?v=3.2.0" width="36" height="36" alt=""></span>Apple <b>Trivia</b></a>
     <div class="header-actions"><button class="text-button" data-action="about">关于</button><button id="theme-toggle" class="icon-button" data-action="theme" aria-label="切换明暗外观"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.5A8.8 8.8 0 0 1 10.5 3.5a8.8 8.8 0 1 0 10 10Z"/></svg></button></div>
   </header>
   <main id="main" tabindex="-1"><div class="loading"><span class="loader"></span><p>加载中…</p></div></main>

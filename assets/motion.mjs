@@ -5,7 +5,7 @@
 export const MOTION_PROFILES = Object.freeze({
   brand:[.955,.98,0,-.4,-2,360], about:[.96,.99,0,1,0,260], tally:[.98,.93,0,.6,0,300],
   appearance:[.9,.9,0,0,-8,380], launch:[.975,.94,0,1.3,0,370], custom:[.97,.965,0,1,-.7,330],
-  resume:[.98,.95,-1,0,0,340], product:[.96,.9,0,1,0,310], 'archive-prev':[.91,.97,-2,0,0,290], 'archive-next':[.97,.91,2,0,0,320],
+  resume:[.98,.95,-1,0,0,340], product:[.96,.9,0,1,0,310], 'archive-prev':[.91,.97,-2,0,0,290], 'archive-next':[.97,.91,2,0,0,320], 'archive-playback':[.88,.96,0,.7,-4,340],
   'topic-surprise':[.99,.965,0,1,-.25,390], 'topic-stories':[.99,.98,1,0,.2,350], 'topic-timeline':[.995,.96,0,.7,0,410],
   home:[.97,.95,-1.5,0,0,280], 'home-return':[.95,.99,0,.7,0,300], map:[.92,.92,0,0,2,330], flag:[.88,.94,0,1,-5,370],
   answer:[.995,.966,0,.8,0,260], previous:[.98,.97,-1,0,0,280], advance:[.975,.96,1,0,0,340], 'quick-next':[.95,.95,1.5,0,0,290],
@@ -26,6 +26,7 @@ export function describeMotion(el) {
   const d=el.dataset, tag=el.tagName.toLowerCase(), has=c=>el.classList.contains(c);
   let kind='control', suffix='';
   if (d.device) { kind='product'; suffix=d.device; }
+  else if (d.archivePlayback !== undefined) kind='archive-playback';
   else if (d.archiveStep) kind=Number(d.archiveStep)<0?'archive-prev':'archive-next';
   else if (d.answer!==undefined) { kind='answer'; suffix=d.answer; }
   else if (d.count) { kind='count'; suffix=d.count; }

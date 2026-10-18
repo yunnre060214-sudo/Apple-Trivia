@@ -1,29 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 440" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 440" fill="none" role="img" aria-labelledby="title">
+  <title id="title">AirPods · 2016</title>
   <defs>
-    <linearGradient id="case" x1="160" y1="217" x2="307" y2="377" gradientUnits="userSpaceOnUse"><stop stop-color="#fffffb"/><stop offset=".5" stop-color="#eef1e8"/><stop offset="1" stop-color="#c7d1c2"/></linearGradient>
-    <linearGradient id="pod" x1="0" y1="0" x2="44" y2="149" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset=".5" stop-color="#e9eee5"/><stop offset="1" stop-color="#b8c6b5"/></linearGradient>
-    <linearGradient id="stem" x1="17" y1="37" x2="38" y2="144" gradientUnits="userSpaceOnUse"><stop stop-color="#eff4e9"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#becbb9"/></linearGradient>
-    <linearGradient id="metal" x1="15" y1="137" x2="38" y2="149" gradientUnits="userSpaceOnUse"><stop stop-color="#b0beb0"/><stop offset=".5" stop-color="#edf2e5"/><stop offset="1" stop-color="#7f9382"/></linearGradient>
-    <radialGradient id="shadow"><stop stop-color="#243d29" stop-opacity=".18"/><stop offset="1" stop-color="#243d29" stop-opacity="0"/></radialGradient>
-    <pattern id="mesh" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="3" fill="#39483b"/><circle cx="1.5" cy="1.5" r=".6" fill="#899783"/></pattern>
-    <g id="earbud">
-      <path d="M17 40h20v95c0 7-4 12-10 12s-10-5-10-12V40Z" fill="url(#stem)" stroke="#c0cdbb"/>
-      <path d="M17 134c5 4 15 4 20 0v6c-1 5-4 8-10 8s-9-3-10-8v-6Z" fill="url(#metal)"/>
-      <path d="M27 2C10 2-1 13 0 30c1 17 13 30 29 32 14 2 24-8 26-24C58 20 46 2 27 2Z" fill="url(#pod)" stroke="#c6d2bf"/>
-      <ellipse cx="14" cy="25" rx="8" ry="14" transform="rotate(-22 14 25)" fill="url(#mesh)" stroke="#becbb8" stroke-width="1.5"/>
-      <ellipse cx="40" cy="33" rx="3.5" ry="6" transform="rotate(-17 40 33)" fill="#64765f"/>
-      <path d="M33 9c7 2 12 8 14 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-      <path d="M28 68v59" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
-    </g>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f9faf9" />
+      <stop offset="0.333" stop-color="#c4cbd0" />
+      <stop offset="0.667" stop-color="#f4f6f7" />
+      <stop offset="1.000" stop-color="#a6aeb5" />
+    </linearGradient>
+    <linearGradient id="white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="0.500" stop-color="#f6f7f6" />
+      <stop offset="1.000" stop-color="#d8dfe0" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#353b42" />
+      <stop offset="0.500" stop-color="#11161d" />
+      <stop offset="1.000" stop-color="#252c36" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="1.000" stop-color="#ffffff00" />
+    </linearGradient>
+    <radialGradient id="ground">
+      <stop stop-color="#18232f" stop-opacity=".19" />
+      <stop offset="1" stop-color="#18232f" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="inside" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#d4dddf" />
+      <stop offset="0.500" stop-color="#f0f3f2" />
+      <stop offset="1.000" stop-color="#e1e7e7" />
+    </linearGradient>
   </defs>
-  <ellipse cx="243" cy="391" rx="145" ry="20" fill="url(#shadow)"/>
-  <g transform="translate(155 62) rotate(-19 27 75)"><use href="#earbud"/></g>
-  <g transform="translate(333 64) scale(-1 1) rotate(-19 27 75)"><use href="#earbud"/></g>
-  <path d="M147 264c0-31 18-47 49-47h91c31 0 49 16 49 47v70c0 31-18 48-49 48h-91c-31 0-49-17-49-48v-70Z" fill="url(#case)" stroke="#b9c7b1" stroke-width="1.2"/>
-  <path d="M152 262c0-27 16-40 44-40h91c28 0 44 13 44 40" stroke="white" stroke-width="2" stroke-linecap="round"/>
-  <path d="M148 270c52 5 134 5 187 0" stroke="#acbba3" stroke-width="1.2"/>
-  <path d="M150 272c52 5 132 5 183 0" stroke="#ffffff" stroke-opacity=".85"/>
-  <path d="M216 271h51c-2 4-6 5-11 5h-29c-5 0-9-1-11-5Z" fill="#b5c3ad"/>
-  <path d="M159 294v39c0 23 12 35 35 35" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
-  <path d="M319 294v39c0 20-8 30-25 33" stroke="#cbd7c2" stroke-width="1" stroke-linecap="round"/>
+  <ellipse cx="240" cy="389" rx="149" ry="17" fill="url(#ground)" />
+  <path d="M143 156q0-40 40-43h115q40 3 40 43v51q0 24-25 24H168q-25 0-25-24Z" fill="url(#white)" stroke="#c7ced0" stroke-width="1.2" />
+  <path d="M153 156q0-31 31-33h112q31 2 31 33v47q0 17-17 17H171q-18 0-18-17Z" fill="url(#inside)" stroke="#e0e4e4" />
+  <path d="M174 147q19-17 36 1v49q-16 11-31-1Zm97 1q18-18 35-1l-5 49q-16 12-30 1Z" fill="#d8dfe0" stroke="#cbd4d6" />
+  <rect x="212" y="222" width="57" height="9" rx="3" fill="#aab5bc" stroke="#edf3f3" />
+  <g transform="rotate(-10 196 222)">
+    <rect x="187" y="174" width="19" height="99" rx="9.5" fill="url(#white)" stroke="#c4cdcf" />
+    <path d="M203 159c-12-13-37-10-40 7-4 22 15 34 33 25 14-8 18-21 7-32Z" fill="url(#white)" stroke="#c5ced1" />
+    <ellipse cx="177" cy="169" rx="7" ry="11" transform="rotate(30 177 169)" fill="#2c363f" stroke="#adb9c0" stroke-width="1.2" />
+    <ellipse cx="201" cy="177" rx="2" ry="4" fill="#3e4a54" />
+    <path d="M193 203v49" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+    <path d="M190 266h13" stroke="#a9b5bc" stroke-width="2" />
+  </g>
+  <g transform="rotate(10 284 222)">
+    <rect x="274" y="174" width="19" height="99" rx="9.5" fill="url(#white)" stroke="#c4cdcf" />
+    <path d="M277 159c12-13 37-10 40 7 4 22-15 34-33 25-14-8-18-21-7-32Z" fill="url(#white)" stroke="#c5ced1" />
+    <ellipse cx="303" cy="169" rx="7" ry="11" transform="rotate(-30 303 169)" fill="#2c363f" stroke="#adb9c0" stroke-width="1.2" />
+    <ellipse cx="279" cy="177" rx="2" ry="4" fill="#3e4a54" />
+    <path d="M280 203v49" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+    <path d="M277 266h13" stroke="#a9b5bc" stroke-width="2" />
+  </g>
+  <path d="M136 247q0-22 24-22h161q24 0 24 22l-5 68q-4 35-39 36H180q-35-1-39-36Z" fill="url(#white)" stroke="#c2cccf" stroke-width="1.3" />
+  <path d="M146 239q6-7 17-7h153q12 0 18 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+  <path d="M140 256h201" stroke="#c6d0d3" stroke-width=".9" />
+  <circle cx="240" cy="273" r="2.5" fill="#a0b982" />
+  <path d="M152 269v43q0 26 27 29" stroke="#ffffff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round" />
 </svg>

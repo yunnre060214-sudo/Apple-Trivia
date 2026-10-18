@@ -33,7 +33,29 @@ test('MacBook Air study keeps a 16:10 screen and individually drawn keyboard', a
 });
 
 function fixture() {
-  const listeners = new Map(), scrolls = [], caption = {}, focus = [];
+  const listeners = new Map(), scrolls = [], caption = {}, focus = [], values = new Map(), scheduled = new Map();
+  let time = 0, timerId = 0;
+  const clock = {
+    setTimer(fn, ms) { scheduled.set(++timerId, {fn, at:time+ms}); return timerId; },
+    clearTimer(id) { scheduled.delete(id); },
+  };
+  const advance = ms => {
+    const end = time + ms;
+    while (true) {
+      const next = [...scheduled].filter(([,t]) => t.at <= end).sort((a,b) => a[1].at-b[1].at)[0];
+      if (!next) break;
+      time = next[1].at; scheduled.delete(next[0]); next[1].fn();
+    }
+    time = end;
+  };
+  const indicator = {style:{setProperty:(key,value) => values.set(key,value)}};
+  const playback = {attributes:new Map(), setAttribute(key,value) { this.attributes.set(key,value); }};
+  const documentEvents = new Map(), rootClasses = new Set();
+  const doc = {hidden:false, documentElement:{classList:{contains:name => rootClasses.has(name)}},
+    querySelector:() => null,
+    addEventListener:(name,fn) => documentEvents.set(name,fn),
+    removeEventListener:name => documentEvents.delete(name),
+  };
   const buttons = devices.map((d, index) => ({
     dataset:{device:d.id}, pressed:String(index === 0),
     setAttribute(name,value) { if (name === 'aria-pressed') this.pressed = value; },
@@ -52,9 +74,10 @@ function fixture() {
     scrollTo(options) { scrolls.push(options); this.scrollLeft = options.left; },
   };
   const figure = {
-    isConnected:true,
+    isConnected:true, ownerDocument:doc, dataset:{},
+    contains:target => buttons.includes(target),
     querySelectorAll:selector => selector === '[data-device]' ? buttons : layers,
-    querySelector:selector => selector === '.archive-select' ? rail : caption,
+    querySelector:selector => ({'.archive-select':rail,'.archive-indicator':indicator,'[data-archive-playback]':playback}[selector] || caption),
     addEventListener:(type, fn) => listeners.set(type, fn),
     removeEventListener:(type, fn) => { if (listeners.get(type) === fn) listeners.delete(type); },
   };
@@ -65,7 +88,7 @@ function fixture() {
     listeners.get('keydown')({target:buttons.find(b => b.dataset.device === id), key:name, preventDefault:() => { prevented = true; }, ...modifiers});
     return prevented;
   };
-  return {figure, buttons, layers, rail, caption, focus, scrolls, listeners, click, step, key};
+  return {figure, buttons, layers, rail, caption, focus, scrolls, listeners, click, step, key, values, clock, advance, scheduled, playback, doc, documentEvents, rootClasses};
 }
 
 test('gallery arrows wrap, keys retain focus, and scrolling is confined to the product rail', () => {
@@ -113,4 +136,43 @@ test('gallery uses smooth horizontal scrolling unless reduced motion is requeste
     if (originalMatch === undefined) delete globalThis.matchMedia; else globalThis.matchMedia = originalMatch;
     if (originalCancel === undefined) delete globalThis.cancelAnimationFrame; else globalThis.cancelAnimationFrame = originalCancel;
   }
+});
+
+test('autoplay wraps, manual selection resets its interval, and one indicator follows the selection', () => {
+  const previous = {match:globalThis.matchMedia,cancel:globalThis.cancelAnimationFrame};
+  globalThis.matchMedia = () => ({matches:false});globalThis.cancelAnimationFrame = () => {};
+  try {
+    const f=fixture(),cleanup=mountArchive(f.figure,{...f.clock});
+    const active=()=>f.buttons.find(b=>b.pressed==='true').dataset.device;
+    assert.equal(f.scheduled.size,1);f.advance(4999);assert.equal(active(),'mac');
+    f.advance(1);assert.equal(active(),'imac');assert.equal(f.values.get('--indicator-x'),'122px');
+    f.advance(2500);f.click(f.buttons[7]);assert.equal(active(),'airpods');
+    f.advance(4999);assert.equal(active(),'airpods');f.advance(1);assert.equal(active(),'vision');
+    f.advance(5000);assert.equal(active(),'mac');assert.equal(f.values.get('--indicator-x'),'30px');
+    cleanup();assert.equal(f.scheduled.size,0);assert.equal(f.listeners.size,0);assert.equal(f.documentEvents.size,0);
+    f.advance(20000);assert.equal(active(),'mac');
+  } finally {globalThis.matchMedia=previous.match;globalThis.cancelAnimationFrame=previous.cancel;}
+});
+
+test('autoplay pauses for hover, keyboard, hidden pages and user pause without losing manual navigation', () => {
+  const previous = {match:globalThis.matchMedia,cancel:globalThis.cancelAnimationFrame};
+  globalThis.matchMedia = () => ({matches:false});globalThis.cancelAnimationFrame = () => {};
+  try {
+    const f=fixture(),cleanup=mountArchive(f.figure,{...f.clock});
+    f.listeners.get('pointerenter')({pointerType:'mouse'});f.advance(10000);
+    assert.equal(f.buttons[0].pressed,'true');assert.equal(f.scheduled.size,0);
+    f.listeners.get('pointerleave')();
+    f.listeners.get('focusin')({target:{matches:()=>true}});f.advance(10000);assert.equal(f.buttons[0].pressed,'true');
+    f.key('mac','ArrowRight');assert.equal(f.buttons[1].pressed,'true');
+    f.listeners.get('focusout')({relatedTarget:null});
+    f.doc.hidden=true;f.documentEvents.get('visibilitychange')();assert.equal(f.scheduled.size,0);
+    f.doc.hidden=false;f.documentEvents.get('visibilitychange')();
+    f.click({closest:selector=>selector==='[data-archive-playback]'?f.playback:null});
+    assert.equal(f.playback.attributes.get('aria-pressed'),'true');assert.equal(f.scheduled.size,0);
+    f.click({closest:selector=>selector==='[data-archive-playback]'?f.playback:null});
+    assert.equal(f.playback.attributes.get('aria-pressed'),'false');f.advance(5000);assert.equal(f.buttons[2].pressed,'true');
+    cleanup();
+    const reduced=fixture(),stop=mountArchive(reduced.figure,{...reduced.clock,reducedMotion:()=>true});
+    assert.equal(reduced.scheduled.size,0);reduced.step(1);assert.equal(reduced.buttons[1].pressed,'true');stop();
+  } finally {globalThis.matchMedia=previous.match;globalThis.cancelAnimationFrame=previous.cancel;}
 });
