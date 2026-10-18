@@ -53,14 +53,14 @@ body[data-view=home] main { position:relative; }
 .archive { animation:none; }
 .archive-stage { height:390px; }
 .archive-stage:after { bottom:9px; opacity:.7; left:9%; right:5%; }
-.archive-year { position:absolute; right:-3px; top:-7px; z-index:2; display:block; width:max-content; min-height:44px; color:var(--ghost); font-family:Outfit,sans-serif; font-size:clamp(92px,9.5vw,132px); font-weight:450; letter-spacing:-.07em; line-height:1; background-image:none!important; transition:color 260ms,translate 350ms var(--ease); }
+.archive-year { position:absolute; right:-3px; top:-7px; z-index:0; display:block; width:max-content; min-height:44px; color:var(--ghost); font-family:Outfit,sans-serif; font-size:clamp(92px,9.5vw,132px); font-weight:450; letter-spacing:-.07em; line-height:1; background-image:none!important; transition:color 260ms,translate 350ms var(--ease); }
 .archive-year:hover { color:var(--accent); translate:0 -3px; }
 .archive-year-corner { position:absolute; width:20px; height:20px; top:10px; right:-12px; opacity:0; transition:opacity 200ms,translate 260ms; }
 .archive-year:hover .archive-year-corner,.archive-year:focus-visible .archive-year-corner { opacity:1; translate:3px -3px; }
 .archive-layer { z-index:1; }
 .archive-object { inset:10px 0 -2px; }
 .archive-object img { filter:var(--product-light); }
-.archive-orbit { position:absolute; width:79%; aspect-ratio:1; top:6%; left:11%; border-radius:50%; z-index:0; opacity:var(--orb-opacity); background:conic-gradient(from 20deg,transparent 15%,var(--orb-a) 22%,transparent 32%,var(--orb-b) 53%,transparent 64%,var(--orb-c) 78%,transparent 88%); mask:radial-gradient(transparent 68.6%,#000 69%,#000 69.3%,transparent 69.8%); }
+.archive-orbit { position:absolute; width:79%; aspect-ratio:1; top:6%; left:11%; border-radius:50%; z-index:-1; pointer-events:none; opacity:var(--orb-opacity); background:conic-gradient(from 20deg,transparent 15%,var(--orb-a) 22%,transparent 32%,var(--orb-b) 53%,transparent 64%,var(--orb-c) 78%,transparent 88%); mask:radial-gradient(transparent 68.6%,#000 69%,#000 69.3%,transparent 69.8%); }
 .archive-footnote { position:relative; min-height:67px; margin:3px 10px 3px 12px; }
 .archive-story { display:grid; grid-template-columns:max-content minmax(0,1fr) 16px; align-items:start; gap:10px; padding:9px 0 10px; min-height:44px; color:var(--muted); font-size:12px; line-height:1.85; background-image:none!important; }
 .archive-story time { font-family:Outfit,sans-serif; color:var(--accent); font-weight:500; letter-spacing:.025em; }

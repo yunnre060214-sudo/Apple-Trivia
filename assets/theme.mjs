@@ -26,11 +26,7 @@ export function createThemeSurface({document, window, theme}) {
     node.removeAttribute('aria-labelledby');
     node.removeAttribute('aria-describedby');
     if (node.matches('a,button,input,select,textarea,[tabindex]')) node.setAttribute('tabindex','-1');
-    // Animations are decoration, not a reason for a wave to jump to a new pose.
-    if (originals[i]?.matches('.hero-title-line,.hero-title-apple,.hero-actions,.archive,.archive-object img,.home-aurora,.home-ribbon,.archive-orbit,.topic-section')) {
-      const style = window.getComputedStyle(originals[i]);
-      for (const key of ['transform','translate','rotate','scale','opacity','filter','clip-path','background-position']) copyStyle(node,style,key);
-    }
+
   });
   copy.querySelectorAll('script,dialog,[data-theme-copy-id="toast"],[data-theme-copy-id="celebration"]').forEach(node => node.remove());
   copy.classList.add('theme-page-copy');
@@ -40,13 +36,23 @@ export function createThemeSurface({document, window, theme}) {
   copy.style.width = `${document.documentElement.clientWidth || window.innerWidth}px`;
   surface.append(copy);
   document.body.append(surface);
-  // cloneNode does not copy scroll offsets or changed form-control properties.
-  originals.forEach((node, i) => {
-    if (!copies[i].isConnected) return;
-    copies[i].scrollLeft = node.scrollLeft;
-    copies[i].scrollTop = node.scrollTop;
-    if ('value' in node) copies[i].value = node.value;
-    if ('checked' in node) copies[i].checked = node.checked;
+  // Read only the few animated poses and the scrolling rail, rather than
+  // forcing layout reads for every descendant on every rapid click.
+  const poses='.hero-title-line,.hero-title-apple,.hero-actions,.archive,.archive-layer.is-active .archive-object img';
+  const originalPoses=[...source.querySelectorAll(poses)];
+  const copyPoses=[...copy.querySelectorAll(poses)];
+  originalPoses.forEach((node,i)=>{
+    const style=window.getComputedStyle(node);
+    for(const key of ['transform','translate','rotate','scale','opacity','clip-path']) copyStyle(copyPoses[i],style,key);
+  });
+  const originalRails=[...source.querySelectorAll('.archive-select,textarea')];
+  copy.querySelectorAll('.archive-select,textarea').forEach((node,i)=>{
+    node.scrollLeft=originalRails[i].scrollLeft; node.scrollTop=originalRails[i].scrollTop;
+  });
+  originals.forEach((node,i)=>{
+    if (!copies[i].isConnected || !node.matches('input,select,textarea')) return;
+    copies[i].value=node.value;
+    if ('checked' in node) copies[i].checked=node.checked;
   });
   return surface;
 }
@@ -104,6 +110,8 @@ export function createThemeSwitcher({document, window, applyTheme, saveTheme, co
           const before = surfaces.slice(0,surfaces.indexOf(wave));
           before.forEach(remove);
           if (token === revision) {
+            active.forEach(earlier=>{window.clearTimeout(earlier.timer);earlier.animation.cancel();earlier.resolve(true);});
+            active.clear();
             surfaces.forEach(surface => surface.remove()); surfaces = [];
             root.classList.remove('theme-revealing');
             delete root.dataset.themeWaves;

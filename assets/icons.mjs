@@ -1,4 +1,4 @@
-import {APPLE_PATH} from './brand.mjs?v=3.3.0';
+import {APPLE_PATH} from './brand.mjs?v=3.3.1';
 const paths = {
  arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>',back:'<path d="M19 12H5m6-6-6 6 6 6"/>',
  shuffle:'<path d="M3 7h3c5 0 7 10 12 10h3m-4-4 4 4-4 4M3 17h3c2 0 3-2 4-4m3-2c1-2 3-4 5-4h3m-4-4 4 4-4 4"/>',
