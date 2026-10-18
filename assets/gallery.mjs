@@ -1,19 +1,12 @@
 // Original vector studies of nine Apple silhouettes. No external assets.
-export const devices = [
-  {id:'mac', name:'Macintosh', year:'1984', image:'macintosh.svg'},
-  {id:'imac', name:'iMac G3', year:'1998', image:'imac-g3.svg'},
-  {id:'ipod', name:'iPod', year:'2004', image:'ipod.svg'},
-  {id:'iphone', name:'iPhone', year:'2007', image:'iphone.svg'},
-  {id:'macbook', name:'MacBook Air', year:'2008', image:'macbook-air.svg'},
-  {id:'ipad', name:'iPad', year:'2010', image:'ipad.svg'},
-  {id:'watch', name:'Apple Watch', year:'2015', image:'apple-watch.svg'},
-  {id:'airpods', name:'AirPods', year:'2016', image:'airpods.svg'},
-  {id:'vision', name:'Vision Pro', year:'2024', image:'vision-pro.svg'},
-];
+import {devices} from './gallery-data.mjs?v=3.3.0';
+export {devices};
 
 export function archiveMarkup(version) {
   const arrow = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  return `<figure class="archive" aria-label="Apple 经典产品"><div class="archive-stage">${devices.map((d,i)=>`<div class="archive-layer ${i===0?'is-active':''}" data-archive-layer="${d.id}" aria-hidden="true"><span class="archive-year">${d.year}</span><div class="archive-object"><img src="./assets/${d.image}?v=${version}" width="480" height="440" alt="" draggable="false" decoding="async" fetchpriority="${i===0?'high':'low'}"></div></div>`).join('')}</div><div class="archive-controls"><button type="button" class="archive-arrow" data-archive-step="-1" aria-label="上一款产品">${arrow}</button><div class="archive-select" role="group" aria-label="切换展陈产品，可横向滑动"><div class="archive-select-track">${devices.map((d,i)=>`<button type="button" data-device="${d.id}" aria-pressed="${i===0}"><span>${d.name}</span></button>`).join('')}<i class="archive-indicator" aria-hidden="true"></i></div></div><button type="button" class="archive-arrow" data-archive-step="1" aria-label="下一款产品">${arrow}</button><button type="button" class="archive-playback" data-archive-playback aria-label="暂停自动切换" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path class="archive-pause-icon" d="M7 5v10m6-10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="archive-play-icon" d="m7 4 8 6-8 6V4Z" fill="currentColor"/></svg></button></div><figcaption class="sr-only" aria-live="polite" data-archive-caption>Macintosh，1984 年</figcaption></figure>`;
+  const first = devices[0];
+  const link = d => `#q=${d.question.id}`;
+  return `<figure class="archive" aria-label="Apple 经典产品"><div class="archive-stage"><a class="archive-year" data-archive-year data-gallery-question="${first.question.id}" href="${link(first)}" aria-label="${first.year} 年，进入 ${first.name} 的画廊考点">${first.year}<svg class="archive-year-corner" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12" stroke="currentColor" stroke-width="1.5"/></svg></a><span class="archive-orbit" aria-hidden="true"></span>${devices.map((d,i)=>`<div class="archive-layer ${i===0?'is-active':''}" data-archive-layer="${d.id}" aria-hidden="true"><div class="archive-object"><img src="./assets/${d.image}?v=${version}" width="480" height="440" alt="" draggable="false" decoding="async" fetchpriority="${i===0?'high':'low'}"></div></div>`).join('')}</div><figcaption class="archive-footnote"><a class="archive-story" data-archive-story-link data-gallery-question="${first.question.id}" href="${link(first)}"><time data-archive-date datetime="${first.iso}">${first.date}</time><span data-archive-story>${first.story}</span><span class="archive-story-arrow" aria-hidden="true">↗</span></a></figcaption><div class="archive-controls"><button type="button" class="archive-arrow" data-archive-step="-1" aria-label="上一款产品">${arrow}</button><div class="archive-select" role="group" aria-label="切换展陈产品，可横向滑动"><div class="archive-select-track">${devices.map((d,i)=>`<button type="button" data-device="${d.id}" aria-pressed="${i===0}"><span>${d.name}</span></button>`).join('')}<i class="archive-indicator" aria-hidden="true"></i></div></div><button type="button" class="archive-arrow" data-archive-step="1" aria-label="下一款产品">${arrow}</button><button type="button" class="archive-playback" data-archive-playback aria-label="暂停自动切换" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path class="archive-pause-icon" d="M7 5v10m6-10v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="archive-play-icon" d="m7 4 8 6-8 6V4Z" fill="currentColor"/></svg></button></div><span class="sr-only" aria-live="polite" data-archive-caption>Macintosh，1984 年</span></figure>`;
 }
 
 export function mountArchive(figure, {reducedMotion = () => false, setTimer = setTimeout, clearTimer = clearTimeout, interval = 5000} = {}) {
@@ -88,6 +81,19 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
     // Automatic updates stay quiet for screen readers.
     caption.setAttribute?.('aria-live', manual ? 'polite' : 'off');
     caption.textContent = `${item.name}，${item.year} 年`;
+    const year = figure.querySelector('[data-archive-year]');
+    const date = figure.querySelector('[data-archive-date]');
+    const story = figure.querySelector('[data-archive-story]');
+    if (year) {
+      year.firstChild.textContent = item.year;
+      year.setAttribute('aria-label', `${item.year} 年，进入 ${item.name} 的画廊考点`);
+      date.textContent = item.date; date.setAttribute('datetime', item.iso);
+      story.textContent = item.story;
+      figure.querySelectorAll('[data-gallery-question]').forEach(link => {
+        link.dataset.galleryQuestion = item.question.id;
+        link.setAttribute('href', `#q=${item.question.id}`);
+      });
+    }
     positionIndicator();
     // Scroll this rail only. scrollIntoView could also move the whole page.
     const bounds = rail.getBoundingClientRect(), target = button.getBoundingClientRect();

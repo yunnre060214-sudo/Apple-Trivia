@@ -2,110 +2,91 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createThemeSwitcher,setBrowserTheme} from '../assets/theme.mjs';
 
-function fixture({theme='light', supported=true, reduce=false, width=390, height=844, snapshotWidth=width, snapshotHeight=height, bounds={left:320,top:18,width:44,height:44}, fail, defer=false}={}) {
-  const values=new Map(), classes=new Set(), applied=[], saved=[], committed=[];
-  const root={dataset:{theme,browserTheme:theme},style:{setProperty:(k,v)=>values.set(k,v),removeProperty:k=>values.delete(k)},classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}};
-  let skipCount=0, captures=0;
-  const transitions=[];
-  const meta={content:theme==='dark'?'#101216':'#f5f4f0'};
-  const document={documentElement:root,querySelector:()=>meta};
-  if(supported)document.startViewTransition=update=>{
-    captures++;
-    if(fail==='start')throw Error('unavailable');
-    let finish;
-    const finished=new Promise(resolve=>{finish=resolve;});
-    if(!defer)update();
-    const transition={update,finish,ready:fail==='ready'?Promise.reject(Error('skipped')):Promise.resolve(),finished,skipTransition(){skipCount++;finish();}};
-    transitions.push(transition);
-    return transition;
+function fixture({theme='light',reduce=false,supported=true,fail=false,width=390,height=844}={}) {
+  const classes=new Set(),saved=[],committed=[],surfaces=[],animations=[],timers=new Map(),events=new Map(),windowEvents=new Map();
+  let timerId=0;
+  const root={dataset:{theme,browserTheme:theme},clientWidth:width,clientHeight:height,classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}};
+  const document={documentElement:root,createElement:()=>({animate:supported?()=>{}:undefined}),addEventListener:(k,v)=>events.set(k,v),removeEventListener:k=>events.delete(k)};
+  const window={innerWidth:width,innerHeight:height,visualViewport:{width,height},setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id),addEventListener:(k,v)=>windowEvents.set(k,v),removeEventListener:k=>windowEvents.delete(k)};
+  const createSurface=({theme})=>{
+    if(fail)throw Error('no snapshot');
+    const surface={theme,removed:false,style:{},classList:{add(){}},remove(){this.removed=true;},animate(keyframes,options){
+      let finish,reject;
+      const animation={finished:new Promise((yes,no)=>{finish=yes;reject=no;}),finish:()=>finish(),cancel:()=>{animation.cancelled=true;reject(Error('cancelled'));},keyframes,options};
+      animations.push(animation);return animation;
+    }};
+    surfaces.push(surface);return surface;
   };
-  const window={innerWidth:width,innerHeight:height,getComputedStyle:(_,pseudo)=>pseudo?{width:`${snapshotWidth}px`,height:`${snapshotHeight}px`}:{getPropertyValue:()=>root.dataset.theme==='dark'?'#101216':'#f5f4f0'}};
-  const switchTheme=createThemeSwitcher({document,window,applyTheme:v=>{root.dataset.theme=v;applied.push(v);},saveTheme:v=>saved.push(v),commitTheme:v=>{setBrowserTheme(document,v);committed.push(v);},reducedMotion:()=>reduce});
-  return {switchTheme,button:{getBoundingClientRect:()=>bounds},root,meta,values,classes,applied,saved,committed,transitions,finish:()=>transitions.at(-1).finish(),get skips(){return skipCount;},get captures(){return captures;}};
+  const switchTheme=createThemeSwitcher({document,window,createSurface,applyTheme:v=>root.dataset.theme=v,saveTheme:v=>saved.push(v),commitTheme:v=>{root.dataset.browserTheme=v;committed.push(v);},reducedMotion:()=>reduce});
+  return {root,classes,saved,committed,surfaces,animations,timers,events,windowEvents,window,switchTheme,button:{getBoundingClientRect:()=>({left:320,top:18,width:44,height:44})}};
 }
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
 
-test('both appearance directions reveal from the button center and cover every viewport corner',async()=>{
-  for(const theme of ['light','dark'])for(const geometry of [
-    {width:390,height:844,bounds:{left:320,top:18,width:44,height:44}},
-    {width:1440,height:900,bounds:{left:1236,top:26,width:44,height:44}},
-    {width:844,height:390,bounds:{left:760,top:12,width:44,height:44}},
-  ]) {
-    const f=fixture({theme,...geometry});const pending=f.switchTheme(f.button);await Promise.resolve();
-    const x=parseFloat(f.values.get('--theme-reveal-x')),y=parseFloat(f.values.get('--theme-reveal-y')),r=parseFloat(f.values.get('--theme-reveal-radius'));
-    assert.equal(x,geometry.bounds.left+22);assert.equal(y,geometry.bounds.top+22);
-    for(const [cx,cy] of [[0,0],[geometry.width,0],[0,geometry.height],[geometry.width,geometry.height]])assert.ok(r>Math.hypot(cx-x,cy-y));
-    assert.equal(f.root.dataset.theme,theme==='dark'?'light':'dark');assert.equal(f.classes.has('theme-revealing'),true);
-    f.finish();assert.equal(await pending,true);assert.equal(f.values.size,0);assert.equal(f.classes.size,0);assert.equal(f.saved.length,1);
-  }
-});
-test('every rapid click reverses direction and superseded finalizers leave the current reveal intact',async()=>{
-  const f=fixture(),requests=[];
-  for(let i=0;i<8;i++)requests.push(f.switchTheme(f.button));
-  await Promise.resolve();await Promise.resolve();
-  assert.equal(f.captures,8);assert.equal(f.skips,7);
-  assert.deepEqual(f.saved,['dark','light','dark','light','dark','light','dark','light']);
-  assert.equal(f.classes.has('theme-revealing'),true);assert.equal(f.committed.length,0);
-  assert.equal(f.root.dataset.theme,'light');f.finish();
-  assert.ok((await Promise.all(requests)).every(Boolean));
-  assert.deepEqual(f.committed,['light']);assert.equal(f.values.size,0);assert.equal(f.classes.size,0);
-});
-test('clicks before capture callbacks run preserve click parity and discard stale updates',async()=>{
-  for(const count of [2,3,16,17]) {
-    const f=fixture({defer:true}),requests=[];
+test('each of 3, 5 and 20 immediate clicks starts an independent wave without cancelling previous waves',async()=>{
+  for(const count of [3,5,20]) {
+    const f=fixture(),requests=[];
     for(let i=0;i<count;i++)requests.push(f.switchTheme(f.button));
-    for(const transition of [...f.transitions].reverse())transition.update();
-    assert.deepEqual(f.saved,[count%2?'dark':'light']);
-    await Promise.resolve();f.finish();await Promise.all(requests);
-    assert.equal(f.root.dataset.theme,count%2?'dark':'light');
-    assert.equal(f.root.dataset.browserTheme,f.root.dataset.theme);assert.equal(f.values.size,0);
+    assert.equal(f.animations.length,count);assert.equal(f.surfaces.length,count+1);
+    assert.equal(f.root.dataset.themeWaves,String(count));assert.equal(f.root.dataset.theme,count%2?'dark':'light');
+    assert.equal(f.saved.length,count);assert.equal(f.committed.length,0);
+    assert.ok(f.animations.every(a=>!a.cancelled));
+    for(const animation of f.animations){animation.finish();await flush();}
+    assert.ok((await Promise.all(requests)).every(Boolean));
+    assert.ok(f.surfaces.every(s=>s.removed));assert.equal(f.timers.size,0);
+    assert.deepEqual(f.committed,[count%2?'dark':'light']);assert.equal(f.root.dataset.themeWaves,undefined);
   }
 });
-test('mobile toolbar areas remain covered when the snapshot exceeds the visible viewport',async()=>{
-  const f=fixture({width:390,height:680,snapshotWidth:390,snapshotHeight:844});
-  const pending=f.switchTheme(f.button);await Promise.resolve();
-  const x=parseFloat(f.values.get('--theme-reveal-x')),y=parseFloat(f.values.get('--theme-reveal-y')),r=parseFloat(f.values.get('--theme-reveal-radius'));
-  for(const [cx,cy] of [[0,844],[390,844]])assert.ok(r>Math.hypot(cx-x,cy-y));
-  f.finish();await pending;
+test('completed older waves form the solid floor under younger waves, and cannot erase them',async()=>{
+  const f=fixture();const a=f.switchTheme(f.button),b=f.switchTheme(f.button),c=f.switchTheme(f.button);
+  f.animations[0].finish();await a;
+  assert.equal(f.surfaces[0].removed,true);assert.equal(f.surfaces[1].removed,false);
+  assert.equal(f.surfaces[3].removed,false);assert.equal(f.classes.has('theme-revealing'),true);assert.equal(f.committed.length,0);
+  f.animations[1].finish();await b;
+  assert.equal(f.surfaces[1].removed,true);assert.equal(f.surfaces[2].removed,false);
+  f.animations[2].finish();await c;
+  assert.equal(f.classes.size,0);assert.deepEqual(f.committed,['dark']);
 });
-test('page appearance changes first while Safari backing and metadata remain old until completion',async()=>{
+test('the wave originates at the control and covers mobile, desktop and expanded toolbar areas',async()=>{
+  for(const [width,height] of [[390,844],[1440,900],[844,390]]) {
+    const f=fixture({width,height});f.window.visualViewport.height=height+100;
+    const pending=f.switchTheme(f.button),[from,to]=f.animations[0].keyframes;
+    const [r,x,y]=[...to.clipPath.matchAll(/([\d.]+)px/g)].map(m=>Number(m[1]));
+    assert.equal(from.clipPath,'circle(0px at 342px 40px)');assert.equal(x,342);assert.equal(y,40);
+    for(const [cx,cy] of [[0,0],[width,0],[0,height+100],[width,height+100]])assert.ok(r>Math.hypot(cx-x,cy-y));
+    f.animations[0].finish();await pending;
+  }
+});
+test('Safari backing stays old through mixed waves and commits only the final appearance',async()=>{
   for(const theme of ['light','dark']) {
-    const f=fixture({theme}),pending=f.switchTheme(f.button);await Promise.resolve();
-    assert.equal(f.values.get('--theme-reveal-backdrop'),theme==='dark'?'#101216':'#f5f4f0');
-    assert.notEqual(f.root.dataset.theme,theme);assert.deepEqual(f.committed,[]);
-    assert.equal(f.root.dataset.browserTheme,theme);
-    assert.equal(f.meta.content,theme==='dark'?'#101216':'#f5f4f0');
-    f.finish();await pending;assert.deepEqual(f.committed,[theme==='dark'?'light':'dark']);
-    assert.equal(f.root.dataset.browserTheme,f.root.dataset.theme);
-    assert.equal(f.meta.content,theme==='dark'?'#f5f4f0':'#101216');
-    assert.equal(f.values.size,0);
+    const f=fixture({theme}),a=f.switchTheme(f.button),b=f.switchTheme(f.button);
+    assert.equal(f.root.dataset.browserTheme,theme);assert.equal(f.committed.length,0);
+    f.animations[0].finish();await a;assert.equal(f.committed.length,0);
+    f.animations[1].finish();await b;assert.deepEqual(f.committed,[theme]);
   }
 });
-test('unsupported browsers and reduced motion still switch and save the appearance once',async()=>{
-  for(const options of [{supported:false},{reduce:true}]) {
+test('reduced motion, unsupported animations and failed copies still switch and save immediately',async()=>{
+  for(const options of [{reduce:true},{supported:false},{fail:true}]) {
     const f=fixture(options);assert.equal(await f.switchTheme(f.button),true);
-    assert.deepEqual(f.applied,['dark']);assert.deepEqual(f.saved,['dark']);assert.equal(f.captures,0);assert.equal(f.classes.size,0);
-    assert.deepEqual(f.committed,['dark']);
-    assert.equal(f.root.dataset.browserTheme,'dark');assert.equal(f.meta.content,'#101216');
-  }
-});
-test('failed or skipped captures apply the appearance without leaving an overlay or lock',async()=>{
-  for(const fail of ['start','ready']) {
-    const f=fixture({fail});assert.equal(await f.switchTheme(f.button),true);
-    assert.deepEqual(f.applied,['dark']);assert.deepEqual(f.saved,['dark']);assert.equal(f.values.size,0);assert.equal(f.classes.size,0);
-    assert.equal(f.root.dataset.browserTheme,'dark');assert.equal(f.meta.content,'#101216');
+    assert.deepEqual(f.saved,['dark']);assert.deepEqual(f.committed,['dark']);assert.equal(f.classes.size,0);assert.equal(f.animations.length,0);
     await f.switchTheme(f.button);assert.equal(f.root.dataset.theme,'light');
-    assert.equal(f.root.dataset.browserTheme,'light');assert.equal(f.meta.content,'#f5f4f0');
   }
 });
-test('an external appearance change during capture commits the latest page state',async()=>{
-  const f=fixture(),pending=f.switchTheme(f.button);await Promise.resolve();
-  assert.equal(f.root.dataset.theme,'dark');assert.equal(f.root.dataset.browserTheme,'light');
-  f.root.dataset.theme='light';
-  f.finish();await pending;
-  assert.deepEqual(f.committed,['light']);assert.equal(f.root.dataset.browserTheme,'light');assert.equal(f.meta.content,'#f5f4f0');
+test('scroll, resize, pagehide and another action settle visual copies without delaying navigation',async()=>{
+  for(const event of ['scroll','resize','pagehide','action']) {
+    const f=fixture(),a=f.switchTheme(f.button),b=f.switchTheme(f.button);
+    if(event==='action')f.events.get('click')({target:{closest:()=>null}});else f.windowEvents.get(event)();
+    await Promise.all([a,b]);assert.equal(f.timers.size,0);assert.equal(f.classes.size,0);assert.ok(f.surfaces.every(s=>s.removed));
+    assert.deepEqual(f.committed,['light']);f.switchTheme.dispose();assert.equal(f.events.size,0);assert.equal(f.windowEvents.size,0);
+  }
 });
-test('browser-theme synchronization tolerates a missing theme-color meta element',()=>{
-  const document={documentElement:{dataset:{}},querySelector:()=>null};
-  setBrowserTheme(document,'dark');assert.equal(document.documentElement.dataset.browserTheme,'dark');
-  setBrowserTheme(document,'unknown');assert.equal(document.documentElement.dataset.browserTheme,'light');
+test('animation timeout cleanup cannot leave a persistent visual curtain',async()=>{
+  const f=fixture(),pending=f.switchTheme(f.button);
+  [...f.timers.values()].forEach(fn=>fn());await pending;
+  assert.ok(f.surfaces.every(s=>s.removed));assert.equal(f.root.dataset.themeWaves,undefined);assert.equal(f.timers.size,0);
+});
+test('browser backing and theme-color use the independent night palette',()=>{
+  const meta={content:''},doc={documentElement:{dataset:{}},querySelector:()=>meta};
+  setBrowserTheme(doc,'dark');assert.equal(meta.content,'#080d1b');assert.equal(doc.documentElement.dataset.browserTheme,'dark');
+  setBrowserTheme(doc,'light');assert.equal(meta.content,'#f5f4f0');
+  setBrowserTheme({documentElement:{dataset:{}},querySelector:()=>null},'dark');
 });

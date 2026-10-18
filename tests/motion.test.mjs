@@ -117,7 +117,7 @@ test('styles constrain hover effects to fine pointers and include a reduced-moti
   const css=await readFile(new URL('../assets/motion.css',import.meta.url),'utf8');
   assert.match(css,/@media \(hover:hover\) and \(pointer:fine\)/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
   assert.match(css,/motion-arrow-back/);assert.match(css,/motion-download/);assert.match(css,/motion-copy-stack/);
-  const [interaction,ambient]=css.split('/* Quiet home loops');
+  const interaction=css,ambient=await readFile(new URL('../assets/home.css',import.meta.url),'utf8');
   assert.doesNotMatch(interaction,/animation:[^;]+infinite/);
   assert.match(ambient,/@media \(prefers-reduced-motion:no-preference\)/);
 });

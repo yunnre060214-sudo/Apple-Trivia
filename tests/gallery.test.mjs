@@ -15,7 +15,9 @@ test('gallery includes nine chronological, locally drawn product studies', async
   const html = archiveMarkup('test');
   assert.equal((html.match(/data-device=/g) || []).length, 9);
   assert.equal((html.match(/aria-pressed="true"/g) || []).length, 1);
-  assert.equal((html.match(/aria-hidden="true"><span class="archive-year"/g) || []).length, 9);
+  assert.equal((html.match(/data-archive-layer=/g) || []).length, 9);
+  assert.equal((html.match(/data-gallery-question=/g) || []).length, 2);
+  assert.match(html, /href="#q=gallery-mac-memory"/);
   assert.match(html, /data-archive-step="-1" aria-label="上一款产品"/);
   assert.match(html, /data-archive-step="1" aria-label="下一款产品"/);
   assert.match(html, /aria-live="polite"/);
@@ -50,6 +52,9 @@ function fixture() {
   };
   const indicator = {style:{setProperty:(key,value) => values.set(key,value)}};
   const playback = {attributes:new Map(), setAttribute(key,value) { this.attributes.set(key,value); }};
+  const storyLink={dataset:{},setAttribute(){}};
+  const year={dataset:{},firstChild:{textContent:'1984'},setAttribute(){}};
+  const date={setAttribute(){}},story={};
   const documentEvents = new Map(), rootClasses = new Set();
   const doc = {hidden:false, documentElement:{classList:{contains:name => rootClasses.has(name)}},
     querySelector:() => null,
@@ -76,8 +81,8 @@ function fixture() {
   const figure = {
     isConnected:true, ownerDocument:doc, dataset:{},
     contains:target => buttons.includes(target),
-    querySelectorAll:selector => selector === '[data-device]' ? buttons : layers,
-    querySelector:selector => ({'.archive-select':rail,'.archive-indicator':indicator,'[data-archive-playback]':playback}[selector] || caption),
+    querySelectorAll:selector => ({'[data-device]':buttons,'[data-archive-layer]':layers,'[data-gallery-question]':[year,storyLink]}[selector] || []),
+    querySelector:selector => ({'.archive-select':rail,'.archive-indicator':indicator,'[data-archive-playback]':playback,'[data-archive-caption]':caption,'[data-archive-year]':year,'[data-archive-date]':date,'[data-archive-story]':story}[selector] || null),
     addEventListener:(type, fn) => listeners.set(type, fn),
     removeEventListener:(type, fn) => { if (listeners.get(type) === fn) listeners.delete(type); },
   };
@@ -88,7 +93,7 @@ function fixture() {
     listeners.get('keydown')({target:buttons.find(b => b.dataset.device === id), key:name, preventDefault:() => { prevented = true; }, ...modifiers});
     return prevented;
   };
-  return {figure, buttons, layers, rail, caption, focus, scrolls, listeners, click, step, key, values, clock, advance, scheduled, playback, doc, documentEvents, rootClasses};
+  return {figure, buttons, layers, rail, caption, focus, scrolls, listeners, click, step, key, values, clock, advance, scheduled, playback, year, date, story, storyLink, doc, documentEvents, rootClasses};
 }
 
 test('gallery arrows wrap, keys retain focus, and scrolling is confined to the product rail', () => {
@@ -147,6 +152,8 @@ test('autoplay wraps, manual selection resets its interval, and one indicator fo
     assert.equal(f.scheduled.size,1);f.advance(4999);assert.equal(active(),'mac');
     f.advance(1);assert.equal(active(),'imac');assert.equal(f.values.get('--indicator-x'),'122px');
     f.advance(2500);f.click(f.buttons[7]);assert.equal(active(),'airpods');
+    assert.equal(f.year.firstChild.textContent,'2016');assert.equal(f.date.textContent,'2016.9.7');
+    assert.equal(f.storyLink.dataset.galleryQuestion,'gallery-airpods-w1');
     f.advance(4999);assert.equal(active(),'airpods');f.advance(1);assert.equal(active(),'vision');
     f.advance(5000);assert.equal(active(),'mac');assert.equal(f.values.get('--indicator-x'),'30px');
     cleanup();assert.equal(f.scheduled.size,0);assert.equal(f.listeners.size,0);assert.equal(f.documentEvents.size,0);
