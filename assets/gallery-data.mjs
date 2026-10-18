@@ -1,0 +1,23 @@
+// The exhibit, its footnote and its question share one stable identity.
+const news = path => `https://www.apple.com/newsroom/${path}/`;
+export const devices = [
+  {id:'mac', name:'Macintosh', year:'1984', image:'macintosh.svg', date:'1984.1.24', iso:'1984-01-24', story:'整台 Macintosh，只有 128 KB 内存。', question:{
+    id:'gallery-mac-memory', category:'mac', prompt:'画廊里这台 Macintosh 128K，名字中的「128K」指什么？', answer:'128 KB 内存', wrong:['128 GB 硬盘','128 万像素摄像头','128 核处理器'], explanation:'1984 年 1 月 24 日推出的 Macintosh 配备 128 KB RAM。名字中的 128K 指内存容量，机身内置的是软盘驱动器，并没有 128 GB 硬盘。', sources:['https://support.apple.com/en-us/112190']}},
+  {id:'imac', name:'iMac G3', year:'1998', image:'imac-g3.svg', date:'1998.8.15', iso:'1998-08-15', story:'透明外壳里，找不到软盘驱动器。', question:{
+    id:'gallery-imac-floppy', category:'mac', prompt:'这台邦迪蓝 iMac G3，舍去了当时电脑上哪种常见设备？', answer:'软盘驱动器', wrong:['内置显示器','键盘和鼠标','以太网接口'], explanation:'1998 年上市的初代 iMac 有 G3 处理器、内置 CRT 显示器、USB 与以太网，却取消了软盘驱动器。Apple 的原始技术规格在 Floppy 一栏标注为 none。', sources:['https://support.apple.com/en-us/112281']}},
+  {id:'ipod', name:'iPod', year:'2004', image:'ipod.svg', date:'2004.7.19', iso:'2004-07-19', story:'滚动与五个按键，合成一只 Click Wheel。', question:{
+    id:'gallery-ipod-wheel', category:'audio', prompt:'2004 年第四代 iPod 的 Click Wheel，将哪两种操作合在一起？', answer:'触摸滚动与实体按键', wrong:['面容识别与手势追踪','手写输入与激光投影','声纹识别与键盘输入'], explanation:'第四代 iPod 于 2004 年 7 月 19 日发布。Click Wheel 把触敏滚动与五个按键结合起来，便于单手操作；这项设计此前也已用于 iPod mini。', sources:[news('2004/07/19Apple-Introduces-the-New-iPod')]}},
+  {id:'iphone', name:'iPhone', year:'2007', image:'iphone.svg', date:'2007.1.9', iso:'2007-01-09', story:'三种产品，最后变成了同一台 iPhone。', question:{
+    id:'gallery-iphone-three', category:'iphone', prompt:'2007 年初代 iPhone 的「三合一」，指的是哪组三种身份？', answer:'宽屏 iPod、手机、互联网通信设备', wrong:['相机、打印机、游戏主机','平板、笔记本、台式电脑','手表、音箱、电视'], explanation:'乔布斯在 2007 年 1 月 9 日的发布演示中，先分别介绍宽屏触控 iPod、手机和互联网通信设备，再揭晓它们是同一台 iPhone。', sources:[news('2007/01/09Apple-Reinvents-the-Phone-with-iPhone')]}},
+  {id:'macbook', name:'MacBook Air', year:'2008', image:'macbook-air.svg', date:'2008.1.15', iso:'2008-01-15', story:'它从一个牛皮纸信封里被抽出来。', question:{
+    id:'gallery-macbook-envelope', category:'mac', prompt:'初代 MacBook Air 发布时，乔布斯从什么里面拿出了这台电脑？', answer:'牛皮纸办公信封', wrong:['玻璃展示箱','铝合金旅行箱','衬衫胸前口袋'], explanation:'2008 年 1 月 15 日，乔布斯从一个牛皮纸办公信封中取出初代 MacBook Air，以直观的舞台演示展示机身的纤薄。Apple 当时的新闻稿给出的机身厚度为 0.16 至 0.76 英寸。', sources:[news('2008/01/15Apple-Introduces-MacBook-Air-The-Worlds-Thinnest-Notebook'),'https://www.macrumors.com/2008/01/15/apple-announces-macbook-air/']}},
+  {id:'ipad', name:'iPad', year:'2010', image:'ipad.svg', date:'2010.1.27', iso:'2010-01-27', story:'Apple 自己设计的 A4，先装进了 iPad。', question:{
+    id:'gallery-ipad-a4', category:'ipad', prompt:'第一代 iPad 在 2010 年亮相时，搭载的是哪款 Apple 芯片？', answer:'A4', wrong:['M1','A17 Pro','S9'], explanation:'2010 年 1 月 27 日发布的第一代 iPad 使用 Apple 设计的 A4 芯片。iPhone 4 后来也采用 A4，M1 则到 2020 年才出现。', sources:[news('2010/01/27Apple-Launches-iPad')]}},
+  {id:'watch', name:'Apple Watch', year:'2015', image:'apple-watch.svg', date:'2015.4.24', iso:'2015-04-24', story:'三只彩色圆环，开始记录每一天。', question:{
+    id:'gallery-watch-rings', category:'watch', prompt:'初代 Apple Watch 的三个健身圆环，分别记录什么？', answer:'活动能量、锻炼、站立', wrong:['睡眠、血糖、血压','来电、短信、邮件','步数、海拔、水深'], explanation:'初代 Apple Watch 于 2015 年 4 月 24 日在首批市场开售。Activity 的三环分别对应活动消耗的能量、锻炼时间与站立活动，帮助用户了解全天活动情况。', sources:[news('2015/03/09Apple-Watch-Available-in-Nine-Countries-on-April-24')]}},
+  {id:'airpods', name:'AirPods', year:'2016', image:'airpods.svg', date:'2016.9.7', iso:'2016-09-07', story:'打开盒盖，轻点一下，就能开始配对。', question:{
+    id:'gallery-airpods-w1', category:'audio', prompt:'为第一代 AirPods 的轻点配对与无线体验提供支持的芯片叫什么？', answer:'W1', wrong:['M1 Max','A4','S10'], explanation:'2016 年 9 月 7 日发布的第一代 AirPods 使用 Apple W1 芯片，配合充电盒与软件，实现简便的设置、无线连接及省电体验。', sources:[news('2016/09/apple-reinvents-the-wireless-headphones-with-airpods')]}},
+  {id:'vision', name:'Vision Pro', year:'2024', image:'vision-pro.svg', date:'2024.2.2', iso:'2024-02-02', story:'在美国开卖，用眼睛、双手和声音来操控。', question:{
+    id:'gallery-vision-input', category:'ecosystem', prompt:'Apple Vision Pro 在 2024 年首次开售时，主要用什么与界面交互？', answer:'眼睛、双手和声音', wrong:['必须握住两只游戏手柄','只用触控笔点按镜片','只能使用实体鼠标'], explanation:'Vision Pro 于 2024 年 2 月 2 日在美国开售。visionOS 的主要输入是眼睛、双手和声音，可以看向目标、轻点手指、用手势滚动或使用语音。', sources:[news('2024/01/apple-vision-pro-available-in-the-us-on-february-2')]}},
+];
+export const galleryQuestions = devices.map(({name,question}) => ({...question, difficulty:'easy', kind:'trivia', topic:'stories', family:question.id, tag:`画廊 · ${name}`, options:[question.answer,...question.wrong]}));

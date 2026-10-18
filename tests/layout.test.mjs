@@ -21,12 +21,12 @@ test('Safari canvas uses committed browser state while the captured page uses th
   const rule = selector => css.slice(css.indexOf(`${selector} {`) + selector.length + 2).split('}')[0];
   assert.match(rule(':root'), /color-scheme:light;/);
   assert.match(rule(':root'), /--browser-bg:#f5f4f0;/);
-  assert.match(rule(':root[data-browser-theme=dark]'), /color-scheme:dark; --browser-bg:#101216;/);
+  assert.match(rule(':root[data-browser-theme=dark]'), /color-scheme:dark; --browser-bg:#080d1b;/);
   for (const selector of ['html','body']) {
     assert.match(rule(selector), /background:var\(--browser-bg\);/);
     assert.doesNotMatch(rule(selector), /background:var\(--bg\);/);
   }
-  assert.match(rule('#site-content'), /background:var\(--bg\); color-scheme:var\(--page-scheme\);/);
+  assert.match(rule(':is(#site-content,[data-theme-copy-id=site-content])'), /background:var\(--bg\); color-scheme:var\(--page-scheme\);/);
   assert.match(rule('[data-theme=dark]'), /--page-scheme:dark;/);
   assert.doesNotMatch(rule('[data-theme=dark]'), /(?:^|[;\s])color-scheme:/);
   const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');

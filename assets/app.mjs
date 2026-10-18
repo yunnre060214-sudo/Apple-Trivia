@@ -1,10 +1,11 @@
-import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.2.0';
-import {icon} from './icons.mjs?v=3.2.0';
-import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.2.0';
-import {replayHello} from './hello.mjs?v=3.2.0';
-import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.2.0';
-import {SITE_URL,shareText,createShareCard,downloadBlob,resultPalette} from './share.mjs?v=3.2.0';
-import {createInteractionMotion} from './motion.mjs?v=3.2.0';
+import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.3.0';
+import {icon} from './icons.mjs?v=3.3.0';
+import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.3.0';
+import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.3.0';
+import {replayHello} from './hello.mjs?v=3.3.0';
+import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.3.0';
+import {SITE_URL,shareText,createShareCard,downloadBlob,resultPalette} from './share.mjs?v=3.3.0';
+import {createInteractionMotion} from './motion.mjs?v=3.3.0';
 const $=s=>document.querySelector(s), main=$('#main'), modal=$('#modal');
 const KEY='apple-quiz:v1:';
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -36,10 +37,13 @@ function visit(q){seen=updateRecent(seen,[q.id],Math.max(3000,Math.floor(bank.le
 function enter(next){disposeArchive();disposeArchive=()=>{};view=next;document.body.dataset.view=next;cancelAuto();clearInterval(clockTimer);if(!document.documentElement.classList.contains('hello-pending'))main.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 function animate(el,{x=0,y=8,duration=260}={}){if(!reduced())el?.animate([{opacity:0,transform:`translate(${x}px,${y}px)`},{opacity:1,transform:'translate(0,0)'}],{duration,easing:'cubic-bezier(.22,1,.36,1)'});}
 function home(){
+  if(location.hash.startsWith('#q='))history.replaceState(null,'',location.pathname+location.search);
   enter('home');if(shareUrl){URL.revokeObjectURL(shareUrl);shareUrl=null;}
   const saved=hydrateSession(read('session',null),bank);
-  main.innerHTML=`<section class="hero"><div class="hero-copy"><h1><span class="hero-title-line">你有多懂</span><span class="hero-title-apple">Apple?</span></h1><div class="hero-actions"><button class="primary-button hero-start" data-action="quick">${icon('shuffle')}<span>随机来 5 题</span><span class="button-disc">${icon('arrow')}</span></button><button class="custom-link" data-action="custom">自定义${icon('sliders')}</button></div>${saved?`<button class="resume-link" data-action="resume">${icon('history')}接着上次玩 · ${Object.keys(saved.answers).length}/${saved.questions.length} 题${icon('arrow')}</button>`:''}</div>${archiveMarkup(VERSION)}</section><section class="topic-section" aria-labelledby="topics-title"><div class="section-label"><h2 id="topics-title">分类挑战</h2><button class="bank-count" data-action="about" aria-label="关于题库，${bank.length} 题"><b>${bank.length.toLocaleString('en-US')}</b> 题${icon('external')}</button></div><div class="topic-grid">${[['surprise','反直觉','bulb'],['stories','产品历史','history'],['timeline','发布年份','clock']].map(([topic,label,symbol],i)=>`<button class="topic-link" data-topic="${topic}"><span class="topic-number" aria-hidden="true">0${i+1}</span><span class="topic-copy"><span class="topic-symbol">${icon(symbol)}</span><strong>${label}</strong></span>${icon('arrow','topic-arrow')}</button>`).join('')}</div></section>`;
-  disposeArchive=mountArchive($('.archive'),{reducedMotion:reduced});
+  main.innerHTML=`${atmosphereMarkup()}<section class="hero home-entry"><div class="hero-copy"><h1><span class="hero-title-line">你有多懂</span><span class="hero-title-apple">Apple?</span></h1><div class="hero-actions"><button class="primary-button hero-start" data-action="quick">${icon('shuffle')}<span>随机来 5 题</span><span class="button-disc">${icon('arrow')}</span></button><button class="custom-link" data-action="custom">自定义${icon('sliders')}</button></div>${saved?`<button class="resume-link" data-action="resume">${icon('history')}接着上次玩 · ${Object.keys(saved.answers).length}/${saved.questions.length} 题${icon('arrow')}</button>`:''}</div>${archiveMarkup(VERSION)}</section><section class="topic-section" aria-labelledby="topics-title"><div class="section-label"><h2 id="topics-title">分类挑战</h2><button class="bank-count" data-action="about" aria-label="关于题库，${bank.length} 题"><b>${bank.length.toLocaleString('en-US')}</b> 题${icon('external')}</button></div><div class="topic-grid">${[['surprise','反直觉','bulb'],['stories','产品历史','history'],['timeline','发布年份','clock']].map(([topic,label,symbol],i)=>`<button class="topic-link" data-topic="${topic}"><span class="topic-number" aria-hidden="true">0${i+1}</span><span class="topic-copy"><span class="topic-symbol">${icon(symbol)}</span><strong>${label}</strong></span>${icon('arrow','topic-arrow')}</button>`).join('')}</div></section>`;
+  const archiveCleanup=mountArchive($('.archive'),{reducedMotion:reduced});
+  const homeCleanup=mountHome(main,{document,window});
+  disposeArchive=()=>{archiveCleanup();homeCleanup();};
 }
 function custom(){
   dialog('自定义',`<form id="custom-form"><fieldset><legend>题数</legend><div class="segments counts">${[5,10,20,50,100,200,500].map(n=>`<button type="button" data-count="${n}" aria-pressed="${config.count===n}" class="${config.count===n?'selected':''}">${n}</button>`).join('')}</div><label class="custom-number">自定题数<input name="count" id="count-input" type="number" min="5" max="500" value="${config.count}" required inputmode="numeric"></label></fieldset><div class="form-row"><label>难度<select name="difficulty">${[['mixed','混合'],['easy','简单'],['medium','中等'],['hard','困难'],['expert','专家']].map(([v,t])=>`<option value="${v}" ${config.difficulty===v?'selected':''}>${t}</option>`).join('')}</select></label><label>玩法<select name="mode" id="mode-select">${[['quick','选完自动下一题'],['exam','自由切题，最后揭晓'],['practice','每题确认，随时看解析']].map(([v,t])=>`<option value="${v}" ${config.mode===v?'selected':''}>${t}</option>`).join('')}</select></label></div><fieldset><legend>领域<span class="muted">可多选</span></legend><div class="category-pills">${Object.entries(CATEGORIES).map(([id,c])=>`<label><input type="checkbox" name="category" value="${id}" ${config.categories.includes(id)?'checked':''}><span>${c.name}</span></label>`).join('')}</div></fieldset><label class="timer-setting" ${config.mode!=='exam'?'hidden':''}>限时<select name="timer">${[[0,'不限时'],[30,'总时间 = 题数 × 30 秒'],[60,'总时间 = 题数 × 60 秒'],[90,'总时间 = 题数 × 90 秒']].map(([v,t])=>`<option value="${v}" ${Number(config.secondsPerQuestion)===v?'selected':''}>${t}</option>`).join('')}</select></label><p id="pool-hint" class="muted" aria-live="polite"></p><button type="submit" class="primary-button full-width">开始${icon('arrow')}</button></form>`);updatePool();
@@ -52,10 +56,16 @@ function start(next){
   questions=drawQuestions(bank,next,seed,seen);if(!questions.length){toast('该分类暂无题目');return;}
   session=createSession(questions,{...next,count:questions.length},seed);questionDirection=1;report=null;finishPending=false;shareBlob=null;save();quiz();
 }
+function startGalleryQuestion(id,{updateUrl=true}={}) {
+  if(!bank.some(q=>q.id===id))return false;
+  start({count:1,difficulty:'mixed',categories:Object.keys(CATEGORIES),mode:'practice',secondsPerQuestion:0,ids:[id],gallery:true});
+  if(updateUrl)history.pushState(null,'',`#q=${encodeURIComponent(id)}`);
+  return true;
+}
 function resume(){modal.close();const s=hydrateSession(read('session',null),bank);if(!s){remove('session');toast('进度已过期');home();return;}questions=s.hydratedQuestions;delete s.hydratedQuestions;session=s;finishPending=false;if(s.deadline&&s.deadline<=Date.now()){finish(true);return;}quiz();}
 function quiz(){
   enter('quiz');const quick=session.config.mode==='quick';
-  main.innerHTML=`<section class="quiz-shell"><div class="quiz-top"><button class="back-button" data-action="home">${icon('back')}返回</button><span class="round-label">${quick?'快速模式':'自定义'}<span id="quiz-clock" ${quick?'hidden':''}></span></span><button class="icon-button" data-action="map" aria-label="打开题目导航" ${quick?'hidden':''}>${icon('grid')}</button></div><div class="progress-row"><div class="progress-track" role="progressbar" aria-label="本局进度" aria-valuemin="0" aria-valuemax="${questions.length}" aria-valuenow="0"><span></span></div><span id="progress-label"></span></div><div id="question-stage"></div>${quick?'':'<p class="keyboard-note">1 至 4 选答案 · 方向键切题 · Enter 继续</p>'}</section>`;
+  main.innerHTML=`<section class="quiz-shell"><div class="quiz-top"><button class="back-button" data-action="home">${icon('back')}返回</button><span class="round-label">${session.config.gallery?'画廊考点':quick?'快速模式':'自定义'}<span id="quiz-clock" ${quick?'hidden':''}></span></span><button class="icon-button" data-action="map" aria-label="打开题目导航" ${quick?'hidden':''}>${icon('grid')}</button></div><div class="progress-row"><div class="progress-track" role="progressbar" aria-label="本局进度" aria-valuemin="0" aria-valuemax="${questions.length}" aria-valuenow="0"><span></span></div><span id="progress-label"></span></div><div id="question-stage"></div>${quick?'':'<p class="keyboard-note">1 至 4 选答案 · 方向键切题 · Enter 继续</p>'}</section>`;
   renderQuestion();clock();clockTimer=setInterval(clock,1000);
 }
 function renderQuestion(){
@@ -140,6 +150,8 @@ function celebrate(n){if(reduced())return;const box=$('#celebration');box.replac
 function about(){dialog('关于',`<p>Apple 冷知识小游戏。默认每局 5 题。</p><p>目前有 <b>${bank.length.toLocaleString('en-US')}</b> 道题，包含产品故事、反直觉小知识、系统功能、发布年份和时间线。时间线题由产品与系统的年份记录组合生成，短局会优先抽趣味题。</p><p>每题都保留解析和 Apple 资料链接。年份采用首次发布或首次预览的公历年份，具体口径写在题目中。不同地区的上市时间可能不同。</p><p class="muted">进度仅保存在当前浏览器。与 Apple Inc. 无关联。v${VERSION}</p><a class="text-button" href="https://github.com/yunnre060214-sudo/Apple-Trivia" target="_blank" rel="noopener noreferrer">查看题库与源代码${icon('external')}</a><button class="secondary-button replay-intro" data-action="replay-hello">${icon('history')}重播 hello</button>`);}
 
 document.addEventListener('click',e=>{
+  const exhibit=e.target.closest('[data-gallery-question]');
+  if(exhibit){e.preventDefault();startGalleryQuestion(exhibit.dataset.galleryQuestion);return;}
   const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.answer!==undefined){selectAnswer(Number(b.dataset.answer));return;}
   if(b.dataset.topic){start(quickConfig(b.dataset.topic));return;}
@@ -168,6 +180,7 @@ function preferredTheme(){const saved=read('theme',null);return ['dark','light']
 applyTheme(preferredTheme());
 systemTheme.addEventListener('change',()=>applyTheme(preferredTheme()));
 window.addEventListener('storage',event=>{if(event.key===KEY+'theme'||event.key===null)applyTheme(preferredTheme());});
-async function init(){try{const res=await fetch(`./questions.json?v=${VERSION}`);if(!res.ok)throw new Error('load');const data=await res.json();if(data.version!==VERSION||!Array.isArray(data.questions))throw new Error('version');bank=data.questions;meta=data;home();}catch{main.innerHTML=`<div class="loading"><h1>加载失败</h1><p>请检查网络后重试。</p><button class="primary-button" data-action="reload">重试${icon('arrow')}</button></div>`;}}
+async function init(){try{const res=await fetch(`./questions.json?v=${VERSION}`);if(!res.ok)throw new Error('load');const data=await res.json();if(data.version!==VERSION||!Array.isArray(data.questions))throw new Error('version');bank=data.questions;meta=data;const id=questionFromHash(location.hash);if(!id||!startGalleryQuestion(id,{updateUrl:false}))home();}catch{main.innerHTML=`<div class="loading"><h1>加载失败</h1><p>请检查网络后重试。</p><button class="primary-button" data-action="reload">重试${icon('arrow')}</button></div>`;}}
+window.addEventListener('hashchange',()=>{if(!bank.length)return;const id=questionFromHash(location.hash);if(!id||!startGalleryQuestion(id,{updateUrl:false}))home();});
 init();
 

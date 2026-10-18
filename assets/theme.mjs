@@ -1,79 +1,141 @@
-// Safari derives its under-page fill from html/body, outside the captured page.
-// Keep that fill and the root color-scheme separate from the page's appearance.
+// Browser chrome commits after the last wave. Safari paints this outside the page.
 export function setBrowserTheme(document, theme) {
   const value = theme === 'dark' ? 'dark' : 'light';
   document.documentElement.dataset.browserTheme = value;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = value === 'dark' ? '#101216' : '#f5f4f0';
+  if (meta) meta.content = value === 'dark' ? '#080d1b' : '#f5f4f0';
 }
 
-// Reveal the new appearance over the old page from the theme button's center.
-export function createThemeSwitcher({document, window, applyTheme, saveTheme, commitTheme = () => {}, reducedMotion = () => false}) {
-  const root = document.documentElement;
-  let revision = 0, activeTransition, requestedTheme;
-  return async function switchTheme(button) {
-    const token = ++revision;
-    const theme = (requestedTheme || root.dataset.theme) === 'dark' ? 'light' : 'dark';
-    requestedTheme = theme;
-    // Every click counts, including clicks before the capture callback runs.
-    // Superseded callbacks and finalizers may never overwrite the latest intent.
-    activeTransition?.skipTransition();
-    activeTransition = undefined;
-    let applied = false, transition;
-    const update = () => {
-      if (applied || token !== revision) return;
-      applied = true;
-      applyTheme(theme);
-      saveTheme(theme);
-    };
-    const properties = ['--theme-reveal-x', '--theme-reveal-y', '--theme-reveal-radius', '--theme-reveal-backdrop'];
-    try {
-      if (reducedMotion() || typeof document.startViewTransition !== 'function') {
-        update();
-        return true;
-      }
-      const bounds = button.getBoundingClientRect();
-      const width = Math.max(window.innerWidth, root.clientWidth || 0);
-      const height = Math.max(window.innerHeight, root.clientHeight || 0);
-      const x = Math.max(0, Math.min(width, bounds.left + bounds.width / 2));
-      const y = Math.max(0, Math.min(height, bounds.top + bounds.height / 2));
-      const setRadius = (w, h) => {
-        const radius = Math.ceil(Math.hypot(Math.max(x, w - x), Math.max(y, h - y))) + 2;
-        root.style.setProperty('--theme-reveal-radius', `${radius}px`);
-      };
-      root.style.setProperty('--theme-reveal-x', `${x}px`);
-      root.style.setProperty('--theme-reveal-y', `${y}px`);
-      setRadius(width, height);
-      // Keep any uncovered canvas in the old color until the reveal reaches it.
-      const backdrop = window.getComputedStyle(root).getPropertyValue('--bg').trim();
-      root.style.setProperty('--theme-reveal-backdrop', backdrop);
-      root.classList.add('theme-revealing');
-      transition = activeTransition = document.startViewTransition(update);
-      await transition.ready;
-      if (token !== revision) return true;
-      // Mobile snapshots can extend beneath retractable browser toolbars, beyond
-      // innerHeight. Measure the actual snapshot before its first painted frame.
-      try {
-        const snapshot = window.getComputedStyle(root, '::view-transition-group(root)');
-        const snapshotWidth = parseFloat(snapshot.width), snapshotHeight = parseFloat(snapshot.height);
-        setRadius(Math.max(width, snapshotWidth || 0), Math.max(height, snapshotHeight || 0));
-      } catch {}
-      await transition.finished;
-      return true;
-    } catch {
-      // Skipped or unsupported transitions still commit the requested appearance.
-      transition?.skipTransition();
-      update();
-      return true;
-    } finally {
-      // A system/storage change during the capture may supersede this request.
-      if (token === revision) {
-        if (applied) commitTheme(root.dataset.theme);
-        root.classList.remove('theme-revealing');
-        properties.forEach(property => root.style.removeProperty(property));
-        activeTransition = undefined;
-        requestedTheme = undefined;
-      }
+// A DOM-only visual copy. No IDs, scripts, event handlers, focus targets or live
+// regions survive. The original page remains the only interactive document.
+export function createThemeSurface({document, window, theme}) {
+  const source = document.getElementById('site-content');
+  if (!source) throw new Error('Missing page');
+  const surface = document.createElement('div');
+  surface.className = 'theme-surface theme-palette';
+  surface.dataset.theme = theme;
+  surface.setAttribute('aria-hidden', 'true');
+  surface.inert = true;
+  const copy = source.cloneNode(true);
+  const originals = [source, ...source.querySelectorAll('*')];
+  const copies = [copy, ...copy.querySelectorAll('*')];
+  copies.forEach((node, i) => {
+    if (node.id) { node.dataset.themeCopyId = node.id; node.removeAttribute('id'); }
+    node.removeAttribute('autofocus');
+    node.removeAttribute('aria-live');
+    node.removeAttribute('aria-labelledby');
+    node.removeAttribute('aria-describedby');
+    if (node.matches('a,button,input,select,textarea,[tabindex]')) node.setAttribute('tabindex','-1');
+    // Animations are decoration, not a reason for a wave to jump to a new pose.
+    if (originals[i]?.matches('.hero-title-line,.hero-title-apple,.hero-actions,.archive,.archive-object img,.home-aurora,.home-ribbon,.archive-orbit,.topic-section')) {
+      const style = window.getComputedStyle(originals[i]);
+      for (const key of ['transform','translate','rotate','scale','opacity','filter','clip-path','background-position']) copyStyle(node,style,key);
     }
+  });
+  copy.querySelectorAll('script,dialog,[data-theme-copy-id="toast"],[data-theme-copy-id="celebration"]').forEach(node => node.remove());
+  copy.classList.add('theme-page-copy');
+  copy.inert = true;
+  copy.style.top = `${-window.scrollY}px`;
+  copy.style.left = '0px';
+  copy.style.width = `${document.documentElement.clientWidth || window.innerWidth}px`;
+  surface.append(copy);
+  document.body.append(surface);
+  // cloneNode does not copy scroll offsets or changed form-control properties.
+  originals.forEach((node, i) => {
+    if (!copies[i].isConnected) return;
+    copies[i].scrollLeft = node.scrollLeft;
+    copies[i].scrollTop = node.scrollTop;
+    if ('value' in node) copies[i].value = node.value;
+    if ('checked' in node) copies[i].checked = node.checked;
+  });
+  return surface;
+}
+function copyStyle(node, style, key) { node.style.setProperty(key, style.getPropertyValue(key)); }
+
+// Native View Transitions serialize captures and replace preceding transitions.
+// Independent clipped surfaces instead let 3, 5 or 20 waves coexist freely.
+export function createThemeSwitcher({document, window, applyTheme, saveTheme, commitTheme = () => {}, reducedMotion = () => false, createSurface = createThemeSurface}) {
+  const root = document.documentElement;
+  let revision = 0, surfaces = [], active = new Set();
+  function remove(surface) { surface.remove(); surfaces = surfaces.filter(s => s !== surface); }
+  function settle() {
+    revision++;
+    const pending = [...active]; active.clear();
+    pending.forEach(record => { window.clearTimeout(record.timer); record.animation.cancel(); record.resolve(true); });
+    surfaces.forEach(surface => surface.remove()); surfaces = [];
+    root.classList.remove('theme-revealing');
+    delete root.dataset.themeWaves;
+    commitTheme(root.dataset.theme);
+  }
+  function switchTheme(button) {
+    const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    const oldTheme = root.dataset.theme;
+    const token = ++revision;
+    let wave;
+    try {
+      if (reducedMotion() || typeof document.createElement('div').animate !== 'function') {
+        applyTheme(theme); saveTheme(theme); settle(); return Promise.resolve(true);
+      }
+      if (!surfaces.length) surfaces.push(createSurface({document,window,theme:oldTheme}));
+      root.classList.add('theme-revealing');
+      applyTheme(theme); saveTheme(theme);
+      wave = createSurface({document,window,theme});
+      const bounds = button.getBoundingClientRect();
+      const width = Math.max(window.innerWidth, root.clientWidth || 0, window.visualViewport?.width || 0);
+      const height = Math.max(window.innerHeight, root.clientHeight || 0, window.visualViewport?.height || 0);
+      const x = Math.max(0,Math.min(width,bounds.left+bounds.width/2));
+      const y = Math.max(0,Math.min(height,bounds.top+bounds.height/2));
+      const radius = Math.ceil(Math.hypot(Math.max(x,width-x),Math.max(y,height-y)))+4;
+      wave.classList.add('theme-wave');
+      wave.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+      surfaces.push(wave);
+      const animation = wave.animate([
+        {clipPath:`circle(0px at ${x}px ${y}px)`},
+        {clipPath:`circle(${radius}px at ${x}px ${y}px)`},
+      ], {duration:1050,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
+      return new Promise(resolve => {
+        const record = {animation,resolve,timer:null};
+        let done = false;
+        function complete() {
+          if (done) return;
+          done = true; active.delete(record); window.clearTimeout(record.timer);
+          if (!surfaces.includes(wave)) return resolve(true);
+          // Completed older waves become the solid floor for younger waves.
+          const before = surfaces.slice(0,surfaces.indexOf(wave));
+          before.forEach(remove);
+          if (token === revision) {
+            surfaces.forEach(surface => surface.remove()); surfaces = [];
+            root.classList.remove('theme-revealing');
+            delete root.dataset.themeWaves;
+            commitTheme(root.dataset.theme);
+          } else root.dataset.themeWaves = String(active.size);
+          resolve(true);
+        }
+        active.add(record);
+        root.dataset.themeWaves = String(active.size);
+        record.timer = window.setTimeout(complete,1250);
+        animation.finished.then(complete,complete);
+      });
+    } catch {
+      wave?.remove();
+      if (root.dataset.theme !== theme) { applyTheme(theme); saveTheme(theme); }
+      settle(); return Promise.resolve(true);
+    }
+  }
+  const onOtherAction = event => {
+    if (surfaces.length && !event.target.closest('[data-action="theme"]')) settle();
   };
+  const onViewport = () => { if (surfaces.length) settle(); };
+  document.addEventListener('click',onOtherAction,true);
+  window.addEventListener('resize',onViewport,{passive:true});
+  window.addEventListener('scroll',onViewport,{passive:true});
+  window.addEventListener('pagehide',onViewport);
+  switchTheme.dispose = () => {
+    settle();
+    document.removeEventListener('click',onOtherAction,true);
+    window.removeEventListener('resize',onViewport);
+    window.removeEventListener('scroll',onViewport);
+    window.removeEventListener('pagehide',onViewport);
+  };
+  return switchTheme;
 }

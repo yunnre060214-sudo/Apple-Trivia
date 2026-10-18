@@ -90,6 +90,7 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     return {scale:style.scale&&style.scale!=='none'?style.scale:'1',translate:style.translate&&style.translate!=='none'?style.translate:'0px 0px',rotate:style.rotate&&style.rotate!=='none'?style.rotate:'0deg'};
   }
   function decorate(el) {
+    if (el.closest?.('.theme-surface')) return;
     const info=describeMotion(el);
     if(el.dataset.motion!==info.kind)el.dataset.motion=info.kind;
     if(el.dataset.motionId!==info.id)el.dataset.motionId=info.id;

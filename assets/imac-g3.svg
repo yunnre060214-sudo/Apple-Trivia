@@ -47,10 +47,11 @@
     </linearGradient>
   </defs>
   <ellipse cx="240" cy="389" rx="145" ry="17" fill="url(#ground)" />
-  <path d="M250 88c78-21 143 33 147 116 4 63-18 111-67 129l-73 13-7-258Z" fill="url(#bondi)" stroke="#548e94" stroke-width="1.4" />
-  <path d="M291 94c59 6 93 57 95 111 2 52-14 94-46 112" stroke="#dbffff" stroke-opacity=".45" stroke-width="3" />
-  <path d="M317 111c36 17 56 53 60 90m-53-79c27 17 44 44 49 76m-43-66c20 17 32 39 38 65" stroke="#dcffff" stroke-opacity=".25" />
-  <path d="M277 90q12-14 27-5l13 11-9 9-22-10Z" fill="#b6e7e4" stroke="#76b7ba" />
+  <path id="imac-rear-shell" d="M242 101C301 83 355 105 381 155C407 207 401 271 369 310C345 339 305 349 265 344L242 101Z" fill="url(#bondi)" stroke="#548e94" stroke-width="1.4" />
+  <path d="M290 105C337 104 369 140 382 183C396 233 382 283 349 315" stroke="#dbffff" stroke-opacity=".45" stroke-width="3" />
+  <path d="M310 112C347 126 369 158 378 193M319 125C348 140 365 166 373 196M327 139C348 154 360 175 368 198" stroke="#dcffff" stroke-opacity=".25" />
+  <path id="imac-carry-handle" d="M275 107C279 96 292 95 304 100L321 109L315 117L295 108Q285 105 280 113Z" fill="#b6e7e4" stroke="#76b7ba" />
+  <path d="M299 125C320 159 326 262 307 321" stroke="#e7ffff" stroke-opacity=".45" stroke-width="3"/>
   <path d="M133 92q-35-2-39 33l-9 129q-2 55 43 70l140 24q40 6 46-35l-2-155q-1-40-35-46L133 92Z" fill="url(#ceramic)" stroke="#9bb5b3" stroke-width="1.5" />
   <path d="M133 99q-29-1-32 28l-8 128q-1 48 37 61l138 24" stroke="#ffffff" stroke-opacity=".8" stroke-width="2" />
   <path d="M135 114q-21-1-23 22l-6 110q-2 29 23 35l137 22q27 4 28-24l-1-119q0-26-23-30Z" fill="#aebfbc" />
