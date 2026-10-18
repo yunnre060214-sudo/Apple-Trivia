@@ -1,10 +1,10 @@
-import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.1.0';
-import {icon} from './icons.mjs?v=3.1.0';
-import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.1.0';
-import {replayHello} from './hello.mjs?v=3.1.0';
-import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.1.0';
-import {SITE_URL,shareText,createShareCard,downloadBlob,resultPalette} from './share.mjs?v=3.1.0';
-import {createInteractionMotion} from './motion.mjs?v=3.1.0';
+import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.2.0';
+import {icon} from './icons.mjs?v=3.2.0';
+import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.2.0';
+import {replayHello} from './hello.mjs?v=3.2.0';
+import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.2.0';
+import {SITE_URL,shareText,createShareCard,downloadBlob,resultPalette} from './share.mjs?v=3.2.0';
+import {createInteractionMotion} from './motion.mjs?v=3.2.0';
 const $=s=>document.querySelector(s), main=$('#main'), modal=$('#modal');
 const KEY='apple-quiz:v1:';
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

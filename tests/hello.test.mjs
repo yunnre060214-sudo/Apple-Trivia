@@ -20,7 +20,7 @@ function fixture({hidden = false} = {}) {
     };
   }
   Object.assign(document,element());document.hidden=hidden;document.documentElement=element();document.body=element();document.activeElement=document.body;
-  const nodes=Object.fromEntries(['hello-intro','site-content','main'].map(x=>[x,element()]));
+  const nodes=Object.fromEntries(['hello-intro','hello-skip','site-content','main'].map(x=>[x,element()]));
   const strokes=[element(),element()];strokes.forEach((s,i)=>s.getTotalLength=()=>i?2500:505);
   nodes['hello-intro'].querySelectorAll=()=>strokes;
   document.getElementById=id=>nodes[id];
@@ -37,7 +37,7 @@ function fixture({hidden = false} = {}) {
   return {document,nodes,strokes,advance,controller,play,end,paint,visibility,scheduled,frames};
 }
 
-test('every load starts a mandatory intro, independent of stored completion or motion preference',async()=>{
+test('every load starts the intro with skip available, independent of stored completion',async()=>{
   const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
   const bootstrap=html.match(/<script>([\s\S]*?)<\/script>/)[1];
   for(const returning of [false,true])for(const reduce of [false,true]) {
@@ -46,7 +46,7 @@ test('every load starts a mandatory intro, independent of stored completion or m
     assert.equal(f.document.documentElement.classList.contains('hello-pending'),true);
     assert.equal(f.play(),true);assert.equal(f.nodes['site-content'].inert,true);
   }
-  assert.ok(!html.includes('hello-skip'));assert.ok(!html.includes('pathLength='));
+  assert.match(html,/id="hello-skip"/);assert.ok(!html.includes('pathLength='));
 });
 test('initial paint precedes writing; the page remains locked through handwriting, hold and fade',()=>{
   const f=fixture();assert.equal(f.controller.play(),true);
@@ -61,15 +61,24 @@ test('initial paint precedes writing; the page remains locked through handwritin
   f.advance(1);assert.equal(f.nodes['site-content'].inert,false);assert.equal(f.nodes['hello-intro'].hidden,true);
   assert.equal(f.document.activeElement,f.nodes.main);assert.equal(f.scheduled.size,0);
 });
-test('Escape, Tab and overlay clicks cannot dismiss or focus behind the intro',()=>{
+test('Tab reaches skip, overlay clicks stay inert, and Escape exits through the fade',()=>{
   const f=fixture();f.play();
-  for(const key of ['Escape','Tab']) {
-    let prevented=false;f.document.emit('keydown',{key,preventDefault(){prevented=true;}});
-    assert.equal(prevented,true);assert.equal(f.nodes['site-content'].inert,true);
-    assert.equal(f.document.activeElement,f.nodes['hello-intro']);
-  }
+  let prevented=false;f.document.emit('keydown',{key:'Tab',preventDefault(){prevented=true;}});
+  assert.equal(prevented,true);assert.equal(f.nodes['site-content'].inert,true);
+  assert.equal(f.document.activeElement,f.nodes['hello-skip']);
   f.nodes['hello-intro'].emit('click');assert.equal(f.nodes['site-content'].inert,true);
-  assert.equal(f.controller.dismiss,undefined);assert.equal(f.controller.play(),false);
+  f.document.emit('keydown',{key:'Escape',preventDefault(){}});
+  assert.equal(f.nodes['hello-intro'].classList.contains('hello-leaving'),true);
+  f.advance(480);assert.equal(f.nodes['site-content'].inert,false);
+});
+test('skip before the first painted frame cancels handwriting and timers and supports replay',()=>{
+  const f=fixture();f.controller.play();
+  f.nodes['hello-skip'].emit('click');f.nodes['hello-skip'].emit('click');
+  f.paint();f.advance(480);
+  assert.equal(f.nodes['hello-intro'].hidden,true);assert.equal(f.nodes['site-content'].inert,false);
+  assert.equal(f.frames.size,0);assert.equal(f.scheduled.size,0);assert.equal(f.document.activeElement,f.nodes.main);
+  assert.equal(f.play(),true);f.advance(3600);f.end();f.advance(980);
+  assert.equal(f.nodes['hello-intro'].hidden,true);assert.equal(f.scheduled.size,0);
 });
 test('completion events from the first stroke or unrelated animations do not end playback',()=>{
   const f=fixture();f.play();

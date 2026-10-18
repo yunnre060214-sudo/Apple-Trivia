@@ -116,5 +116,8 @@ test('reduced motion, missing animation APIs and pagehide leave controls usable 
 test('styles constrain hover effects to fine pointers and include a reduced-motion override',async()=>{
   const css=await readFile(new URL('../assets/motion.css',import.meta.url),'utf8');
   assert.match(css,/@media \(hover:hover\) and \(pointer:fine\)/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/motion-arrow-back/);assert.match(css,/motion-download/);assert.match(css,/motion-copy-stack/);assert.doesNotMatch(css,/animation:[^;]+infinite/);
+  assert.match(css,/motion-arrow-back/);assert.match(css,/motion-download/);assert.match(css,/motion-copy-stack/);
+  const [interaction,ambient]=css.split('/* Quiet home loops');
+  assert.doesNotMatch(interaction,/animation:[^;]+infinite/);
+  assert.match(ambient,/@media \(prefers-reduced-motion:no-preference\)/);
 });

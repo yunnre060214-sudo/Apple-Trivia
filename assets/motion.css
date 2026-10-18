@@ -26,9 +26,7 @@ a:not(.brand):not(.skip-link):focus-visible { background-size:100% 1px; }
 .bank-count b { display:inline-block; transition:translate 240ms var(--motion-spring); }
 .archive-arrow { transition:color 160ms,background 180ms; border-radius:50%; }
 .archive-select button span { display:block; transition:translate 260ms var(--motion-spring),opacity 200ms; }
-.archive-select button i { transition:opacity 180ms,transform 350ms var(--motion-spring),width 350ms var(--motion-spring); }
 .archive-select button[aria-pressed=true] span { translate:0 -1px; }
-.archive-select button[aria-pressed=true] i { width:24px; }
 .topic-copy strong { display:block; transition:translate 320ms var(--motion-spring); }
 .topic-number { transition:opacity 180ms,translate 280ms; }
 .topic-link .topic-arrow { transition:translate 300ms var(--motion-spring),rotate 300ms var(--motion-spring),color 160ms; }
@@ -102,8 +100,6 @@ dialog[data-motion-closing] { pointer-events:none; }
   [data-motion=archive-prev]:hover svg { animation:motion-arrow-back 500ms var(--motion-spring); }
   [data-motion=archive-next]:hover svg { animation:motion-arrow-forward 500ms var(--motion-spring); }
   .archive-select button:hover span { translate:0 -2px; }
-  .archive-select button:hover i { opacity:.45; transform:translateX(-50%) scaleX(.7); }
-  .archive-select button[aria-pressed=true]:hover i { opacity:1; transform:translateX(-50%) scaleX(1.2); }
   .topic-link:hover .topic-copy strong { translate:4px 0; }
   .topic-link:hover .topic-number { opacity:.6; translate:-2px 0; }
   [data-topic=surprise]:hover [data-icon=bulb] { animation:motion-bulb 650ms var(--motion-spring); }
@@ -177,3 +173,23 @@ dialog[data-motion-closing] { pointer-events:none; }
   [data-motion],.motion-select-arrow,.motion-segment,.category-pills span,.auto-switch input:after { animation:none!important; transition:none!important; }
   .motion-status-icon path,.answer-mark path,.share-preview img { animation:none!important; stroke-dashoffset:0!important; }
 }
+
+/* Quiet home loops, on independent transform layers so interaction stays crisp. */
+@media (prefers-reduced-motion:no-preference) {
+  body[data-view=home] .archive-layer.is-active .archive-object img { animation:home-object-float 7s ease-in-out infinite; }
+  body[data-view=home] .hero-title-apple:after { background-size:180% 100%; animation:home-spectrum 9s ease-in-out infinite alternate; }
+  body[data-view=home] .footer-spectrum { background-size:180% 100%; animation:home-spectrum 12s ease-in-out infinite alternate-reverse; }
+  body[data-view=home] .hero-start .button-disc .icon { animation:home-arrow-nudge 8s ease-in-out 2s infinite; }
+  body[data-view=home] [data-topic=surprise] .topic-symbol { animation:home-bulb-breathe 7s ease-in-out infinite; }
+  body[data-view=home] [data-topic=stories] .topic-symbol { animation:home-history-turn 14s ease-in-out 3s infinite; }
+  body[data-view=home] [data-topic=timeline] .topic-symbol { animation:home-clock-tick 10s ease-in-out 5s infinite; }
+  .archive[data-paused=true] .archive-object img,.hello-pending .archive-object img { animation-play-state:paused!important; }
+  .hello-pending .hero-start .button-disc .icon { animation-play-state:paused; }
+  body:has(.archive[data-paused=true]) .topic-symbol,body:has(.archive[data-paused=true]) .hero-title-apple:after { animation-play-state:paused; }
+}
+@keyframes home-object-float { 0%,100% { translate:0 0; } 50% { translate:0 -6px; } }
+@keyframes home-spectrum { from { background-position:0% 50%; } to { background-position:100% 50%; } }
+@keyframes home-arrow-nudge { 0%,80%,100% { translate:0; } 87% { translate:3px; } 94% { translate:0; } }
+@keyframes home-bulb-breathe { 0%,65%,100% { color:var(--muted); filter:drop-shadow(0 0 0 transparent); } 80% { color:#b68a30; filter:drop-shadow(0 0 4px #dab44a44); } }
+@keyframes home-history-turn { 0%,84%,100% { rotate:0deg; } 91% { rotate:-18deg; } }
+@keyframes home-clock-tick { 0%,80%,100% { rotate:0deg; } 86%,92% { rotate:6deg; } 89%,95% { rotate:-3deg; } }

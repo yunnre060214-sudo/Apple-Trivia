@@ -2,22 +2,26 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createThemeSwitcher,setBrowserTheme} from '../assets/theme.mjs';
 
-function fixture({theme='light', supported=true, reduce=false, width=390, height=844, snapshotWidth=width, snapshotHeight=height, bounds={left:320,top:18,width:44,height:44}, fail}={}) {
+function fixture({theme='light', supported=true, reduce=false, width=390, height=844, snapshotWidth=width, snapshotHeight=height, bounds={left:320,top:18,width:44,height:44}, fail, defer=false}={}) {
   const values=new Map(), classes=new Set(), applied=[], saved=[], committed=[];
   const root={dataset:{theme,browserTheme:theme},style:{setProperty:(k,v)=>values.set(k,v),removeProperty:k=>values.delete(k)},classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}};
-  let finish, skipCount=0, captures=0;
-  const finished=new Promise(resolve=>{finish=resolve;});
+  let skipCount=0, captures=0;
+  const transitions=[];
   const meta={content:theme==='dark'?'#101216':'#f5f4f0'};
   const document={documentElement:root,querySelector:()=>meta};
   if(supported)document.startViewTransition=update=>{
     captures++;
     if(fail==='start')throw Error('unavailable');
-    update();
-    return {ready:fail==='ready'?Promise.reject(Error('skipped')):Promise.resolve(),finished,skipTransition(){skipCount++;finish();}};
+    let finish;
+    const finished=new Promise(resolve=>{finish=resolve;});
+    if(!defer)update();
+    const transition={update,finish,ready:fail==='ready'?Promise.reject(Error('skipped')):Promise.resolve(),finished,skipTransition(){skipCount++;finish();}};
+    transitions.push(transition);
+    return transition;
   };
   const window={innerWidth:width,innerHeight:height,getComputedStyle:(_,pseudo)=>pseudo?{width:`${snapshotWidth}px`,height:`${snapshotHeight}px`}:{getPropertyValue:()=>root.dataset.theme==='dark'?'#101216':'#f5f4f0'}};
   const switchTheme=createThemeSwitcher({document,window,applyTheme:v=>{root.dataset.theme=v;applied.push(v);},saveTheme:v=>saved.push(v),commitTheme:v=>{setBrowserTheme(document,v);committed.push(v);},reducedMotion:()=>reduce});
-  return {switchTheme,button:{getBoundingClientRect:()=>bounds},root,meta,values,classes,applied,saved,committed,finish,get skips(){return skipCount;},get captures(){return captures;}};
+  return {switchTheme,button:{getBoundingClientRect:()=>bounds},root,meta,values,classes,applied,saved,committed,transitions,finish:()=>transitions.at(-1).finish(),get skips(){return skipCount;},get captures(){return captures;}};
 }
 
 test('both appearance directions reveal from the button center and cover every viewport corner',async()=>{
@@ -34,10 +38,27 @@ test('both appearance directions reveal from the button center and cover every v
     f.finish();assert.equal(await pending,true);assert.equal(f.values.size,0);assert.equal(f.classes.size,0);assert.equal(f.saved.length,1);
   }
 });
-test('rapid clicks cannot overlap captures or overwrite the saved appearance',async()=>{
-  const f=fixture(),pending=f.switchTheme(f.button);assert.equal(await f.switchTheme(f.button),false);
-  assert.equal(f.captures,1);assert.deepEqual(f.saved,['dark']);f.finish();await pending;
-  await f.switchTheme(f.button);assert.deepEqual(f.saved,['dark','light']);
+test('every rapid click reverses direction and superseded finalizers leave the current reveal intact',async()=>{
+  const f=fixture(),requests=[];
+  for(let i=0;i<8;i++)requests.push(f.switchTheme(f.button));
+  await Promise.resolve();await Promise.resolve();
+  assert.equal(f.captures,8);assert.equal(f.skips,7);
+  assert.deepEqual(f.saved,['dark','light','dark','light','dark','light','dark','light']);
+  assert.equal(f.classes.has('theme-revealing'),true);assert.equal(f.committed.length,0);
+  assert.equal(f.root.dataset.theme,'light');f.finish();
+  assert.ok((await Promise.all(requests)).every(Boolean));
+  assert.deepEqual(f.committed,['light']);assert.equal(f.values.size,0);assert.equal(f.classes.size,0);
+});
+test('clicks before capture callbacks run preserve click parity and discard stale updates',async()=>{
+  for(const count of [2,3,16,17]) {
+    const f=fixture({defer:true}),requests=[];
+    for(let i=0;i<count;i++)requests.push(f.switchTheme(f.button));
+    for(const transition of [...f.transitions].reverse())transition.update();
+    assert.deepEqual(f.saved,[count%2?'dark':'light']);
+    await Promise.resolve();f.finish();await Promise.all(requests);
+    assert.equal(f.root.dataset.theme,count%2?'dark':'light');
+    assert.equal(f.root.dataset.browserTheme,f.root.dataset.theme);assert.equal(f.values.size,0);
+  }
 });
 test('mobile toolbar areas remain covered when the snapshot exceeds the visible viewport',async()=>{
   const f=fixture({width:390,height:680,snapshotWidth:390,snapshotHeight:844});

@@ -4,6 +4,7 @@ export function createHelloController({document, setTimer = setTimeout, clearTim
   const root = document.documentElement;
   const overlay = document.getElementById('hello-intro');
   const content = document.getElementById('site-content');
+  const skip = document.getElementById('hello-skip');
   const strokes = [...overlay.querySelectorAll('.hello-stroke')];
   const timers = new Set();
   let active = false, leaving = false, completed = false, previousFocus, frame, generation = 0;
@@ -24,7 +25,8 @@ export function createHelloController({document, setTimer = setTimeout, clearTim
     if (!active || !['Tab', 'Escape'].includes(event.key)) return;
     event.preventDefault();
     event.stopPropagation?.();
-    overlay.focus({preventScroll:true});
+    if (event.key === 'Escape') finish();
+    else (skip || overlay).focus({preventScroll:true});
   };
   function cleanup(restoreFocus = true) {
     clear(); cancelFrame(frame); generation++;
@@ -42,7 +44,7 @@ export function createHelloController({document, setTimer = setTimeout, clearTim
   }
   function finish() {
     if (!active || leaving) return;
-    leaving = true; clear();
+    leaving = true; clear(); cancelFrame(frame); generation++;
     overlay.classList.add('hello-complete', 'hello-leaving');
     later(cleanup, 480);
   }
@@ -95,6 +97,7 @@ export function createHelloController({document, setTimer = setTimeout, clearTim
     return true;
   }
   document.addEventListener('visibilitychange', onVisibility);
+  skip?.addEventListener('click', finish);
   return {play};
 }
 

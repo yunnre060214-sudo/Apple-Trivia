@@ -1,12 +1,18 @@
-/* Inlined into HTML so the mandatory intro has no stylesheet dependency. */
+/* Inlined into HTML so playback and skip have no stylesheet dependency. */
 .hello-intro { display:none; position:fixed; inset:0; z-index:100; place-items:center; background:var(--bg,#f5f4f0); isolation:isolate; outline:none; }
 [data-theme=dark] .hello-intro { background:var(--bg,#101216); }
 .hello-pending { overflow:hidden; }
 .hello-pending .hello-intro { display:grid; }
 .hello-pending #site-content { visibility:hidden; pointer-events:none; }
 .hello-word { width:min(560px,78vw); height:auto; overflow:visible; transform:translateY(-12px); }
+.hello-skip { position:absolute; right:max(24px,env(safe-area-inset-right)); bottom:calc(28px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:center; gap:9px; min-width:88px; min-height:44px; padding:9px 16px; border:1px solid var(--line,#d9dcd3); border-radius:24px; background:transparent; color:var(--ink,#222622); cursor:pointer; font:500 14px -apple-system,BlinkMacSystemFont,sans-serif; letter-spacing:.04em; transition:background .2s,transform .25s; }
+.hello-skip:hover { background:var(--soft,#eaece5); }
+.hello-skip:active { transform:scale(.95); }
+.hello-skip:focus-visible { outline:2px solid var(--accent,#245abe); outline-offset:4px; }
+.hello-skip svg { transition:transform .25s; }
+.hello-skip:hover svg { transform:translateX(3px); }
 .hello-stroke { stroke-dasharray:var(--hello-length,4000); stroke-dashoffset:var(--hello-length,4000); opacity:0; }
-/* Explicitly mandatory on every visit, including reduced-motion preferences. */
+/* Replay handwriting on every visit; the independent skip control stays usable. */
 .hello-playing .hello-first { animation:hello-write .9s .15s cubic-bezier(.45,0,.25,1) both!important; }
 .hello-playing .hello-rest { animation:hello-write 2.8s .8s cubic-bezier(.45,0,.25,1) both!important; }
 .hello-intro.hello-complete .hello-stroke { animation:none!important; stroke-dashoffset:0; opacity:1; }
