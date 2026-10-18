@@ -2,9 +2,9 @@
 
 一个轻松的中文 Apple 冷知识小游戏。点「随机来 5 题」直接开玩，猜完领个趣味称号，生成战绩图片，邀请朋友「不服来战」。
 
-[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.3.0) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
+[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.3.1) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
 
-当前版本 **3.3.0**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
+当前版本 **3.3.1**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
 
 仓库地址：[Apple-Trivia](https://github.com/yunnre060214-sudo/Apple-Trivia)；网站地址：[Apple Trivia](https://yunnre060214-sudo.github.io/Apple-Trivia/)。仓库更名后，原 GitHub Pages 路径 `Apple-Product-Knowledge-Quiz` 已失效。线上发布版本可通过网站的 `version.json` 核查。
 

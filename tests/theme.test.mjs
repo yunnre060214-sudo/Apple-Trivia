@@ -90,3 +90,10 @@ test('browser backing and theme-color use the independent night palette',()=>{
   setBrowserTheme(doc,'light');assert.equal(meta.content,'#f5f4f0');
   setBrowserTheme({documentElement:{dataset:{}},querySelector:()=>null},'dark');
 });
+
+test('a newer wave completing first cancels stale animations and clears their timers',async()=>{
+  const f=fixture(),pending=[f.switchTheme(f.button),f.switchTheme(f.button),f.switchTheme(f.button)];
+  f.animations[2].finish();await Promise.all(pending);
+  assert.equal(f.timers.size,0);assert.equal(f.classes.size,0);assert.ok(f.surfaces.every(s=>s.removed));
+  assert.deepEqual(f.committed,['dark']);
+});
