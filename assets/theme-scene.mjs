@@ -35,7 +35,7 @@ export function synchronizeAnimations(originals,copies,sourceForCopy,copyForSour
   return mirrored;
 }
 
-export function createThemeScene({document,window,theme,width,height}) {
+export function createThemeScene({document,window,theme,width,height,duration=780}) {
   const source=document.getElementById('site-content');
   if(!source||typeof source.getAnimations!=='function')throw Error('Missing page animation API');
   const prefix=`theme-scene-${++identity}`,sourceForCopy=new Map(),copyForSource=new Map();
@@ -92,10 +92,12 @@ export function createThemeScene({document,window,theme,width,height}) {
     setFloor(show){floor.setAttribute('fill',show?'white':'black');},
     addWave({x,y,radius,show}) {
       const circle=document.createElementNS(SVG,'circle');circle.classList.add('theme-wave');
-      circle.setAttribute('r',String(radius));circle.setAttribute('fill',show?'white':'black');
-      circle.style.transformOrigin='0 0';circle.style.transform=`translate(${x}px,${y}px) scale(0)`;
+      circle.setAttribute('cx',String(x));circle.setAttribute('cy',String(y));
+      circle.setAttribute('r','0');circle.setAttribute('fill',show?'white':'black');
       mask.append(circle);
-      const animation=circle.animate([{transform:`translate(${x}px,${y}px) scale(0)`},{transform:`translate(${x}px,${y}px) scale(1)`}],{duration:780,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
+      // Geometry animation invalidates the mask resource directly. Transform
+      // animation of SVG mask children can reuse stale raster bounds in engines.
+      const animation=circle.animate([{r:'0px'},{r:`${radius}px`}],{duration,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
       return {animation,remove:()=>circle.remove()};
     },
     dispose(){animations.forEach(animation=>animation.cancel());animations=[];surface.remove();defs.remove();},

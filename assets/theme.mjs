@@ -1,4 +1,4 @@
-import {createThemeScene} from './theme-scene.mjs?v=3.4.1';
+import {createThemeScene} from './theme-scene.mjs?v=3.4.2';
 
 export function setBrowserTheme(document, theme) {
   const value = theme === 'dark' ? 'dark' : 'light';
@@ -9,7 +9,7 @@ export function setBrowserTheme(document, theme) {
 
 // The real page keeps its palette and animation clocks while one live alternate
 // palette is revealed/erased by lightweight circles. A burst never clones pages.
-export function createThemeSwitcher({document, window, applyTheme, previewTheme=()=>{}, saveTheme, commitTheme=()=>{}, reducedMotion=()=>false, createScene=createThemeScene}) {
+export function createThemeSwitcher({document, window, applyTheme, previewTheme=()=>{}, saveTheme, commitTheme=()=>{}, reducedMotion=()=>false, duration=780, createScene=createThemeScene}) {
   const root=document.documentElement;
   let target=root.dataset.theme, scene=null, ready=false, disposed=false;
   let preparation=null, preparationIsIdle=false, frame=null, sequence=0;
@@ -26,7 +26,7 @@ export function createThemeSwitcher({document, window, applyTheme, previewTheme=
   function prepare() {
     preparation=null;
     if(disposed||scene||requests.size||reducedMotion()||!supported()||document.hidden)return;
-    try {scene=createScene({document,window,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});}
+    try {scene=createScene({document,window,duration,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});}
     catch {scene=null;}
   }
   function warm() {
@@ -62,8 +62,8 @@ export function createThemeSwitcher({document, window, applyTheme, previewTheme=
   function launch(record) {
     record.wave=scene.addWave({...record,show:record.theme===scene.theme});
     const animation=record.wave.animation;
-    animation.currentTime=Math.min(780,Math.max(0,now()-record.started));
-    record.timer=window.setTimeout(()=>complete(record),1000);
+    animation.currentTime=Math.min(duration,Math.max(0,now()-record.started));
+    record.timer=window.setTimeout(()=>complete(record),duration+220);
     animation.finished.then(()=>complete(record),()=>complete(record));
   }
   function begin() {
@@ -72,7 +72,7 @@ export function createThemeSwitcher({document, window, applyTheme, previewTheme=
   function flush() {
     frame=null;if(!requests.size||disposed)return;
     try {
-      if(!scene)scene=createScene({document,window,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});
+      if(!scene)scene=createScene({document,window,duration,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});
       if(!ready)begin();
       scene.updateControl();
       requests.forEach(record=>{if(!record.wave)launch(record);});
