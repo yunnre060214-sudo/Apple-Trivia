@@ -13,6 +13,7 @@ export function createThemeSwitcher({document, window, applyTheme, previewTheme=
   const root=document.documentElement;
   let target=root.dataset.theme, scene=null, ready=false, disposed=false;
   let preparation=null, preparationIsIdle=false, frame=null, sequence=0;
+  let commitFrame=null;
   const requests=new Set(),listeners=[];
   const listen=(node,type,fn,options)=>{node.addEventListener(type,fn,options);listeners.push(()=>node.removeEventListener(type,fn,options));};
   const now=()=>window.performance?.now()??0;
@@ -38,16 +39,31 @@ export function createThemeSwitcher({document, window, applyTheme, previewTheme=
     if(!requests.delete(record))return;
     window.clearTimeout(record.timer);record.wave?.animation.cancel();record.wave?.remove();record.resolve(true);
   }
+  function clearCommit() {
+    if(commitFrame!==null)window.cancelAnimationFrame(commitFrame);
+    commitFrame=null;root.classList.remove('theme-committing');
+  }
   function settle(theme) {
     cancelPreparation();
     if(frame!==null){window.cancelAnimationFrame(frame);frame=null;}
     const finalTheme=theme??(requests.size?target:root.dataset.theme);
+    const changing=root.dataset.theme!==finalTheme;
+    clearCommit();
+    const atomic=changing&&!disposed&&document.getElementById?.('site-content');
+    if(atomic)root.classList.add('theme-committing');
     [...requests].forEach(release);
     scene?.dispose();scene=null;ready=false;
     target=finalTheme;
     root.classList.remove('theme-revealing');
     delete root.dataset.themeWaves;delete root.dataset.themeTarget;
-    applyTheme(finalTheme);commitTheme(finalTheme);warm();
+    applyTheme(finalTheme);commitTheme(finalTheme);
+    // Paint the final palette with color transitions suppressed, then restore
+    // normal hover transitions. Otherwise the old button colors flash back as
+    // soon as the alternate scene is removed. Input never waits for these frames.
+    if(atomic)commitFrame=window.requestAnimationFrame(()=>{
+      commitFrame=window.requestAnimationFrame(()=>{commitFrame=null;root.classList.remove('theme-committing');});
+    });
+    warm();
   }
   function complete(record) {
     if(!requests.has(record))return;
