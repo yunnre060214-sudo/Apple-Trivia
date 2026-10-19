@@ -44,16 +44,17 @@ test('the alternate scene preserves original animation identity, sanitizes dupli
   assert.equal(f.surface.inert,true);assert.equal(f.surface.attrs.get('aria-hidden'),'true');
   f.scene.dispose();assert.equal(f.body.children.length,1);assert.equal(alternate.cancelled,true);assert.equal(original.cancelled,undefined);
 });
-test('mask waves allocate circles without copying scene content and alternate luminance reveal/erase',async()=>{
+test('compound circles reveal and erase through one clip path without allocating DOM nodes',async()=>{
   const f=fixture(),before=f.surface.querySelectorAll('*').length;
   const a=f.scene.addWave({x:342,y:40,radius:950,show:true}),b=f.scene.addWave({x:342,y:40,radius:950,show:false});
   assert.equal(f.surface.querySelectorAll('*').length,before);
-  const circles=f.body.querySelectorAll('circle');assert.deepEqual(circles.map(n=>n.attrs.get('fill')),['white','black']);
-  assert.equal(circles[0].attrs.get('cx'),'342');assert.equal(circles[0].attrs.get('cy'),'40');
+  assert.equal(f.body.querySelectorAll('circle').length,0);
   assert.equal(f.frames.size,1);f.advance(390);
-  assert.ok(Number(circles[0].attrs.get('r'))>0&&Number(circles[0].attrs.get('r'))<950);
+  assert.match(f.surface.style.clipPath,/path\(evenodd/);
+  assert.equal((f.surface.style.clipPath.match(/A/g)||[]).length,4);
+  assert.match(f.surface.style.clipPath,/831\.25/);
   assert.equal(f.frames.size,1);
-  f.scene.setFloor(true);assert.equal(f.body.querySelectorAll('rect')[0].attrs.get('fill'),'white');
+  f.scene.setFloor(true);assert.match(f.surface.style.clipPath,/M0 0H390V844H0Z/);
   f.advance(390);await Promise.all([a.animation.finished,b.animation.finished]);a.remove();b.remove();f.scene.dispose();
   assert.equal(f.body.children.length,1);assert.equal(f.frames.size,0);
 });
@@ -61,7 +62,7 @@ test('mask waves allocate circles without copying scene content and alternate lu
 test('twenty mask circles use one frame pump and cancellation releases the last scheduled callback',async()=>{
   const f=fixture(),waves=Array.from({length:20},(_,i)=>f.scene.addWave({x:342,y:40,radius:950,show:i%2===0}));
   assert.equal(f.frames.size,1);f.advance(160);assert.equal(f.frames.size,1);
-  const circles=f.body.querySelectorAll('circle');assert.ok(circles.every(circle=>Number(circle.attrs.get('r'))>0));
+  assert.equal((f.surface.style.clipPath.match(/A/g)||[]).length,40);assert.equal(f.body.querySelectorAll('circle').length,0);
   waves.forEach(wave=>{wave.animation.cancel();wave.remove();});await Promise.all(waves.map(wave=>wave.animation.finished));
   assert.equal(f.frames.size,0);f.scene.dispose();
 });
