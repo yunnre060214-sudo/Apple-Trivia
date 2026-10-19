@@ -71,6 +71,20 @@ export function createThemeScene({document,window,theme,width,height,duration=78
   surface.style.maskMode='luminance';surface.style.opacity='0';surface.append(copy);
   document.body.append(defs,surface);
   let animations=surface.getAnimations({subtree:true});
+  const waves=new Set();let frame=null;
+  const now=()=>window.performance.now();
+  function schedule(){if(frame===null&&waves.size)frame=window.requestAnimationFrame(tick);}
+  function tick(time) {
+    frame=null;
+    for(const wave of [...waves]) {
+      const progress=Math.max(0,Math.min(1,(time-wave.started)/duration));
+      // All circles share one frame callback. Attribute geometry invalidates the
+      // referenced SVG mask in every engine, without independent transform layers.
+      wave.circle.setAttribute('r',(wave.radius*(1-Math.pow(1-progress,3))).toFixed(3));
+      if(progress===1){waves.delete(wave);wave.resolve();}
+    }
+    schedule();
+  }
   function updateControl() {
     const original=document.getElementById('theme-toggle'),button=copyForSource.get(original);
     if(button)button.innerHTML=original.innerHTML;
@@ -95,11 +109,15 @@ export function createThemeScene({document,window,theme,width,height,duration=78
       circle.setAttribute('cx',String(x));circle.setAttribute('cy',String(y));
       circle.setAttribute('r','0');circle.setAttribute('fill',show?'white':'black');
       mask.append(circle);
-      // Geometry animation invalidates the mask resource directly. Transform
-      // animation of SVG mask children can reuse stale raster bounds in engines.
-      const animation=circle.animate([{r:'0px'},{r:`${radius}px`}],{duration,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
+      let resolve;const finished=new Promise(done=>resolve=done);
+      const wave={circle,radius,started:now(),resolve};waves.add(wave);schedule();
+      const animation={finished,
+        get currentTime(){return now()-wave.started;},
+        set currentTime(value){wave.started=now()-value;},
+        cancel(){waves.delete(wave);resolve();if(!waves.size&&frame!==null){window.cancelAnimationFrame(frame);frame=null;}},
+      };
       return {animation,remove:()=>circle.remove()};
     },
-    dispose(){animations.forEach(animation=>animation.cancel());animations=[];surface.remove();defs.remove();},
+    dispose(){if(frame!==null)window.cancelAnimationFrame(frame);frame=null;waves.forEach(wave=>wave.resolve());waves.clear();animations.forEach(animation=>animation.cancel());animations=[];surface.remove();defs.remove();},
   };
 }

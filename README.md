@@ -2,17 +2,17 @@
 
 一个轻松的中文 Apple 冷知识小游戏。点「随机来 5 题」直接开玩，猜完领个趣味称号，生成战绩图片，邀请朋友「不服来战」。
 
-[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.4.2) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
+[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.4.3) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
 
-当前版本 **3.4.2**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
+当前版本 **3.4.3**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
 
 仓库地址：[Apple-Trivia](https://github.com/yunnre060214-sudo/Apple-Trivia)；网站地址：[Apple Trivia](https://yunnre060214-sudo.github.io/Apple-Trivia/)。仓库更名后，原 GitHub Pages 路径 `Apple-Product-Knowledge-Quiz` 已失效。线上发布版本可通过网站的 `version.json` 核查。
 
-## v3.4.2 主题切换性能修复
+## v3.4.3 主题切换性能修复
 
 主题扩散改为单份活态备用页面与交替明暗的 SVG 遮罩。备用页面在空闲时准备，整轮连点始终共用；每次点击仅增加一个圆形遮罩，原页面的配色与浏览器底色在最后一轮完成后统一提交。按钮图标和目标状态立即反馈，支持 3、5、20 次连续触发，不等待上一轮结束。
 
-原页面的流光、产品浮动和入场动画保持运行，备用页面同步其 DocumentTimeline、开始时间和暂停状态，不读取计算后的变换来冻结姿态，也不重新插入首页。背景光带从逐帧修改 SVG 描边改成整层变换。遮罩直接动画圆的半径，避免 SVG 变换资源缓存的差异。完成遮罩合并为一块底板，及时回收旧圆；导航、视口变化、后台与减少动态效果保留清理路径。
+原页面的流光、产品浮动和入场动画保持运行，备用页面同步其 DocumentTimeline、开始时间和暂停状态，不读取计算后的变换来冻结姿态，也不重新插入首页。背景光带从逐帧修改 SVG 描边改成整层变换。所有遮罩共用一条 requestAnimationFrame 循环，直接提交圆的半径，避免 SVG 变换资源缓存的差异。完成遮罩合并为一块底板，及时回收旧圆；导航、视口变化、后台与减少动态效果保留清理路径。
 
 ## v3.4.0 修复与代码优化
 
