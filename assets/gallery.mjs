@@ -1,5 +1,5 @@
 // Original vector studies of nine Apple silhouettes. No external assets.
-import {devices} from './gallery-data.mjs?v=3.3.1';
+import {devices} from './gallery-data.mjs?v=3.4.0';
 export {devices};
 
 export function archiveMarkup(version) {
@@ -16,7 +16,7 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
   const indicator = figure.querySelector('.archive-indicator');
   const playback = figure.querySelector('[data-archive-playback]');
   const doc = figure.ownerDocument;
-  const pauses = new Set();
+  const pauses = new Set(), touches = new Set();
   let timer, disposed = false, userPaused = false;
   let active = 'mac', frame, previous = 0;
   let targetX = 0, targetY = 0, x = 0, y = 0;
@@ -37,13 +37,17 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
     }, interval);
   }
   function pause(reason, value) {
+    if (pauses.has(reason) === value) return;
     if (value) pauses.add(reason); else pauses.delete(reason);
     scheduleAuto();
   }
   function syncVisibility() {
-    pause('hidden', Boolean(doc?.hidden));
-    pause('intro', Boolean(doc?.documentElement.classList.contains('hello-pending')));
-    pause('dialog', Boolean(doc?.querySelector('dialog[open]')));
+    const hidden=Boolean(doc?.hidden);
+    if(hidden){touches.clear();pauses.delete('touch');}
+    for(const [reason,value] of [['hidden',hidden],['intro',Boolean(doc?.documentElement.classList.contains('hello-pending'))],['dialog',Boolean(doc?.querySelector('dialog[open]'))]]) {
+      if(value)pauses.add(reason);else pauses.delete(reason);
+    }
+    scheduleAuto();
   }
   function positionIndicator() {
     if (!indicator) return;
@@ -94,9 +98,9 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
         link.setAttribute('href', `#q=${item.question.id}`);
       });
     }
-    positionIndicator();
     // Scroll this rail only. scrollIntoView could also move the whole page.
     const bounds = rail.getBoundingClientRect(), target = button.getBoundingClientRect();
+    indicator?.style.setProperty('--indicator-x', `${rail.scrollLeft + target.left - bounds.left + (target.width - 24) / 2}px`);
     const left = rail.scrollLeft + target.left - bounds.left - (bounds.width - target.width) / 2;
     rail.scrollTo({left:Math.max(0, Math.min(left, rail.scrollWidth - rail.clientWidth)), behavior:reducedMotion()?'auto':'smooth'});
     if (manual) scheduleAuto();
@@ -119,8 +123,18 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
   const onLeave = () => { reset(); pause('hover', false); };
   const onFocus = event => pause('focus', event.target.matches?.(':focus-visible') ?? true);
   const onBlur = event => { if (!figure.contains(event.relatedTarget)) pause('focus', false); };
-  const onTouchStart = event => { if (event.pointerType === 'touch') pause('touch', true); };
-  const onTouchEnd = () => pause('touch', false);
+  const onTouchStart = event => { if (event.pointerType === 'touch') {touches.add(event.pointerId);pause('touch', true);} };
+  // Pointerup can occur outside the figure after a drag. Observe the document
+  // without capture/preventDefault so native rail scrolling keeps working.
+  const onTouchEnd = event => {if(touches.delete(event.pointerId)&&!touches.size)pause('touch', false);};
+  function onMotionPreference() {
+    if(reducedMotion()) {
+      cancelAnimationFrame(frame);frame=undefined;previous=0;
+      targetX=targetY=x=y=0;
+      figure.style.setProperty('--art-x','0deg');figure.style.setProperty('--art-y','0deg');
+    }
+    scheduleAuto();
+  }
   function keydown(event) {
     const button = event.target.closest('[data-device]');
     if (!button || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -139,8 +153,8 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
   figure.addEventListener('focusin', onFocus);
   figure.addEventListener('focusout', onBlur);
   figure.addEventListener('pointerdown', onTouchStart);
-  figure.addEventListener('pointerup', onTouchEnd);
-  figure.addEventListener('pointercancel', onTouchEnd);
+  doc?.addEventListener('pointerup', onTouchEnd);
+  doc?.addEventListener('pointercancel', onTouchEnd);
   doc?.addEventListener('visibilitychange', syncVisibility);
   const resize = typeof ResizeObserver === 'function' ? new ResizeObserver(positionIndicator) : null;
   resize?.observe(rail);
@@ -151,7 +165,7 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
   const dialog = doc?.querySelector('dialog');
   if (dialog) state?.observe(dialog, {attributes:true, attributeFilter:['open']});
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-  motionPreference.addEventListener?.('change', scheduleAuto);
+  motionPreference.addEventListener?.('change', onMotionPreference);
   positionIndicator();
   syncVisibility();
   return () => {
@@ -166,10 +180,10 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
     figure.removeEventListener('focusin', onFocus);
     figure.removeEventListener('focusout', onBlur);
     figure.removeEventListener('pointerdown', onTouchStart);
-    figure.removeEventListener('pointerup', onTouchEnd);
-    figure.removeEventListener('pointercancel', onTouchEnd);
+    doc?.removeEventListener('pointerup', onTouchEnd);
+    doc?.removeEventListener('pointercancel', onTouchEnd);
     doc?.removeEventListener('visibilitychange', syncVisibility);
-    motionPreference.removeEventListener?.('change', scheduleAuto);
+    motionPreference.removeEventListener?.('change', onMotionPreference);
     resize?.disconnect(); visibility?.disconnect(); state?.disconnect();
   };
 }

@@ -84,6 +84,21 @@ test('a wrong-book retry never draws outside the requested IDs',()=>{
   const ids=bank.slice(20,31).map(q=>q.id);const qs=drawQuestions(bank,{...config,ids,count:100},2);
   assert.equal(qs.length,11);assert.ok(qs.every(q=>ids.includes(q.id)));
 });
+test('malformed JSON session rows and oversized saves recover without throwing during home loading',()=>{
+  const qs=drawQuestions(bank,{...config,count:5},7),s=createSession(qs,config,7,100);
+  for(const row of [null,1,'bad',[],{},false,{id:qs[0].id,options:null}]) {
+    assert.equal(hydrateSession({...s,questions:[row]},bank),null);
+  }
+  assert.equal(hydrateSession({...s,questions:Array(501).fill(s.questions[0])},bank),null);
+  assert.equal(hydrateSession({...s,startedAt:-1},bank),null);
+  for(const answers of [null,[],true,5,'bad'])assert.deepEqual(hydrateSession({...s,answers},bank).answers,{});
+  assert.equal(hydrateSession({...s,version:'3.3.1'},bank).hydratedQuestions.length,5);
+});
+test('restored practice and quick rounds cannot inherit a corrupt exam deadline',()=>{
+  const qs=drawQuestions(bank,{...config,count:5},7),s=createSession(qs,{...config,secondsPerQuestion:30},7,100);
+  for(const mode of ['practice','quick'])assert.equal(hydrateSession({...s,config:{...s.config,mode}},bank).deadline,null);
+  assert.equal(hydrateSession(s,bank).deadline,150100);
+});
 test('seeded Fisher-Yates reaches all answer positions without sorting bias',()=>{
   const positions=new Set();
   for(let i=0;i<40;i++)positions.add(shuffle(['a','b','c','d'],seeded(i)).indexOf('a'));

@@ -121,3 +121,16 @@ test('styles constrain hover effects to fine pointers and include a reduced-moti
   assert.doesNotMatch(interaction,/animation:[^;]+infinite/);
   assert.match(ambient,/@media \(prefers-reduced-motion:no-preference\)/);
 });
+
+test('theme copies and disconnected mutation records do not create motion wrappers or extra markers',()=>{
+  const f=fixture(),motion=f.mount(),copy=f.append('div','theme-surface');
+  const group=f.append('div','segments',{},copy),button=f.append('button','',{count:'5'},group);
+  button.setAttribute('aria-pressed','true');
+  const label=f.append('label','',{},copy),select=f.append('select','',{},label);select.name='mode';
+  copy.nodeType=group.nodeType=select.nodeType=1;
+  f.mutate([{type:'childList',target:f.body,addedNodes:[copy],removedNodes:[]}]);
+  assert.equal(group.querySelector('.motion-segment'),null);assert.equal(label.querySelector('.motion-select'),null);
+  const removed=f.append('select');removed.nodeType=1;removed.isConnected=false;
+  f.mutate([{type:'childList',target:f.body,addedNodes:[removed],removedNodes:[]}]);
+  assert.equal(removed.parentElement,f.body);motion.dispose();
+});

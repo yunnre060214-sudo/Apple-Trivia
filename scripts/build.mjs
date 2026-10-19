@@ -4,8 +4,11 @@ import { resolve, dirname } from 'node:path';
 import { buildBank, REVIEWED_AT } from '../src/bank.mjs';
 import { VERSION, validateBank } from '../src/engine.mjs';
 import { createHelloController } from '../assets/hello.mjs';
+import { verifyRelease } from './verify-release.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const packageInfo=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
+if(packageInfo.version!==VERSION)throw Error('Package and engine release versions differ');
 const catalog=JSON.parse(await readFile(resolve(root,'src/catalog.json'),'utf8'));
 const questions=buildBank(catalog);
 const statistics={...validateBank(questions), kinds:Object.fromEntries(['trivia','timeline','classic'].map(k=>[k,questions.filter(q=>(q.kind||'classic')===k).length]))};
@@ -24,5 +27,6 @@ await cp(resolve(root,'src/engine.mjs'),resolve(destination,'src/engine.mjs'));
 await writeFile(resolve(destination,'questions.json'),JSON.stringify({version:VERSION,reviewedAt:REVIEWED_AT,statistics,questions}));
 await writeFile(resolve(destination,'.nojekyll'),'');
 await writeFile(resolve(destination,'version.json'),JSON.stringify({version:VERSION,questions:questions.length,reviewedAt:REVIEWED_AT})+'\n');
+await verifyRelease(destination,VERSION);
 console.log(JSON.stringify({version:VERSION,reviewedAt:REVIEWED_AT,...statistics},null,2));
 

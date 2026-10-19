@@ -104,10 +104,11 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
   }
   function state(el) {return {pressed:el.getAttribute('aria-pressed'),correct:el.classList.contains('correct'),wrong:el.classList.contains('wrong'),disabled:el.disabled};}
   function refresh(scope=document) {
+    if(scope.closest?.('.theme-surface'))return;
     if(scope.matches?.(SELECTOR))decorate(scope);
     scope.querySelectorAll?.(SELECTOR).forEach(decorate);
     const groups=[...(scope.matches?.('.segments')?[scope]:[]),...(scope.querySelectorAll?.('.segments')||[])];
-    groups.forEach(group=>segment(group,false));
+    groups.filter(group=>!group.closest('.theme-surface')).forEach(group=>segment(group,false));
   }
   function press(el,event) {
     if(blocked(el)||reduced())return;
@@ -163,7 +164,7 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     if(animated&&from.width)run(marker,'segment',[{transform:`translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width},${from.height/to.height})`},{transform:'translate(0px,0px) scale(1)'}],{duration:350,easing:SETTLE});
   }
   function changed(el) {
-    if(!el.matches?.(SELECTOR))return;
+    if(!el.isConnected||el.closest?.('.theme-surface')||!el.matches?.(SELECTOR))return;
     const before=states.get(el);decorate(el);const after=state(el);states.set(el,after);
     if(!before)return;
     const info=describeMotion(el);
@@ -246,9 +247,10 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
   if(window.MutationObserver) {
     observer=new window.MutationObserver(records=>{
       records.forEach(record=>{
+        if(record.target.closest?.('.theme-surface'))return;
         if(record.type==='attributes')changed(record.target);
         else {
-          record.addedNodes.forEach(node=>{if(node.nodeType===1)refresh(node);});
+          record.addedNodes.forEach(node=>{if(node.nodeType===1&&node.isConnected)refresh(node);});
           record.removedNodes.forEach(node=>{if(node.nodeType!==1)return;[...active].forEach(a=>{if(node===a.el||node.contains(a.el))cancel(a);});disclosures.forEach((d,el)=>{if(node===el||node.contains(el))disclosures.delete(el);});feedbacks.forEach((f,el)=>{if(node===el||node.contains(el))f.restore();});});
         }
       });
