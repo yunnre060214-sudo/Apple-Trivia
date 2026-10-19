@@ -27,4 +27,4 @@ export function mountHome(main, {document,window}) {
   return () => { disposed = true; observer?.disconnect(); };
 }
 
-export {questionFromHash} from './navigation.mjs?v=3.4.2';
+export {questionFromHash} from './navigation.mjs?v=3.4.3';

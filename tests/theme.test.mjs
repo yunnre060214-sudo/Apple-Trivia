@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {createThemeSwitcher,setBrowserTheme} from '../assets/theme.mjs';
 import {synchronizeAnimations} from '../assets/theme-scene.mjs';
 
-function fixture({theme='light',reduce=false,supported=true,fail=false,width=390,height=844,cold=false}={}) {
+function fixture({theme='light',reduce=false,supported=true,fail=false,width=390,height=844,cold=false,page=false}={}) {
   const classes=new Set(),saved=[],previewed=[],committed=[],scenes=[],animations=[],timers=new Map(),idles=new Map(),frames=new Map(),events=new Map(),windowEvents=new Map();
   let id=0,time=0;
   const root={dataset:{theme,browserTheme:theme},clientWidth:width,clientHeight:height,classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}};
-  const document={documentElement:root,createElement:()=>({animate:supported?()=>{}:undefined}),addEventListener:(k,v)=>events.set(k,v),removeEventListener:k=>events.delete(k)};
+  const document={documentElement:root,getElementById:()=>page?{}:null,createElement:()=>({animate:supported?()=>{}:undefined}),addEventListener:(k,v)=>events.set(k,v),removeEventListener:k=>events.delete(k)};
   const preference={matches:reduce,addEventListener:(_,fn)=>preference.change=fn,removeEventListener:()=>preference.change=null};
   const window={innerWidth:width,innerHeight:height,visualViewport:{width,height},performance:{now:()=>time},matchMedia:()=>preference,
     setTimeout:fn=>{timers.set(++id,fn);return id;},clearTimeout:id=>timers.delete(id),
@@ -124,4 +124,13 @@ test('in-flight press and entry effects mirror their existing keyframes and phas
   const mirrored=synchronizeAnimations([original],[],new Map([[copy,source]]));
   assert.equal(mirrored.length,1);assert.equal(made[0].startTime,500);assert.deepEqual(made[0].timing,{duration:220,fill:'both'});
   assert.equal(original.startTime,500);assert.equal(original.currentTime,50);
+});
+
+test('final palette commits suppress a second color transition without imposing an input cooldown',async()=>{
+  const f=fixture({page:true}),first=f.switchTheme(f.button);f.animations[0].finish();await first;
+  assert.equal(f.root.dataset.theme,'dark');assert.equal(f.classes.has('theme-committing'),true);
+  f.idle();const second=f.switchTheme(f.button);assert.equal(f.animations.length,2);
+  f.frame();f.frame();assert.equal(f.classes.has('theme-committing'),false);
+  f.animations[1].finish();await second;f.switchTheme.dispose();
+  assert.equal(f.frames.size,0);assert.equal(f.classes.size,0);
 });

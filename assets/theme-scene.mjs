@@ -61,16 +61,34 @@ export function createThemeScene({document,window,theme,width,height,duration=78
   copy.querySelectorAll('script,dialog,[data-theme-copy-id="toast"],[data-theme-copy-id="celebration"]').forEach(node=>node.remove());
   copy.classList.add('theme-page-copy');copy.inert=true;
   Object.assign(copy.style,{top:`${-window.scrollY}px`,left:'0px',width:`${document.documentElement.clientWidth||width}px`});
-  const defs=document.createElementNS(SVG,'svg');defs.classList.add('theme-mask-defs');defs.setAttribute('aria-hidden','true');
-  const mask=document.createElementNS(SVG,'mask');mask.id=`${prefix}-mask`;
-  for(const [key,value] of Object.entries({maskUnits:'userSpaceOnUse',maskContentUnits:'userSpaceOnUse',x:0,y:0,width,height,'mask-type':'luminance'}))mask.setAttribute(key,String(value));
-  const floor=document.createElementNS(SVG,'rect');
-  for(const [key,value] of Object.entries({x:0,y:0,width,height,fill:'black'}))floor.setAttribute(key,String(value));
-  mask.append(floor);defs.append(mask);
-  surface.style.maskImage=`url("#${mask.id}")`;surface.style.webkitMaskImage=surface.style.maskImage;
-  surface.style.maskMode='luminance';surface.style.opacity='0';surface.append(copy);
-  document.body.append(defs,surface);
+  surface.style.clipPath='path(evenodd,"M0 0L0 0Z")';surface.style.opacity='0';surface.append(copy);
+  document.body.append(surface);
   let animations=surface.getAnimations({subtree:true});
+  const waves=new Set(),shapes=new Set();let frame=null,origin=null,floor=false;
+  const now=()=>window.performance.now();
+  function draw() {
+    const parts=[floor?`M0 0H${width}V${height}H0Z`:'M0 0L0 0Z'];
+    if(origin)for(const shape of shapes) {
+      const r=Number(shape.currentRadius.toFixed(3));if(!r)continue;
+      const {x,y}=origin;
+      parts.push(`M${x-r} ${y}A${r} ${r} 0 1 0 ${x+r} ${y}A${r} ${r} 0 1 0 ${x-r} ${y}Z`);
+    }
+    // All waves share one stationary control origin, so older circles contain
+    // younger circles. Even-odd contours reproduce alternating reveal/erase
+    // exactly, without SVG reference resources or one DOM layer per click.
+    surface.style.clipPath=`path(evenodd,"${parts.join(' ')}")`;
+  }
+  function schedule(){if(frame===null&&waves.size)frame=window.requestAnimationFrame(tick);}
+  function tick(time) {
+    frame=null;
+    for(const wave of [...waves]) {
+      const progress=Math.max(0,Math.min(1,(time-wave.started)/duration));
+      wave.currentRadius=origin.radius*(1-Math.pow(1-progress,3));
+      if(progress===1){waves.delete(wave);wave.resolve();}
+    }
+    draw();
+    schedule();
+  }
   function updateControl() {
     const original=document.getElementById('theme-toggle'),button=copyForSource.get(original);
     if(button)button.innerHTML=original.innerHTML;
@@ -89,17 +107,18 @@ export function createThemeScene({document,window,theme,width,height,duration=78
       surface.style.opacity='1';
     },
     updateControl,
-    setFloor(show){floor.setAttribute('fill',show?'white':'black');},
+    setFloor(show){floor=show;draw();},
     addWave({x,y,radius,show}) {
-      const circle=document.createElementNS(SVG,'circle');circle.classList.add('theme-wave');
-      circle.setAttribute('cx',String(x));circle.setAttribute('cy',String(y));
-      circle.setAttribute('r','0');circle.setAttribute('fill',show?'white':'black');
-      mask.append(circle);
-      // Geometry animation invalidates the mask resource directly. Transform
-      // animation of SVG mask children can reuse stale raster bounds in engines.
-      const animation=circle.animate([{r:'0px'},{r:`${radius}px`}],{duration,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
-      return {animation,remove:()=>circle.remove()};
+      if(!origin)origin={x,y,radius};
+      let resolve;const finished=new Promise(done=>resolve=done);
+      const wave={currentRadius:0,started:now(),resolve};waves.add(wave);shapes.add(wave);schedule();
+      const animation={finished,
+        get currentTime(){return now()-wave.started;},
+        set currentTime(value){wave.started=now()-value;},
+        cancel(){waves.delete(wave);resolve();if(!waves.size&&frame!==null){window.cancelAnimationFrame(frame);frame=null;}},
+      };
+      return {animation,remove:()=>{shapes.delete(wave);draw();}};
     },
-    dispose(){animations.forEach(animation=>animation.cancel());animations=[];surface.remove();defs.remove();},
+    dispose(){if(frame!==null)window.cancelAnimationFrame(frame);frame=null;waves.forEach(wave=>wave.resolve());waves.clear();shapes.clear();animations.forEach(animation=>animation.cancel());animations=[];surface.remove();},
   };
 }
