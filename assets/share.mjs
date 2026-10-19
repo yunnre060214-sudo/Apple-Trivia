@@ -1,4 +1,4 @@
-import {APPLE_PATH} from './brand.mjs?v=3.4.1';
+import {APPLE_PATH} from './brand.mjs?v=3.4.2';
 export const SITE_URL = 'https://yunnre060214-sudo.github.io/Apple-Trivia/';
 const PALETTES = {
   perfect:{title:['#88632d','#997645'],darkTitle:['#dec392','#e3cfaa'],wash:['#f3eddf','#f7f2e7'],ink:'#88632d'},

@@ -1,4 +1,4 @@
-export const VERSION = '3.4.1';
+export const VERSION = '3.4.2';
 export const CATEGORIES = {
   iphone: { name: 'iPhone', short: 'iP', color: '#3478e7' },
   ipad: { name: 'iPad', short: 'iD', color: '#8958c7' },
@@ -82,7 +82,7 @@ export function createSession(questions, config, seed, now = Date.now()) {
   };
 }
 export function hydrateSession(saved, bank) {
-  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', '3.3.1', '3.4.0', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || saved.questions.length > Math.min(500,bank.length) || !Number.isFinite(saved.startedAt) || saved.startedAt < 0) return null;
+  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', '3.3.1', '3.4.0', '3.4.1', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || saved.questions.length > Math.min(500,bank.length) || !Number.isFinite(saved.startedAt) || saved.startedAt < 0) return null;
   if (!saved.config || !['quick', 'exam', 'practice'].includes(saved.config.mode)) return null;
   const lookup = new Map(bank.map(q => [q.id, q]));
   const ids = new Set();

@@ -46,7 +46,8 @@ test('mask waves allocate circles without copying scene content and alternate lu
   const a=f.scene.addWave({x:342,y:40,radius:950,show:true}),b=f.scene.addWave({x:342,y:40,radius:950,show:false});
   assert.equal(f.surface.querySelectorAll('*').length,before);
   const circles=f.body.querySelectorAll('circle');assert.deepEqual(circles.map(n=>n.attrs.get('fill')),['white','black']);
-  assert.equal(a.animation.keyframes[0].transform,'translate(342px,40px) scale(0)');assert.equal(a.animation.options.duration,780);
+  assert.equal(circles[0].attrs.get('cx'),'342');assert.equal(circles[0].attrs.get('cy'),'40');
+  assert.deepEqual(a.animation.keyframes,[{r:'0px'},{r:'950px'}]);assert.equal(a.animation.options.duration,780);
   f.scene.setFloor(true);assert.equal(f.body.querySelectorAll('rect')[0].attrs.get('fill'),'white');
   a.animation.finish();b.animation.finish();await Promise.all([a.animation.finished,b.animation.finished]);a.remove();b.remove();f.scene.dispose();
   assert.equal(f.body.children.length,1);

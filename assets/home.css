@@ -25,7 +25,7 @@
 /* One idle-prepared alternate palette serves the entire burst of mask circles. */
 .theme-surface { position:fixed; inset:0; z-index:90; overflow:hidden; pointer-events:none!important; background:var(--bg); color:var(--ink); color-scheme:var(--page-scheme); contain:paint; }
 .theme-surface * { pointer-events:none!important; transition:none!important; caret-color:transparent!important; }
-.theme-mask-defs { position:fixed; width:0; height:0; overflow:hidden; pointer-events:none; }
+.theme-mask-defs { position:fixed; inset:0; width:100%; height:100%; overflow:hidden; pointer-events:none; }
 .theme-page-copy { position:absolute; margin:0; min-height:100dvh; }
 .theme-page-copy .skip-link { display:none; }
 .theme-surface .archive-year,.theme-surface .archive-story { background-image:none; }

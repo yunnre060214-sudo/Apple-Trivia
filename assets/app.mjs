@@ -1,12 +1,12 @@
-import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.4.1';
-import {icon} from './icons.mjs?v=3.4.1';
-import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.4.1';
-import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.4.1';
-import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.4.1';
-import {replayHello} from './hello.mjs?v=3.4.1';
-import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.4.1';
-import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.4.1';
-import {createInteractionMotion} from './motion.mjs?v=3.4.1';
+import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.4.2';
+import {icon} from './icons.mjs?v=3.4.2';
+import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.4.2';
+import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.4.2';
+import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.4.2';
+import {replayHello} from './hello.mjs?v=3.4.2';
+import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.4.2';
+import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.4.2';
+import {createInteractionMotion} from './motion.mjs?v=3.4.2';
 const $=s=>document.querySelector(s), main=$('#main'), modal=$('#modal');
 const KEY='apple-quiz:v1:';
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -198,7 +198,7 @@ function previewTheme(theme){
   const toggle=$('#theme-toggle');toggle.innerHTML=icon(dark?'sun':'moon');
   toggle.setAttribute('aria-label',dark?'使用浅色外观':'使用深色外观');
 }
-const switchTheme=createThemeSwitcher({document,window,applyTheme:theme=>applyTheme(theme,{syncChrome:false}),previewTheme,commitTheme:syncBrowserTheme,saveTheme:theme=>write('theme',theme),reducedMotion:reduced});
+const switchTheme=createThemeSwitcher({document,window,applyTheme:theme=>applyTheme(theme,{syncChrome:false}),previewTheme,commitTheme:syncBrowserTheme,saveTheme:theme=>write('theme',theme),reducedMotion:reduced,duration:new URLSearchParams(location.search).get('motion')==='slow'?6000:780});
 function preferredTheme(){const saved=read('theme',null);return ['dark','light'].includes(saved)?saved:systemTheme.matches?'dark':'light';}
 applyTheme(preferredTheme());
 function syncPreferredTheme(){switchTheme.settle(preferredTheme());}
