@@ -1,4 +1,4 @@
-import {APPLE_PATH} from './brand.mjs?v=3.3.1';
+import {APPLE_PATH} from './brand.mjs?v=3.4.0';
 export const SITE_URL = 'https://yunnre060214-sudo.github.io/Apple-Trivia/';
 const PALETTES = {
   perfect:{title:['#88632d','#997645'],darkTitle:['#dec392','#e3cfaa'],wash:['#f3eddf','#f7f2e7'],ink:'#88632d'},
@@ -10,6 +10,32 @@ export function resultPalette(report) {
 }
 export function shareText(report,title) {
   return `Apple 冷知识 · ${report.correct}/${report.total} 题 · ${report.score} 分\n「${title}」\n不服来战！\n${SITE_URL}`;
+}
+
+// One renderer per report, one owner per visible preview. Closing or replacing
+// a dialog invalidates its callbacks and releases its object URL immediately.
+export function createSharePreview({render=createShareCard,createUrl=blob=>URL.createObjectURL(blob),revokeUrl=url=>URL.revokeObjectURL(url)}={}) {
+  const cache=new WeakMap();
+  let revision=0,url=null,blob=null;
+  function clear() {
+    revision++;
+    if(url)revokeUrl(url);
+    url=null;blob=null;
+  }
+  async function show(report,title,{ready,fail}) {
+    clear();const token=revision;
+    let task=cache.get(report);
+    if(!task){task=Promise.resolve().then(()=>render(report,title));cache.set(report,task);}
+    try {
+      const generated=await task;
+      if(token!==revision)return;
+      url=createUrl(generated);blob=generated;ready({blob,url});
+    } catch(error) {
+      if(cache.get(report)===task)cache.delete(report);
+      if(token===revision)fail(error);
+    }
+  }
+  return {show,clear,get blob(){return blob;}};
 }
 export async function createShareCard(report,title) {
   await document.fonts?.ready;

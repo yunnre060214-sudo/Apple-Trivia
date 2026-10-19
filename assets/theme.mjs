@@ -106,6 +106,10 @@ export function createThemeSwitcher({document, window, applyTheme, saveTheme, co
           if (done) return;
           done = true; active.delete(record); window.clearTimeout(record.timer);
           if (!surfaces.includes(wave)) return resolve(true);
+          // Preserve the completed floor with CSS, then release the filled WAAPI
+          // effect even while a younger curtain is still running above it.
+          wave.style.clipPath = 'none';
+          animation.cancel();
           // Completed older waves become the solid floor for younger waves.
           const before = surfaces.slice(0,surfaces.indexOf(wave));
           before.forEach(remove);
@@ -134,13 +138,21 @@ export function createThemeSwitcher({document, window, applyTheme, saveTheme, co
     if (surfaces.length && !event.target.closest('[data-action="theme"]')) settle();
   };
   const onViewport = () => { if (surfaces.length) settle(); };
+  const onHidden = () => { if (document.hidden) onViewport(); };
+  const preference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const onPreference = event => { if (event.matches) onViewport(); };
   document.addEventListener('click',onOtherAction,true);
+  document.addEventListener('visibilitychange',onHidden);
+  preference?.addEventListener?.('change',onPreference);
   window.addEventListener('resize',onViewport,{passive:true});
   window.addEventListener('scroll',onViewport,{passive:true});
   window.addEventListener('pagehide',onViewport);
+  switchTheme.settle = settle;
   switchTheme.dispose = () => {
     settle();
     document.removeEventListener('click',onOtherAction,true);
+    document.removeEventListener('visibilitychange',onHidden);
+    preference?.removeEventListener?.('change',onPreference);
     window.removeEventListener('resize',onViewport);
     window.removeEventListener('scroll',onViewport);
     window.removeEventListener('pagehide',onViewport);

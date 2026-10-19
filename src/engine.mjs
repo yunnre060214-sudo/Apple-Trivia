@@ -1,4 +1,4 @@
-export const VERSION = '3.3.1';
+export const VERSION = '3.4.0';
 export const CATEGORIES = {
   iphone: { name: 'iPhone', short: 'iP', color: '#3478e7' },
   ipad: { name: 'iPad', short: 'iD', color: '#8958c7' },
@@ -49,6 +49,10 @@ export function drawQuestions(bank, config, seed, seen = []) {
   const pool = filterBank(bank, config);
   const wanted = Math.min(pool.length, Math.max(1, Math.floor(config.count || 20)));
   const recent = new Set(seen);
+  const positions = new Map(seen.map((id, i) => [id, i]));
+  // Quick rounds have their own topic/family policy. Skip the unused balanced
+  // shuffle and its allocations for the most common five-question entry point.
+  if (config.mode === 'quick') return quickDraw(pool, wanted, rng, recent, positions).map(q => ({...q, options:shuffle(q.options,rng)}));
   const takeBalanced = (items, limit) => {
     const groups = new Map();
     for (const q of shuffle(items, rng)) {
@@ -64,9 +68,8 @@ export function drawQuestions(bank, config, seed, seen = []) {
     return picked;
   };
   const fresh = takeBalanced(pool.filter(q => !recent.has(q.id)), wanted);
-  const positions = new Map(seen.map((id, i) => [id, i]));
   const old = pool.filter(q => recent.has(q.id)).sort((a,b) => positions.get(a.id)-positions.get(b.id)).slice(0,wanted-fresh.length);
-  const selected = config.mode === 'quick' ? quickDraw(pool, wanted, rng, recent, positions) : shuffle([...fresh, ...old], rng);
+  const selected = shuffle([...fresh, ...old], rng);
   return selected.map(q => ({ ...q, options: shuffle(q.options, rng) }));
 }
 export function createSession(questions, config, seed, now = Date.now()) {
@@ -79,24 +82,26 @@ export function createSession(questions, config, seed, now = Date.now()) {
   };
 }
 export function hydrateSession(saved, bank) {
-  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || !Number.isFinite(saved.startedAt)) return null;
+  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', '3.3.1', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || saved.questions.length > Math.min(500,bank.length) || !Number.isFinite(saved.startedAt) || saved.startedAt < 0) return null;
   if (!saved.config || !['quick', 'exam', 'practice'].includes(saved.config.mode)) return null;
   const lookup = new Map(bank.map(q => [q.id, q]));
   const ids = new Set();
   const questions = [];
   for (const row of saved.questions) {
+    if (!row || typeof row !== 'object' || typeof row.id !== 'string') return null;
     const q = lookup.get(row.id);
     if (!q || ids.has(q.id) || !Array.isArray(row.options) || row.options.length !== q.options.length || new Set(row.options).size !== q.options.length || !row.options.every(o => q.options.includes(o))) return null;
     ids.add(q.id);
     questions.push({ ...q, options: row.options });
   }
   const answers = {};
-  for (const q of questions) if (q.options.includes(saved.answers?.[q.id])) answers[q.id] = saved.answers[q.id];
+  const storedAnswers = saved.answers && typeof saved.answers === 'object' && !Array.isArray(saved.answers) ? saved.answers : {};
+  for (const q of questions) if (Object.hasOwn(storedAnswers,q.id) && q.options.includes(storedAnswers[q.id])) answers[q.id] = storedAnswers[q.id];
   const safeIds = a => Array.isArray(a) ? [...new Set(a)].filter(id => ids.has(id)) : [];
   return {
     ...saved, answers, confirmed: safeIds(saved.confirmed).filter(id => answers[id]),
     flags: safeIds(saved.flags), index: Math.max(0, Math.min(questions.length - 1, Math.floor(saved.index) || 0)),
-    deadline: Number.isFinite(saved.deadline) && saved.deadline > saved.startedAt ? saved.deadline : null,
+    deadline: saved.config.mode === 'exam' && Number.isFinite(saved.deadline) && saved.deadline > saved.startedAt ? saved.deadline : null,
     hydratedQuestions: questions,
   };
 }

@@ -27,7 +27,4 @@ export function mountHome(main, {document,window}) {
   return () => { disposed = true; observer?.disconnect(); };
 }
 
-export function questionFromHash(hash) {
-  if (!hash.startsWith('#q=')) return null;
-  try { const id=decodeURIComponent(hash.slice(3)); return /^gallery-[a-z0-9-]+$/.test(id)?id:null; } catch { return null; }
-}
+export {questionFromHash} from './navigation.mjs?v=3.4.0';

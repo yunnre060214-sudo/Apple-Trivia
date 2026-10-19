@@ -80,6 +80,7 @@ function fixture() {
   };
   const figure = {
     isConnected:true, ownerDocument:doc, dataset:{},
+    style:{setProperty:(key,value)=>values.set(key,value)},
     contains:target => buttons.includes(target),
     querySelectorAll:selector => ({'[data-device]':buttons,'[data-archive-layer]':layers,'[data-gallery-question]':[year,storyLink]}[selector] || []),
     querySelector:selector => ({'.archive-select':rail,'.archive-indicator':indicator,'[data-archive-playback]':playback,'[data-archive-caption]':caption,'[data-archive-year]':year,'[data-archive-date]':date,'[data-archive-story]':story}[selector] || null),
@@ -181,5 +182,33 @@ test('autoplay pauses for hover, keyboard, hidden pages and user pause without l
     cleanup();
     const reduced=fixture(),stop=mountArchive(reduced.figure,{...reduced.clock,reducedMotion:()=>true});
     assert.equal(reduced.scheduled.size,0);reduced.step(1);assert.equal(reduced.buttons[1].pressed,'true');stop();
+  } finally {globalThis.matchMedia=previous.match;globalThis.cancelAnimationFrame=previous.cancel;}
+});
+
+test('touch drags released outside the gallery or interrupted by backgrounding cannot permanently pause autoplay',()=>{
+  const previous={match:globalThis.matchMedia,cancel:globalThis.cancelAnimationFrame};
+  globalThis.matchMedia=()=>({matches:false});globalThis.cancelAnimationFrame=()=>{};
+  try {
+    const f=fixture(),cleanup=mountArchive(f.figure,{...f.clock});
+    f.listeners.get('pointerdown')({pointerType:'touch',pointerId:4});assert.equal(f.scheduled.size,0);
+    f.documentEvents.get('pointerup')({pointerId:99});assert.equal(f.scheduled.size,0);
+    f.documentEvents.get('pointerup')({pointerId:4});assert.equal(f.scheduled.size,1);
+    f.advance(5000);assert.equal(f.buttons[1].pressed,'true');
+    f.listeners.get('pointerdown')({pointerType:'touch',pointerId:5});
+    f.doc.hidden=true;f.documentEvents.get('visibilitychange')();
+    f.doc.hidden=false;f.documentEvents.get('visibilitychange')();
+    f.advance(5000);assert.equal(f.buttons[2].pressed,'true');
+    cleanup();assert.equal(f.documentEvents.size,0);assert.equal(f.scheduled.size,0);
+  } finally {globalThis.matchMedia=previous.match;globalThis.cancelAnimationFrame=previous.cancel;}
+});
+test('enabling reduced motion resets the artwork pose immediately and clears autoplay',()=>{
+  const previous={match:globalThis.matchMedia,cancel:globalThis.cancelAnimationFrame};
+  const preference={matches:false,addEventListener:(_,fn)=>preference.change=fn,removeEventListener:()=>preference.change=null};
+  globalThis.matchMedia=()=>preference;globalThis.cancelAnimationFrame=()=>{};
+  try {
+    const f=fixture(),cleanup=mountArchive(f.figure,{...f.clock,reducedMotion:()=>preference.matches});
+    preference.matches=true;preference.change();
+    assert.equal(f.scheduled.size,0);assert.equal(f.values.get('--art-x'),'0deg');assert.equal(f.values.get('--art-y'),'0deg');
+    preference.matches=false;preference.change();assert.equal(f.scheduled.size,1);cleanup();assert.equal(preference.change,null);
   } finally {globalThis.matchMedia=previous.match;globalThis.cancelAnimationFrame=previous.cancel;}
 });

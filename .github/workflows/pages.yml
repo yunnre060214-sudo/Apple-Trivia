@@ -17,6 +17,8 @@ concurrency:
 jobs:
   validate-build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,6 +28,9 @@ jobs:
         run: npm test
       - name: Build static website
         run: npm run build
+      - name: Record expected release
+        id: release
+        run: node -p '"version=" + JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version' >> "$GITHUB_OUTPUT"
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
@@ -52,14 +57,17 @@ jobs:
         shell: bash
         run: |
           site="https://yunnre060214-sudo.github.io/Apple-Trivia/"
+          expected="${{ needs.validate-build.outputs.version }}"
           for attempt in 1 2 3 4 5; do
-            http_code="$(curl --silent --show-error --location --output /tmp/apple-trivia-index.html --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "$site" || true)"
-            asset_code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "${site}assets/app.mjs" || true)"
-            version_code="$(curl --silent --show-error --location --output /tmp/apple-trivia-version.json --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "${site}version.json" || true)"
+            http_code="$(curl --silent --show-error --location --output /tmp/apple-trivia-index.html --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "${site}?v=${expected}" || true)"
+            asset_code="$(curl --silent --show-error --location --output /tmp/apple-trivia-app.mjs --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "${site}assets/app.mjs?v=${expected}" || true)"
+            version_code="$(curl --silent --show-error --location --output /tmp/apple-trivia-version.json --write-out '%{http_code}' --connect-timeout 10 --max-time 20 "${site}version.json?v=${expected}" || true)"
             if [ "$http_code" = "200" ] && [ "$asset_code" = "200" ] && [ "$version_code" = "200" ] \
                && grep -q '<title>Apple Trivia' /tmp/apple-trivia-index.html \
-               && grep -q '"version"' /tmp/apple-trivia-version.json; then
-              echo "Verified live site, JavaScript and version.json: $site"
+               && grep -Fq "./assets/app.mjs?v=${expected}" /tmp/apple-trivia-index.html \
+               && grep -Fq "../src/engine.mjs?v=${expected}" /tmp/apple-trivia-app.mjs \
+               && EXPECTED_VERSION="$expected" node -e 'const data=JSON.parse(require("node:fs").readFileSync("/tmp/apple-trivia-version.json","utf8"));process.exit(data.version===process.env.EXPECTED_VERSION?0:1)'; then
+              echo "Verified live site, JavaScript and version.json at v${expected}: $site"
               cat /tmp/apple-trivia-version.json
               exit 0
             fi
