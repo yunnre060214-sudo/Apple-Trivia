@@ -3,6 +3,7 @@
   --page-scheme:light; --bg:#f5f4f0; --surface:#fdfcf9; --ink:#222622; --muted:#656b65;
   --line:#d9dcd3; --soft:#eaece5; --ghost:#d9ddd2; --accent:#245abe; --accent-hover:#16499f; --accent-soft:#e8edf8;
   --button:#222622; --button-ink:#fffefa;
+  --shadow:0 2px 4px #26301f06,0 12px 28px #26301f09;
   --green:#256744; --green-soft:#eaf2e8; --green-line:#7fa485; --red:#a13e35; --red-soft:#f9ede6; --red-line:#cb9187;
   --title-colors:linear-gradient(115deg,#29867d 4%,#3973bf 27%,#8560ad 49%,#bd6173 71%,#ac792c 94%);
   --title-lead:#273f48; --title-glow:0 0 0 transparent; --day-opacity:.54; --night-opacity:0;
@@ -21,13 +22,14 @@
   --orb-a:#4d97ff; --orb-b:#9672e8; --orb-c:#6cddce; --glow-blue:#417eff88; --glow-rose:#9864ef77; --glow-gold:#39c5c44d; --product-light:drop-shadow(0 24px 42px #6997ff2b) saturate(1.06);
   --hero-button-shadow:0 3px 32px #779bff28,inset 0 1px 0 #ffffff60; --entry-flare:radial-gradient(ellipse,#4c76df66 0%,#8268bb33 32%,transparent 68%);
 }
-/* Every wave owns a complete palette. These surfaces never intercept input. */
+/* One idle-prepared alternate palette serves the entire burst of mask circles. */
 .theme-surface { position:fixed; inset:0; z-index:90; overflow:hidden; pointer-events:none!important; background:var(--bg); color:var(--ink); color-scheme:var(--page-scheme); contain:paint; }
-.theme-surface * { pointer-events:none!important; animation:none!important; transition:none!important; caret-color:transparent!important; }
-.theme-page-copy { position:absolute; margin:0; min-height:100dvh; visibility:visible!important; }
+.theme-surface * { pointer-events:none!important; transition:none!important; caret-color:transparent!important; }
+.theme-mask-defs { position:fixed; width:0; height:0; overflow:hidden; pointer-events:none; }
+.theme-page-copy { position:absolute; margin:0; min-height:100dvh; }
 .theme-page-copy .skip-link { display:none; }
-.theme-surface .home-aurora { filter:none!important; }
 .theme-surface .archive-year,.theme-surface .archive-story { background-image:none; }
+.theme-palette[data-theme=light] .result-emblem { color:var(--result-a); }
 :is(#site-content,[data-theme-copy-id=site-content]) { position:relative; isolation:isolate; }
 body[data-view=home] main { position:relative; }
 .home-atmosphere { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; background:var(--bg); }
@@ -38,7 +40,7 @@ body[data-view=home] main { position:relative; }
 .aurora-blue { top:-25%; right:-14%; background:radial-gradient(ellipse,var(--glow-blue),transparent 66%); }
 .aurora-rose { bottom:-38%; left:-22%; background:radial-gradient(ellipse,var(--glow-rose),transparent 64%); }
 .aurora-gold { top:10%; left:23%; width:48vw; height:52vw; background:radial-gradient(ellipse,var(--glow-gold),transparent 67%); }
-.home-ribbons { position:absolute; width:100%; height:100%; inset:0; opacity:var(--ribbon-opacity); overflow:visible; }
+.home-ribbons { position:absolute; width:100%; height:100%; inset:0; opacity:var(--ribbon-opacity); overflow:visible; will-change:transform; }
 .home-ribbon { stroke-width:1; stroke-dasharray:380 1800; stroke-linecap:round; }
 .ribbon-two { stroke-width:18; filter:blur(15px); opacity:.7; }
 .ribbon-three { opacity:.5; }
@@ -82,9 +84,9 @@ body[data-view=home] main { position:relative; }
   .home-aurora { animation:home-aurora-drift 11s ease-in-out infinite alternate; }
   .aurora-rose { animation-duration:14s; animation-direction:alternate-reverse; }
   .aurora-gold { animation-duration:17s; animation-delay:-4s; }
-  .home-ribbon { animation:home-light-travel 7s linear infinite; }
-  .ribbon-two { animation-delay:-2.5s; animation-duration:9s; }
-  .ribbon-three { animation-delay:-4s; animation-duration:11s; }
+  .home-ribbons { animation:home-ribbons-drift 12s ease-in-out infinite alternate; }
+  .ribbon-two { stroke-dashoffset:690; }
+  .ribbon-three { stroke-dashoffset:1100; }
   .archive-orbit { animation:home-orbit-turn 36s linear infinite; }
   .archive-layer.is-active .archive-object img { animation:home-object-float 5.5s ease-in-out infinite; }
   .hero-start .button-disc .icon { animation:home-arrow-nudge 5s ease-in-out 2s infinite; }
@@ -101,7 +103,7 @@ body[data-view=home] main { position:relative; }
 @keyframes home-opening-light { 0% { opacity:0; transform:translate(-25%,-10%) rotate(-15deg) scale(.6); } 35% { opacity:1; } 100% { opacity:0; transform:translate(35%,10%) rotate(20deg) scale(1.3); } }
 @keyframes home-type-flow { to { background-position:100% 50%; } }
 @keyframes home-aurora-drift { from { transform:translate(-8vw,-5vh) rotate(-12deg) scale(.9); } to { transform:translate(12vw,12vh) rotate(16deg) scale(1.25); } }
-@keyframes home-light-travel { from { stroke-dashoffset:1700; } to { stroke-dashoffset:-480; } }
+@keyframes home-ribbons-drift { from { transform:translate3d(-6%,3%,0) rotate(-5deg) scale(1.08); } to { transform:translate3d(9%,-5%,0) rotate(6deg) scale(1.2); } }
 @keyframes home-orbit-turn { to { rotate:360deg; } }
 @keyframes home-object-float { 0%,100% { translate:0 4px; rotate:-.5deg; } 50% { translate:0 -12px; rotate:.5deg; } }
 @keyframes home-arrow-nudge { 0%,70%,100% { translate:0; } 80% { translate:4px; } 90% { translate:-2px; } }

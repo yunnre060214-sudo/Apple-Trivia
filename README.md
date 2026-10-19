@@ -2,11 +2,17 @@
 
 一个轻松的中文 Apple 冷知识小游戏。点「随机来 5 题」直接开玩，猜完领个趣味称号，生成战绩图片，邀请朋友「不服来战」。
 
-[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.4.0) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
+[来猜 5 题](https://yunnre060214-sudo.github.io/Apple-Trivia/?v=3.4.1) · [反馈题目](https://github.com/yunnre060214-sudo/Apple-Trivia/issues)
 
-当前版本 **3.4.0**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
+当前版本 **3.4.1**，题库 **4,585 道**，资料整理日期 **2026-10-18**。
 
 仓库地址：[Apple-Trivia](https://github.com/yunnre060214-sudo/Apple-Trivia)；网站地址：[Apple Trivia](https://yunnre060214-sudo.github.io/Apple-Trivia/)。仓库更名后，原 GitHub Pages 路径 `Apple-Product-Knowledge-Quiz` 已失效。线上发布版本可通过网站的 `version.json` 核查。
+
+## v3.4.1 主题切换性能修复
+
+主题扩散改为单份活态备用页面与交替明暗的 SVG 遮罩。备用页面在空闲时准备，整轮连点始终共用；每次点击仅增加一个圆形遮罩，原页面的配色与浏览器底色在最后一轮完成后统一提交。按钮图标和目标状态立即反馈，支持 3、5、20 次连续触发，不等待上一轮结束。
+
+原页面的流光、产品浮动和入场动画保持运行，备用页面同步其 DocumentTimeline、开始时间和暂停状态，不读取计算后的变换来冻结姿态，也不重新插入首页。背景光带从逐帧修改 SVG 描边改成整层变换。完成遮罩合并为一块底板，及时回收旧圆；导航、视口变化、后台与减少动态效果保留清理路径。
 
 ## v3.4.0 修复与代码优化
 
@@ -32,7 +38,7 @@
 
 每次进入播放 hello，可点右下角 skip 或按 Escape 跳过。进入首页后，标题、产品和背景光带依次展开。大标题改用本地托管的 Outfit 字体，彩色直接融入文字，移除 Apple 下方的装饰短条；中英文两行使用实际字形边界测量做光学对齐。
 
-明暗切换使用独立的页面视觉副本与圆形裁剪，每次点击同步切换目标并新增一层扩散，先前的扩散继续运行，支持多次快速连点。视觉副本不含重复 ID，不可聚焦，也不拦截鼠标和触摸；滚动、缩放、其他导航操作或页面退出时清理叠层。Safari 的页面外底色和浏览器主题色在最终扩散完成后再提交。
+明暗切换共用一份预备的活态备用页面，圆形遮罩按点击顺序交替显示和擦除另一套配色，支持多次快速连点。备用页面与原页面同步动画时钟，SVG 绘图 ID 使用独立命名空间，不可聚焦，也不拦截鼠标和触摸；滚动、缩放、其他导航操作或页面退出时清理遮罩。Safari 的页面外底色和浏览器主题色在最终扩散完成后再提交。
 
 浅色使用纸白底、彩色折射光带与柔和投影；深色单独配置靛蓝底、星点、轨道、发光字色和产品照明。更多研究来源与取舍见 [设计研究与迭代记录](docs/design-research.md)。
 
@@ -83,7 +89,7 @@
 - `src/bank.mjs`：构建完整题库。
 - `src/engine.mjs`：抽题、近期记录、恢复进度、结算和彩蛋规则。
 - `assets/app.mjs`：界面与玩法，选答案时局部更新按钮和进度，切题时只替换题目区域。
-- `assets/theme.mjs`：明暗外观的圆形扩散过渡与兼容处理。扩散半径包含移动端完整快照范围；页面外观与浏览器底色分别使用 `data-theme`、`data-browser-theme`，动画完成后同步底色、根配色方案和浏览器主题色。
+- `assets/theme.mjs`、`assets/theme-scene.mjs`：明暗外观的遮罩扩散、预备页面与共享动画时钟。扩散半径包含移动端完整快照范围；页面外观与浏览器底色分别使用 `data-theme`、`data-browser-theme`，动画完成后同步底色、根配色方案和浏览器主题色。
 - `assets/motion.mjs`、`assets/motion.css`：全站交互分类、按压保持与回弹、图标语义动作、表单选择、高度折叠、弹窗退出和真实操作完成后的反馈；减少动态效果及清理机制。
 - `assets/hello.mjs`、`assets/hello.css`：每次进入必播的开场控制与关键样式，在构建时内联。手写路径改编自 [Chánh Đại Apple Hello Effect](https://github.com/ncdai/chanhdai.com/blob/main/src/registry/components/apple-hello-effect/apple-hello-effect-english.tsx)，MIT 许可保留于 `assets/hello-LICENSE.txt`。
 - `assets/icons.mjs`、`assets/brand.mjs`：统一线性 SVG 图标与 Apple 官网咬口苹果轮廓。品牌沿用轮廓，配以六色条纹。
