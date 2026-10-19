@@ -1,4 +1,5 @@
-// Browser chrome commits after the last wave. Safari paints this outside the page.
+import {createThemeScene} from './theme-scene.mjs?v=3.4.1';
+
 export function setBrowserTheme(document, theme) {
   const value = theme === 'dark' ? 'dark' : 'light';
   document.documentElement.dataset.browserTheme = value;
@@ -6,156 +7,121 @@ export function setBrowserTheme(document, theme) {
   if (meta) meta.content = value === 'dark' ? '#080d1b' : '#f5f4f0';
 }
 
-// A DOM-only visual copy. No IDs, scripts, event handlers, focus targets or live
-// regions survive. The original page remains the only interactive document.
-export function createThemeSurface({document, window, theme}) {
-  const source = document.getElementById('site-content');
-  if (!source) throw new Error('Missing page');
-  const surface = document.createElement('div');
-  surface.className = 'theme-surface theme-palette';
-  surface.dataset.theme = theme;
-  surface.setAttribute('aria-hidden', 'true');
-  surface.inert = true;
-  const copy = source.cloneNode(true);
-  const originals = [source, ...source.querySelectorAll('*')];
-  const copies = [copy, ...copy.querySelectorAll('*')];
-  copies.forEach((node, i) => {
-    if (node.id) { node.dataset.themeCopyId = node.id; node.removeAttribute('id'); }
-    node.removeAttribute('autofocus');
-    node.removeAttribute('aria-live');
-    node.removeAttribute('aria-labelledby');
-    node.removeAttribute('aria-describedby');
-    if (node.matches('a,button,input,select,textarea,[tabindex]')) node.setAttribute('tabindex','-1');
-
-  });
-  copy.querySelectorAll('script,dialog,[data-theme-copy-id="toast"],[data-theme-copy-id="celebration"]').forEach(node => node.remove());
-  copy.classList.add('theme-page-copy');
-  copy.inert = true;
-  copy.style.top = `${-window.scrollY}px`;
-  copy.style.left = '0px';
-  copy.style.width = `${document.documentElement.clientWidth || window.innerWidth}px`;
-  surface.append(copy);
-  document.body.append(surface);
-  // Read only the few animated poses and the scrolling rail, rather than
-  // forcing layout reads for every descendant on every rapid click.
-  const poses='.hero-title-line,.hero-title-apple,.hero-actions,.archive,.archive-layer.is-active .archive-object img';
-  const originalPoses=[...source.querySelectorAll(poses)];
-  const copyPoses=[...copy.querySelectorAll(poses)];
-  originalPoses.forEach((node,i)=>{
-    const style=window.getComputedStyle(node);
-    for(const key of ['transform','translate','rotate','scale','opacity','clip-path']) copyStyle(copyPoses[i],style,key);
-  });
-  const originalRails=[...source.querySelectorAll('.archive-select,textarea')];
-  copy.querySelectorAll('.archive-select,textarea').forEach((node,i)=>{
-    node.scrollLeft=originalRails[i].scrollLeft; node.scrollTop=originalRails[i].scrollTop;
-  });
-  originals.forEach((node,i)=>{
-    if (!copies[i].isConnected || !node.matches('input,select,textarea')) return;
-    copies[i].value=node.value;
-    if ('checked' in node) copies[i].checked=node.checked;
-  });
-  return surface;
-}
-function copyStyle(node, style, key) { node.style.setProperty(key, style.getPropertyValue(key)); }
-
-// Native View Transitions serialize captures and replace preceding transitions.
-// Independent clipped surfaces instead let 3, 5 or 20 waves coexist freely.
-export function createThemeSwitcher({document, window, applyTheme, saveTheme, commitTheme = () => {}, reducedMotion = () => false, createSurface = createThemeSurface}) {
-  const root = document.documentElement;
-  let revision = 0, surfaces = [], active = new Set();
-  function remove(surface) { surface.remove(); surfaces = surfaces.filter(s => s !== surface); }
-  function settle() {
-    revision++;
-    const pending = [...active]; active.clear();
-    pending.forEach(record => { window.clearTimeout(record.timer); record.animation.cancel(); record.resolve(true); });
-    surfaces.forEach(surface => surface.remove()); surfaces = [];
+// The real page keeps its palette and animation clocks while one live alternate
+// palette is revealed/erased by lightweight circles. A burst never clones pages.
+export function createThemeSwitcher({document, window, applyTheme, previewTheme=()=>{}, saveTheme, commitTheme=()=>{}, reducedMotion=()=>false, createScene=createThemeScene}) {
+  const root=document.documentElement;
+  let target=root.dataset.theme, scene=null, ready=false, disposed=false;
+  let preparation=null, preparationIsIdle=false, frame=null, sequence=0;
+  const requests=new Set(),listeners=[];
+  const listen=(node,type,fn,options)=>{node.addEventListener(type,fn,options);listeners.push(()=>node.removeEventListener(type,fn,options));};
+  const now=()=>window.performance?.now()??0;
+  const supported=()=>typeof document.createElement('div').animate==='function';
+  const viewport=()=>({width:Math.max(window.innerWidth,root.clientWidth||0,window.visualViewport?.width||0),height:Math.max(window.innerHeight,root.clientHeight||0,window.visualViewport?.height||0)});
+  function cancelPreparation() {
+    if(preparation===null)return;
+    if(preparationIsIdle)window.cancelIdleCallback(preparation);else window.clearTimeout(preparation);
+    preparation=null;
+  }
+  function prepare() {
+    preparation=null;
+    if(disposed||scene||requests.size||reducedMotion()||!supported()||document.hidden)return;
+    try {scene=createScene({document,window,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});}
+    catch {scene=null;}
+  }
+  function warm() {
+    if(disposed||preparation!==null||scene||requests.size||reducedMotion()||!supported()||document.hidden)return;
+    preparationIsIdle=typeof window.requestIdleCallback==='function';
+    preparation=preparationIsIdle?window.requestIdleCallback(prepare,{timeout:800}):window.setTimeout(prepare,80);
+  }
+  function release(record) {
+    if(!requests.delete(record))return;
+    window.clearTimeout(record.timer);record.wave?.animation.cancel();record.wave?.remove();record.resolve(true);
+  }
+  function settle(theme) {
+    cancelPreparation();
+    if(frame!==null){window.cancelAnimationFrame(frame);frame=null;}
+    const finalTheme=theme??(requests.size?target:root.dataset.theme);
+    [...requests].forEach(release);
+    scene?.dispose();scene=null;ready=false;
+    target=finalTheme;
     root.classList.remove('theme-revealing');
-    delete root.dataset.themeWaves;
-    commitTheme(root.dataset.theme);
+    delete root.dataset.themeWaves;delete root.dataset.themeTarget;
+    applyTheme(finalTheme);commitTheme(finalTheme);warm();
+  }
+  function complete(record) {
+    if(!requests.has(record))return;
+    const floor=record.theme===scene.theme;
+    // A finished circle covers the viewport. Replace it and all older circles
+    // with one mask rectangle while preserving every younger wave above it.
+    scene.setFloor(floor);
+    [...requests].filter(other=>other.order<=record.order).forEach(release);
+    if(!requests.size)settle(target);
+    else root.dataset.themeWaves=String(requests.size);
+  }
+  function launch(record) {
+    record.wave=scene.addWave({...record,show:record.theme===scene.theme});
+    const animation=record.wave.animation;
+    animation.currentTime=Math.min(780,Math.max(0,now()-record.started));
+    record.timer=window.setTimeout(()=>complete(record),1000);
+    animation.finished.then(()=>complete(record),()=>complete(record));
+  }
+  function begin() {
+    scene.begin();ready=true;root.classList.add('theme-revealing');
+  }
+  function flush() {
+    frame=null;if(!requests.size||disposed)return;
+    try {
+      if(!scene)scene=createScene({document,window,theme:root.dataset.theme==='dark'?'light':'dark',...viewport()});
+      if(!ready)begin();
+      scene.updateControl();
+      requests.forEach(record=>{if(!record.wave)launch(record);});
+    } catch {settle(target);}
   }
   function switchTheme(button) {
-    const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    const oldTheme = root.dataset.theme;
-    const token = ++revision;
-    let wave;
-    try {
-      if (reducedMotion() || typeof document.createElement('div').animate !== 'function') {
-        applyTheme(theme); saveTheme(theme); settle(); return Promise.resolve(true);
-      }
-      if (!surfaces.length) surfaces.push(createSurface({document,window,theme:oldTheme}));
-      root.classList.add('theme-revealing');
-      applyTheme(theme); saveTheme(theme);
-      wave = createSurface({document,window,theme});
-      const bounds = button.getBoundingClientRect();
-      const width = Math.max(window.innerWidth, root.clientWidth || 0, window.visualViewport?.width || 0);
-      const height = Math.max(window.innerHeight, root.clientHeight || 0, window.visualViewport?.height || 0);
-      const x = Math.max(0,Math.min(width,bounds.left+bounds.width/2));
-      const y = Math.max(0,Math.min(height,bounds.top+bounds.height/2));
-      const radius = Math.ceil(Math.hypot(Math.max(x,width-x),Math.max(y,height-y)))+4;
-      wave.classList.add('theme-wave');
-      wave.style.clipPath = `circle(0px at ${x}px ${y}px)`;
-      surfaces.push(wave);
-      const animation = wave.animate([
-        {clipPath:`circle(0px at ${x}px ${y}px)`},
-        {clipPath:`circle(${radius}px at ${x}px ${y}px)`},
-      ], {duration:1050,easing:'cubic-bezier(.16,.62,.25,1)',fill:'forwards'});
-      return new Promise(resolve => {
-        const record = {animation,resolve,timer:null};
-        let done = false;
-        function complete() {
-          if (done) return;
-          done = true; active.delete(record); window.clearTimeout(record.timer);
-          if (!surfaces.includes(wave)) return resolve(true);
-          // Preserve the completed floor with CSS, then release the filled WAAPI
-          // effect even while a younger curtain is still running above it.
-          wave.style.clipPath = 'none';
-          animation.cancel();
-          // Completed older waves become the solid floor for younger waves.
-          const before = surfaces.slice(0,surfaces.indexOf(wave));
-          before.forEach(remove);
-          if (token === revision) {
-            active.forEach(earlier=>{window.clearTimeout(earlier.timer);earlier.animation.cancel();earlier.resolve(true);});
-            active.clear();
-            surfaces.forEach(surface => surface.remove()); surfaces = [];
-            root.classList.remove('theme-revealing');
-            delete root.dataset.themeWaves;
-            commitTheme(root.dataset.theme);
-          } else root.dataset.themeWaves = String(active.size);
-          resolve(true);
-        }
-        active.add(record);
-        root.dataset.themeWaves = String(active.size);
-        record.timer = window.setTimeout(complete,1250);
-        animation.finished.then(complete,complete);
-      });
-    } catch {
-      wave?.remove();
-      if (root.dataset.theme !== theme) { applyTheme(theme); saveTheme(theme); }
-      settle(); return Promise.resolve(true);
+    if(disposed)return Promise.resolve(false);
+    if(!requests.size)target=root.dataset.theme;
+    target=target==='dark'?'light':'dark';
+    const theme=target;
+    if(reducedMotion()||!supported()) {
+      saveTheme(theme);settle(theme);return Promise.resolve(true);
     }
+    // Read geometry before changing icon DOM. No computed-style snapshots or
+    // palette invalidation occurs on the click path, including rapid repeats.
+    const {width,height}=viewport(),bounds=button.getBoundingClientRect();
+    const x=Math.max(0,Math.min(width,bounds.left+bounds.width/2));
+    const y=Math.max(0,Math.min(height,bounds.top+bounds.height/2));
+    const radius=Math.ceil(Math.hypot(Math.max(x,width-x),Math.max(y,height-y)))+4;
+    cancelPreparation();
+    if(scene&&!ready)try{begin();}catch{scene.dispose();scene=null;ready=false;}
+    previewTheme(theme);saveTheme(theme);root.dataset.themeTarget=theme;
+    return new Promise(resolve=>{
+      const record={theme,x,y,radius,started:now(),order:++sequence,resolve,wave:null,timer:null};
+      requests.add(record);root.dataset.themeWaves=String(requests.size);
+      if(ready)try{scene.updateControl();launch(record);}catch{settle(theme);}
+      else if(frame===null)frame=window.requestAnimationFrame(flush);
+    });
   }
-  const onOtherAction = event => {
-    if (surfaces.length && !event.target.closest('[data-action="theme"]')) settle();
-  };
-  const onViewport = () => { if (surfaces.length) settle(); };
-  const onHidden = () => { if (document.hidden) onViewport(); };
-  const preference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-  const onPreference = event => { if (event.matches) onViewport(); };
-  document.addEventListener('click',onOtherAction,true);
-  document.addEventListener('visibilitychange',onHidden);
-  preference?.addEventListener?.('change',onPreference);
-  window.addEventListener('resize',onViewport,{passive:true});
-  window.addEventListener('scroll',onViewport,{passive:true});
-  window.addEventListener('pagehide',onViewport);
-  switchTheme.settle = settle;
-  switchTheme.dispose = () => {
-    settle();
-    document.removeEventListener('click',onOtherAction,true);
-    document.removeEventListener('visibilitychange',onHidden);
-    preference?.removeEventListener?.('change',onPreference);
-    window.removeEventListener('resize',onViewport);
-    window.removeEventListener('scroll',onViewport);
-    window.removeEventListener('pagehide',onViewport);
-  };
+  function invalidate() {
+    if(requests.size)return;
+    scene?.dispose();scene=null;ready=false;warm();
+  }
+  const onOtherAction=event=>{if(requests.size&&!event.target.closest('[data-action="theme"]'))settle();};
+  const onViewport=()=>{if(requests.size)settle();else invalidate();};
+  const onHidden=()=>{if(document.hidden){if(requests.size)settle();cancelPreparation();scene?.dispose();scene=null;}else warm();};
+  listen(document,'click',onOtherAction,true);listen(document,'visibilitychange',onHidden);
+  listen(window,'resize',onViewport,{passive:true});listen(window,'scroll',onViewport,{passive:true});
+  listen(window,'pagehide',()=>{if(requests.size)settle();cancelPreparation();scene?.dispose();scene=null;});
+  const preference=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  if(preference?.addEventListener)listen(preference,'change',event=>{if(event.matches)settle();else warm();});
+  const source=document.getElementById?.('site-content');
+  const observer=source&&window.MutationObserver?new window.MutationObserver(records=>{
+    if(records.some(record=>!record.target.closest?.('[data-action="theme"]')))invalidate();
+  }):null;
+  observer?.observe(source,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-pressed','disabled','data-paused']});
+  warm();
+  switchTheme.settle=settle;
+  switchTheme.prepare=warm;
+  switchTheme.dispose=()=>{disposed=true;settle();observer?.disconnect();listeners.forEach(remove=>remove());};
   return switchTheme;
 }
