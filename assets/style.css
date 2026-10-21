@@ -69,8 +69,6 @@ main { width:100%; max-width:1240px; padding:0 var(--gutter); margin:0 auto; fle
 .text-button .icon { width:16px; height:16px; }
 .primary-button,.secondary-button { min-height:54px; padding:0 23px; border:1px solid transparent; border-radius:var(--radius-button); display:inline-flex; align-items:center; justify-content:center; gap:10px; font-size:16px; font-weight:550; transition:background 180ms,transform 220ms var(--ease),border-color 180ms; }
 .primary-button { background:var(--button); color:var(--button-ink); }
-.primary-button>.icon:last-child { transition:transform 220ms var(--ease); }
-.primary-button:hover>.icon:last-child { transform:translateX(3px); }
 .secondary-button { background:transparent; border-color:var(--line); }
 .secondary-button:hover:not(:disabled) { background:var(--soft); border-color:var(--muted); }
 .full-width { width:100%; }
@@ -120,7 +118,7 @@ main { width:100%; max-width:1240px; padding:0 var(--gutter); margin:0 auto; fle
 .archive-playback { width:44px; height:44px; display:grid; place-items:center; color:var(--muted); border-radius:50%; transition:color 180ms,background 180ms; }
 .archive-playback:hover { background:var(--soft); color:var(--ink); }
 .archive-playback svg { width:17px; height:17px; }
-.archive-playback path { transform-origin:10px 10px; transition:opacity 180ms,transform 260ms var(--ease); }
+.archive-playback path { transform-origin:12px 12px; transition:opacity 180ms,transform 260ms var(--ease); }
 .archive-play-icon,.archive-playback[aria-pressed=true] .archive-pause-icon { opacity:0; transform:scale(.6); }
 .archive-playback[aria-pressed=true] .archive-play-icon { opacity:1; transform:scale(1); }
 .topic-section { margin:0 0 18px; animation:arrive 550ms 150ms var(--ease) both; }

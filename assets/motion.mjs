@@ -1,3 +1,4 @@
+import {ICON_MOTIONS} from './icon-motion.mjs?v=3.5.0';
 // A small, delegated motion system. Intent, contact, state and completion have
 // separate channels; no interaction waits for a decorative animation to finish.
 // Tuple: pressed scale X/Y, displacement X/Y in px, rotation in degrees,
@@ -84,7 +85,7 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     return el || (labels?target.closest('label')?.querySelector('input,select,textarea'):null);
   }
   function surface(el) {return el.matches('input[type=checkbox]')&&el.id!=='auto-toggle'?el.closest('label')?.querySelector('span')||el:el;}
-  function blocked(el) {return !el||el.disabled||el.getAttribute('aria-disabled')==='true'||el.closest('[inert]')||document.documentElement.classList.contains('hello-pending');}
+  function blocked(el) {return !el||el.disabled||el.getAttribute('aria-disabled')==='true'||el.closest('[inert]')||el.closest('.theme-surface')||document.documentElement.classList.contains('hello-pending');}
   function snapshot(el) {
     const style=window.getComputedStyle(el);
     return {scale:style.scale&&style.scale!=='none'?style.scale:'1',translate:style.translate&&style.translate!=='none'?style.translate:'0px 0px',rotate:style.rotate&&style.rotate!=='none'?style.rotate:'0deg'};
@@ -133,16 +134,30 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     const amount=cancelled?1:1.005+info.variation*.0008;
     run(node,'contact',[from,{scale:`${amount} ${cancelled?1:1.008}`,translate:'0px 0px',rotate:'0deg',offset:.58},{scale:'1',translate:'0px 0px',rotate:'0deg'}],{duration:cancelled?160:info.profile[5]+info.variation*7,easing:SETTLE});
   }
+  function animateGlyph(icon,mode='activate') {
+    if(!icon?.isConnected||reduced())return;
+    const recipe=ICON_MOTIONS[icon.dataset.icon];
+    recipe?.forEach(({part,frames,duration,delay,origin='12px 12px'})=>{
+      const node=icon.querySelector(`[data-icon-part="${part}"]`);if(!node)return;
+      const channel='glyph-part';
+      const keyframes=frames.map(frame=>({...frame,transformOrigin:origin}));
+      // Rapid repeats continue from the painted pose, with one live track per
+      // part. A fresh gesture never queues behind an earlier gesture.
+      if(channels.get(node)?.has(channel)) {
+        const current=window.getComputedStyle(node);
+        for(const key of Object.keys(frames[0]))if(current[key])keyframes[0][key]=current[key];
+      }
+      run(node,channel,keyframes,{duration:duration*(mode==='focus'?.85:1),delay});
+    });
+  }
   function iconMotion(el,mode='activate') {
-    const {kind,variation}=decorate(el),icon=el.querySelector('.icon,.brand-symbol img,svg');
-    if(!icon)return;
-    const backward=['home','previous','results','archive-prev','continue'].includes(kind);
-    const up=['share-card','native','repository','footer','external'].includes(kind);
-    const rotation={appearance:70,launch:12,replay:-22,restart:16,custom:-8,resume:-24,map:8,flag:-18,dismiss:90,rehello:-12,reload:180,'topic-surprise':-12,'topic-stories':-35,'topic-timeline':22}[kind]||0;
-    const dx=backward?-4:up?2:['advance','quick-next','review','launch','submit'].includes(kind)?4:0;
-    const dy=kind==='save'?4:up?-4:0;
-    const baseRotation=kind==='flag'&&el.getAttribute('aria-pressed')==='true'?-5:0;
-    run(icon,'glyph',[snapshot(icon),{translate:`${dx}px ${dy}px`,rotate:`${rotation+baseRotation}deg`,scale:kind==='copy'?'.82':'1.07',offset:.42},{translate:'0px 0px',rotate:`${baseRotation}deg`,scale:'1'}],{duration:(mode==='focus'?320:420)+variation*9});
+    if(blocked(el)||reduced())return;
+    decorate(el);
+    // A control can contain more than one symbol (e.g. shuffle + arrow).
+    el.querySelectorAll('.icon[data-icon]').forEach(icon=>{
+      if(icon.closest('a,button,summary')!==el)return;
+      animateGlyph(icon,mode);
+    });
   }
   function activate(el) {
     if(blocked(el)||reduced())return;
@@ -171,7 +186,6 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     if(before.pressed!==after.pressed) {
       if(info.kind==='count')segment(el.closest('.segments'),true);
       if(info.kind==='answer'&&after.pressed==='true')run(el.querySelector('.letter'),'selection',[{scale:'.76',rotate:'-8deg'},{scale:'1.12',rotate:'2deg',offset:.6},{scale:'1',rotate:'0deg'}],{duration:300});
-      if(info.kind==='flag')iconMotion(el);
     }
     if(info.kind==='answer'&&((after.correct&&!before.correct)||(after.wrong&&!before.wrong))) {
       const letter=el.querySelector('.letter');
@@ -182,6 +196,7 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
   function enter(scope,kind='content') {
     if(!scope||reduced()||document.documentElement.classList.contains('hello-pending'))return;
     refresh(scope);
+    if(kind==='result'||kind==='feedback')scope.querySelectorAll('.result-emblem .icon,.feedback-line>.icon').forEach(icon=>animateGlyph(icon));
     const selector=kind==='answers'?'.answer':kind==='dialog'?'#modal-content>h2,#modal-content>p,#modal-content>form>fieldset,#modal-content>form>.form-row,#modal-content>form>.timer-setting,#modal-content>form>[type=submit],.map-grid,.share-preview,.share-buttons,.dialog-actions,.replay-intro':kind==='explanation'?'.explanation p,.source-links a':'.result-actions>button,.result-links>button';
     const nodes=[...scope.querySelectorAll(selector)].filter(el=>!el.hidden).slice(0,16);
     nodes.forEach((el,i)=>run(el,'entry',[{opacity:0,translate:kind==='answers'?'5px 0px':'0px 6px'},{opacity:1,translate:'0px 0px'}],{duration:kind==='dialog'?340:300,delay:i*(kind==='answers'?24:28)}));
@@ -234,6 +249,12 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
   listen(document,'click',event=>{const el=control(event.target,false);if(blocked(el))return;if(el.tagName==='SUMMARY')disclosure(el,event);activate(el);},true);
   listen(document,'keydown',event=>{const el=control(event.target,false);if(!el)return;if(el.tagName==='SELECT'&&['Escape','Enter'].includes(event.key))delete el.parentElement.dataset.open;else if(el.tagName==='SELECT'&&['ArrowDown','ArrowUp',' '].includes(event.key))el.parentElement.dataset.open='';if(!event.repeat&&['Enter',' '].includes(event.key)&&!el.matches('input,select,textarea'))press(el,event);},true);
   listen(document,'keyup',event=>{if(['Enter',' '].includes(event.key))release();},true);
+  const hover=window.matchMedia('(hover:hover) and (pointer:fine)');
+  listen(document,'pointerover',event=>{
+    if(!hover.matches||event.pointerType==='touch')return;
+    const el=control(event.target,false);
+    if(el&&!blocked(el)&&(!event.relatedTarget||!el.contains(event.relatedTarget)))iconMotion(el,'hover');
+  },{passive:true});
   listen(document,'focusin',event=>{const el=control(event.target,false);if(el&&!blocked(el)&&el.matches(':focus-visible'))iconMotion(el,'focus');});
   listen(document,'focusout',event=>{const el=control(event.target,false);if(el?.tagName==='SELECT')delete el.parentElement.dataset.open;release(true);});
   listen(document,'change',event=>{const el=control(event.target,false);if(!el)return;if(el.tagName==='SELECT'){delete el.parentElement.dataset.open;run(el,'choice',[{opacity:.65},{opacity:1}],{duration:260});}else if(el.type==='checkbox'){const node=surface(el);if(el.id!=='auto-toggle')run(node,'choice',[{scale:'.94'},{scale:'1.035',offset:.6},{scale:'1'}],{duration:310});}});
