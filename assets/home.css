@@ -117,7 +117,7 @@ body[data-view=home] main { position:relative; }
 @keyframes home-history-rewind { 0%,65% { rotate:0deg; } 89%,100% { rotate:-360deg; } }
 @keyframes home-history-rim { 0%,65%,100% { rotate:0deg; } 77% { rotate:-26deg; } }
 @keyframes home-minute-turn { 0%,60% { rotate:0deg; } 87%,100% { rotate:360deg; } }
-@keyframes home-clock-case { 0%,85%,100% { rotate:0deg; } 89% { rotate:6deg; } 93% { rotate:-4deg; } 97% { rotate:2deg; } }
+@keyframes home-clock-case { 0%,85%,100% { rotate:0deg; translate:0; } 89% { rotate:6deg; translate:-1px; } 93% { rotate:-4deg; translate:1px; } 97% { rotate:2deg; translate:0; } }
 @media (max-width:1000px) and (min-width:761px) {
   .hero { min-height:530px; gap:16px; }
   .hero h1 { font-size:clamp(86px,10.7vw,112px); }

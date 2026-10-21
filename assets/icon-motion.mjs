@@ -10,7 +10,7 @@ export const ICON_MOTIONS = Object.freeze({
  back:[move('tip',-3,0,520),track('shaft',[{scale:'1 1'},{scale:'.7 1',offset:.4},{scale:'1 1'}],520)],
  shuffle:[draw('descending',540),draw('ascending',540,110),move('tips',2,0,480,150)],
  history:[turn('hand',-360,900),track('orbit',[{rotate:'0deg'},{rotate:'-32deg',offset:.35},{rotate:'0deg'}],760)],
- clock:[turn('minute',360,820),track('hour',[{rotate:'0deg'},{rotate:'24deg',offset:.6},{rotate:'0deg'}],900),track('case',[{rotate:'0deg'},{rotate:'0deg',offset:.6},{rotate:'7deg',offset:.7},{rotate:'-5deg',offset:.8},{rotate:'2deg',offset:.9},{rotate:'0deg'}],940)],
+ clock:[turn('minute',360,820),track('hour',[{rotate:'0deg'},{rotate:'24deg',offset:.6},{rotate:'0deg'}],900),track('case',[{rotate:'0deg',translate:'0px 0px'},{rotate:'0deg',translate:'0px 0px',offset:.6},{rotate:'7deg',translate:'-1px 0px',offset:.7},{rotate:'-5deg',translate:'1px 0px',offset:.8},{rotate:'2deg',translate:'0px 0px',offset:.9},{rotate:'0deg',translate:'0px 0px'}],940)],
  check:[draw('stroke',480)],
  close:[track('slash',[{rotate:'0deg'},{rotate:'-45deg',offset:.4},{rotate:'0deg'}],480),track('backslash',[{rotate:'0deg'},{rotate:'45deg',offset:.4},{rotate:'0deg'}],480,50)],
  sliders:[move('upper',-5,0,720),move('lower',6,0,720,100)],

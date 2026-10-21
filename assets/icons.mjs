@@ -8,7 +8,7 @@ const paths = {
  back:part('shaft',path('M19 12H5'))+part('tip',path('m11 6-6 6 6 6')),
  shuffle:part('descending',path('M3 7h3c5 0 7 10 12 10h3','pathLength="1"'))+part('ascending',path('M3 17h3c2 0 3-2 4-4m3-2c1-2 3-4 5-4h3','pathLength="1"'))+part('tips',path('m17 13 4 4-4 4m0-18 4 4-4 4')),
  history:part('orbit',path('M3 11a9 9 0 1 1 2 7M3 4v7h7'))+part('hand',path('M12 7v6l4 2')),
- clock:part('case','<circle cx="12" cy="12" r="9"/>')+part('hour',path('M12 12l3 2'))+part('minute',path('M12 7v5')),
+ clock:part('case','<circle cx="12" cy="12" r="9"/>'+part('hour',path('M12 12l3 2'))+part('minute',path('M12 7v5'))),
  check:part('stroke',path('m5 12 4 4L19 6','pathLength="1"')),
  close:part('slash',path('m6 6 12 12','pathLength="1"'))+part('backslash',path('M6 18 18 6','pathLength="1"')),
  sliders:part('track',path('M4 7h16M4 17h16'))+part('upper','<circle cx="14" cy="7" r="2" fill="var(--bg)"/>')+part('lower','<circle cx="9" cy="17" r="2" fill="var(--bg)"/>'),
