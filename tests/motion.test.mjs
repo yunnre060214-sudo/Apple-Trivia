@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import {ICON_MOTIONS} from '../assets/icon-motion.mjs';
+import {icon as iconMarkup} from '../assets/icons.mjs';
 import {createInteractionMotion,describeMotion,MOTION_PROFILES} from '../assets/motion.mjs';
 
 class Element {
@@ -116,7 +118,8 @@ test('reduced motion, missing animation APIs and pagehide leave controls usable 
 test('styles constrain hover effects to fine pointers and include a reduced-motion override',async()=>{
   const css=await readFile(new URL('../assets/motion.css',import.meta.url),'utf8');
   assert.match(css,/@media \(hover:hover\) and \(pointer:fine\)/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
-  assert.match(css,/motion-arrow-back/);assert.match(css,/motion-download/);assert.match(css,/motion-copy-stack/);
+  assert.doesNotMatch(css,/motion-arrow-back|motion-download|motion-copy-stack/);
+  assert.match(css,/data-icon-part/);
   const interaction=css,ambient=await readFile(new URL('../assets/home.css',import.meta.url),'utf8');
   assert.doesNotMatch(interaction,/animation:[^;]+infinite/);
   assert.match(ambient,/@media \(prefers-reduced-motion:no-preference\)/);
@@ -133,4 +136,64 @@ test('theme copies and disconnected mutation records do not create motion wrappe
   const removed=f.append('select');removed.nodeType=1;removed.isConnected=false;
   f.mutate([{type:'childList',target:f.body,addedNodes:[removed],removedNodes:[]}]);
   assert.equal(removed.parentElement,f.body);motion.dispose();
+});
+
+function glyph(f,button,name) {
+  const svg=f.append('svg','icon',{icon:name},button),parts={};
+  const names=[...iconMarkup(name).matchAll(/data-icon-part="([^"]+)"/g)].map(m=>m[1]);
+  for(const part of names)parts[part]=f.append('g','',{iconPart:part},svg);
+  return {svg,parts};
+}
+
+test('every semantic recipe addresses real SVG anatomy, with bounded finite timing',()=>{
+  const signatures=new Set();
+  for(const [name,recipe] of Object.entries(ICON_MOTIONS)) {
+    const markup=iconMarkup(name),parts=[...markup.matchAll(/data-icon-part="([^"]+)"/g)].map(m=>m[1]);
+    assert.equal(parts.length,new Set(parts).size,name);
+    for(const track of recipe){assert.ok(parts.includes(track.part),`${name}.${track.part}`);assert.ok(track.duration>0&&track.duration+track.delay<=1100);assert.ok(track.frames.length>=2);}
+    if(name!=='playback')signatures.add(JSON.stringify(recipe));
+    assert.match(markup,/aria-hidden="true"/);assert.doesNotMatch(markup,/id=|<animate|<script/);
+  }
+  assert.equal(signatures.size,Object.keys(ICON_MOTIONS).length-1);
+  assert.match(iconMarkup('missing'),/data-icon="bulb"/);
+});
+
+test('clock drives its hands and case separately; multi-symbol controls animate every symbol',()=>{
+  const f=fixture(),b=f.append('button','',{topic:'timeline'}),clock=glyph(f,b,'clock'),arrow=glyph(f,b,'arrow'),motion=f.mount();
+  motion.activate(b);
+  assert.equal(clock.svg.animations.length,0);assert.equal(arrow.svg.animations.length,0);
+  assert.equal(clock.parts.minute.animations.at(-1).keyframes.at(-1).rotate,'360deg');
+  assert.ok(clock.parts.case.animations.at(-1).keyframes.some(frame=>frame.rotate==='-5deg'));
+  assert.ok(arrow.parts.tip.animations.at(-1).keyframes.some(frame=>frame.translate==='3px 0px'));
+  motion.dispose();
+});
+
+test('rapid retriggers replace each part track, preserve painted poses, and clear on removal',async()=>{
+  const f=fixture(),b=f.append('button','',{action:'download'}),{parts}=glyph(f,b,'download'),motion=f.mount();
+  f.window.getComputedStyle=()=>({translate:'0px 2px',opacity:'.7',scale:'1.05 1'});
+  for(let i=0;i<20;i++)motion.activate(b);
+  for(const part of Object.values(parts))assert.equal(part.animations.filter(a=>!a.cancelled).length,1);
+  assert.equal(parts.arrow.animations.at(-1).keyframes[0].translate,'0px 2px');
+  assert.equal(parts.arrow.animations.at(-1).keyframes[0].opacity,'.7');
+  b.nodeType=1;f.mutate([{type:'childList',target:f.body,addedNodes:[],removedNodes:[b]}]);
+  for(const part of Object.values(parts))assert.ok(part.animations.every(a=>a.cancelled));
+  await flush();motion.dispose();
+});
+
+test('hover fires once per control entry, touch does not hover, keyboard has the same anatomy',()=>{
+  const f=fixture(),b=f.append('button','',{action:'copy'}),{parts}=glyph(f,b,'copy'),motion=f.mount();
+  f.emit('pointerover',parts.front,{pointerType:'touch'});assert.equal(parts.front.animations.length,0);
+  f.emit('pointerover',b,{pointerType:'mouse'});assert.equal(parts.front.animations.length,1);
+  f.emit('pointerover',parts.front,{pointerType:'mouse',relatedTarget:b});assert.equal(parts.front.animations.length,1);
+  b.focusVisible=true;f.emit('focusin',b);assert.equal(parts.front.animations.length,2);
+  f.preference.matches=true;f.preference.fn({matches:true});assert.ok(parts.front.animations.every(a=>a.cancelled));
+  motion.activate(b);assert.equal(parts.front.animations.length,2);motion.dispose();
+});
+
+test('semantic gestures ignore nested controls, inert copies and disabled controls',()=>{
+  const f=fixture(),b=f.append('button','',{action:'custom'}),child=f.append('button','',{action:'copy'},b),nested=glyph(f,child,'copy'),own=glyph(f,b,'sliders'),motion=f.mount();
+  motion.activate(b);assert.equal(nested.parts.front.animations.length,0);assert.equal(own.parts.upper.animations.length,1);
+  b.disabled=true;motion.activate(b);assert.equal(own.parts.upper.animations.length,1);
+  const copy=f.append('div','theme-surface'),c=f.append('button','',{action:'download'},copy),copied=glyph(f,c,'download');
+  motion.activate(c);assert.equal(copied.parts.arrow.animations.length,0);motion.dispose();
 });

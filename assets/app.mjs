@@ -1,12 +1,12 @@
-import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.4.3';
-import {icon} from './icons.mjs?v=3.4.3';
-import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.4.3';
-import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.4.3';
-import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.4.3';
-import {replayHello} from './hello.mjs?v=3.4.3';
-import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.4.3';
-import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.4.3';
-import {createInteractionMotion} from './motion.mjs?v=3.4.3';
+import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.5.0';
+import {icon} from './icons.mjs?v=3.5.0';
+import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.5.0';
+import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.5.0';
+import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.5.0';
+import {replayHello} from './hello.mjs?v=3.5.0';
+import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.5.0';
+import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.5.0';
+import {createInteractionMotion} from './motion.mjs?v=3.5.0';
 const $=s=>document.querySelector(s), main=$('#main'), modal=$('#modal');
 const KEY='apple-quiz:v1:';
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -102,6 +102,7 @@ function showFeedback(fresh){
   let streak=0;for(let i=session.index;i>=0;i--){if(session.answers[questions[i].id]!==questions[i].answer)break;streak++;}
   const line=correct?(streak>=3?`${streak} 连对`:'答对了'):'答错了';
   const f=$('#answer-feedback');f.className=`feedback visible ${correct?'good':'oops'}`;f.innerHTML=`<div class="feedback-line">${icon(correct?'check':'bulb')}<strong>${line}</strong><button class="text-button" data-action="explain" aria-expanded="false" aria-controls="explanation-area">解析${icon('arrow')}</button></div>${quick?`<button class="quick-next" data-action="next">${session.index===questions.length-1?'查看结果':'下一题'}${icon('arrow')}</button>`:''}`;
+  if(fresh)motion.enter(f,'feedback');
   if(fresh&&correct&&[3,5,10,20,50,100].includes(streak)){toast(`${streak} 连对`);if(streak===3)celebrate(12);}
   if(quick&&fresh)scheduleNext();else if(quick)$('#auto-label').textContent='手动切题';
 }
@@ -195,7 +196,8 @@ function applyTheme(theme,{syncChrome=true}={}){
 }
 function previewTheme(theme){
   const dark=theme==='dark';
-  const toggle=$('#theme-toggle');toggle.innerHTML=icon(dark?'sun':'moon');
+  const toggle=$('#theme-toggle'),symbol=dark?'sun':'moon';
+  if(toggle.querySelector('[data-icon]')?.dataset.icon!==symbol){toggle.innerHTML=icon(symbol);motion.activate(toggle);}
   toggle.setAttribute('aria-label',dark?'使用浅色外观':'使用深色外观');
 }
 const switchTheme=createThemeSwitcher({document,window,applyTheme:theme=>applyTheme(theme,{syncChrome:false}),previewTheme,commitTheme:syncBrowserTheme,saveTheme:theme=>write('theme',theme),reducedMotion:reduced,duration:new URLSearchParams(location.search).get('motion')==='slow'?6000:780});
