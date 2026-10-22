@@ -1,12 +1,13 @@
-import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.5.0';
-import {icon} from './icons.mjs?v=3.5.0';
-import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.5.0';
-import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.5.0';
-import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.5.0';
-import {replayHello} from './hello.mjs?v=3.5.0';
-import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.5.0';
-import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.5.0';
-import {createInteractionMotion} from './motion.mjs?v=3.5.0';
+import {VERSION,CATEGORIES,LEVELS,drawQuestions,filterBank,createSession,hydrateSession,grade,updateRecent,resultTitle,easterEggs} from '../src/engine.mjs?v=3.6.0';
+import {icon} from './icons.mjs?v=3.6.0';
+import {archiveMarkup,mountArchive} from './gallery.mjs?v=3.6.0';
+import {atmosphereMarkup,mountHome,questionFromHash} from './home.mjs?v=3.6.0';
+import {clearQuestionUrl,questionRouteChange,followsInPlace,quizShortcut} from './navigation.mjs?v=3.6.0';
+import {replayHello} from './hello.mjs?v=3.6.0';
+import {createThemeSwitcher,setBrowserTheme} from './theme.mjs?v=3.6.0';
+import {SITE_URL,shareText,createSharePreview,downloadBlob,resultPalette} from './share.mjs?v=3.6.0';
+import {createInteractionMotion} from './motion.mjs?v=3.6.0';
+import {mountSurfacePointer} from './surface.mjs?v=3.6.0';
 const $=s=>document.querySelector(s), main=$('#main'), modal=$('#modal');
 const KEY='apple-quiz:v1:';
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -26,17 +27,19 @@ let bank=[], questions=[], session=null, report=null, view='home', seen=arr(read
 let autoTimer, clockTimer, toastTimer, celebrationTimer, generation=0, paused=false, finishPending=false;
 const sharePreview=createSharePreview();
 let disposeArchive=()=>{}, questionDirection=1;
+let disposeAnswerSurface=()=>{},disposeShareSurface=()=>{},shareTheme='light';
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const motion=createInteractionMotion({document,window,reducedMotion:reduced});
 const fmt=n=>`${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`;
 const quickConfig=topic=>({count:5,difficulty:'mixed',categories:Object.keys(CATEGORIES),mode:'quick',casual:true,secondsPerQuestion:0,...(topic?{topic}: {})});
 const sourceLinks=q=>q.sources.map((s,i)=>`<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${s.includes('macrumors.com')?'历史声明存档':'Apple 资料'}${q.sources.length>1?` ${i+1}`:''}${icon('external')}</a>`).join('');
 function toast(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3500);}
-function dialog(title,body){sharePreview.clear();motion.prepareDialog(modal);$('#modal-content').innerHTML=`<h2 id="modal-title">${title}</h2>${body}`;if(!modal.open)modal.showModal();motion.enter(modal,'dialog');}
+function clearShareSurface(){disposeShareSurface();disposeShareSurface=()=>{};}
+function dialog(title,body){clearShareSurface();sharePreview.clear();motion.prepareDialog(modal);$('#modal-content').innerHTML=`<h2 id="modal-title">${title}</h2>${body}`;if(!modal.open)modal.showModal();motion.enter(modal,'dialog');}
 function cancelAuto(){clearTimeout(autoTimer);autoTimer=null;generation++;$('.quick-controls')?.classList.remove('counting');}
 function save(){if(session&&!finishPending)write('session',session);}
 function visit(q){seen=updateRecent(seen,[q.id],Math.max(3000,Math.floor(bank.length*.75)));write('seen',seen);}
-function enter(next){disposeArchive();disposeArchive=()=>{};switchTheme.settle();sharePreview.clear();modal.close();view=next;document.body.dataset.view=next;cancelAuto();clearInterval(clockTimer);clearTimeout(celebrationTimer);$('#celebration').replaceChildren();if(!document.documentElement.classList.contains('hello-pending'))main.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
+function enter(next){disposeArchive();disposeArchive=()=>{};disposeAnswerSurface();disposeAnswerSurface=()=>{};clearShareSurface();switchTheme.settle();sharePreview.clear();modal.close();view=next;document.body.dataset.view=next;cancelAuto();clearInterval(clockTimer);clearTimeout(celebrationTimer);$('#celebration').replaceChildren();if(!document.documentElement.classList.contains('hello-pending'))main.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 function animate(el,{x=0,y=8,duration=260}={}){if(!reduced())el?.animate([{opacity:0,transform:`translate(${x}px,${y}px)`},{opacity:1,transform:'translate(0,0)'}],{duration,easing:'cubic-bezier(.22,1,.36,1)'});}
 function home(){
   clearQuestionUrl(window);
@@ -72,11 +75,13 @@ function quiz(){
   renderQuestion();clock();if(view==='quiz'&&!quick)clockTimer=setInterval(clock,1000);
 }
 function renderQuestion(){
+  disposeAnswerSurface();
   cancelAuto();paused=false;const q=questions[session.index],answer=session.answers[q.id],quick=session.config.mode==='quick';visit(q);
   const locked=session.confirmed.includes(q.id);
   $('#question-stage').innerHTML=`<article class="question-card" aria-labelledby="question-prompt"><div class="question-meta"><span class="question-topic">${icon(q.kind==='timeline'?'clock':q.topic==='stories'?'history':'apple')}${esc(q.tag||CATEGORIES[q.category].name)}</span>${quick?'':`<button class="flag-button" data-action="flag" aria-pressed="${session.flags.includes(q.id)}" aria-label="${session.flags.includes(q.id)?'取消标记':'标记题目'}">${icon('flag')}</button>`}</div><h1 id="question-prompt" tabindex="-1">${esc(q.prompt)}</h1><div class="answers" role="group" aria-label="选择一个答案">${q.options.map((o,i)=>`<button class="answer" data-answer="${i}" aria-pressed="${answer===o}"><span class="letter">${'ABCD'[i]}</span><span class="answer-text">${esc(o)}</span><span class="answer-mark"></span></button>`).join('')}</div><div id="answer-feedback" class="feedback" aria-live="polite"></div><div id="explanation-area"></div><div class="question-nav" ${quick?'hidden':''}><button class="text-button" data-action="previous" ${session.index===0?'disabled':''}>${icon('back')}上一题</button><button class="primary-button" id="advance" data-action="${session.config.mode==='practice'&&!locked?'confirm':'next'}">${session.config.mode==='practice'&&!locked?'确认':session.index===questions.length-1?'查看结果':'下一题'}${icon('arrow')}</button></div><div class="quick-controls" ${quick?'':'hidden'}><label class="auto-switch"><input id="auto-toggle" type="checkbox" ${read('auto',true)?'checked':''}>自动下一题</label><span id="auto-label"></span></div></article>`;
   updateOptions();updateProgress();if(locked)showFeedback(false);animate($('.question-card'),{x:questionDirection*12,y:0,duration:220});motion.enter($('.answers'),'answers');
   $('#question-prompt').focus({preventScroll:true});
+  disposeAnswerSurface=mountSurfacePointer($('.answers'),{document,window});
 }
 // Selection changes four option nodes and the progress label. The shell, navigation and prompt survive.
 function selectAnswer(index){
@@ -99,6 +104,7 @@ function updateProgress(){
 function confirmAnswer(){const q=questions[session.index];if(!session.answers[q.id])return;if(!session.confirmed.includes(q.id))session.confirmed.push(q.id);save();updateOptions();showFeedback(true);const b=$('#advance');b.dataset.action='next';b.innerHTML=`${session.index===questions.length-1?'查看结果':'下一题'}${icon('arrow')}`;b.disabled=false;}
 function showFeedback(fresh){
   const q=questions[session.index],correct=session.answers[q.id]===q.answer,quick=session.config.mode==='quick';
+  if(fresh&&correct&&!reduced())$('.answer.correct')?.setAttribute('data-answer-pulse','');
   let streak=0;for(let i=session.index;i>=0;i--){if(session.answers[questions[i].id]!==questions[i].answer)break;streak++;}
   const line=correct?(streak>=3?`${streak} 连对`:'答对了'):'答错了';
   const f=$('#answer-feedback');f.className=`feedback visible ${correct?'good':'oops'}`;f.innerHTML=`<div class="feedback-line">${icon(correct?'check':'bulb')}<strong>${line}</strong><button class="text-button" data-action="explain" aria-expanded="false" aria-controls="explanation-area">解析${icon('arrow')}</button></div>${quick?`<button class="quick-next" data-action="next">${session.index===questions.length-1?'查看结果':'下一题'}${icon('arrow')}</button>`:''}`;
@@ -144,15 +150,26 @@ function review(){
   enter('review');main.innerHTML=`<section class="review-shell"><button class="back-button" data-action="results">${icon('back')}回到战绩</button><h1>本局解析</h1><div class="review-list">${questions.map((q,i)=>`<details class="review-item"><summary><span class="review-state ${session.answers[q.id]===q.answer?'good':'oops'}">${icon(session.answers[q.id]===q.answer?'check':'bulb')}</span><span><small>第 ${i+1} 题</small>${esc(q.prompt)}</span>${icon('arrow')}</summary><div class="review-body"><p class="review-answer">正确答案：<b>${esc(q.answer)}</b>${session.answers[q.id]!==q.answer?`<span>你猜的是：${esc(session.answers[q.id]||'还没猜')}</span>`:''}</p><p>${esc(q.explanation)}</p><div class="source-links">${sourceLinks(q)}</div></div></details>`).join('')}</div><button class="primary-button" data-action="quick">再来 5 题${icon('arrow')}</button></section>`;
 }
 async function showShare(){
-  const title=resultTitle(report);dialog('分享结果',`<div id="share-preview" class="share-preview"><span class="loader"></span></div><div class="share-buttons"><button class="primary-button" data-action="download" disabled>${icon('download')}保存图片</button><button class="secondary-button" data-action="native-share" disabled>${icon('share')}分享</button></div><button class="text-button full-width" data-action="copy">${icon('copy')}复制文字</button>`);
-  const preview=$('#share-preview'),currentReport=report;
+  const preferred=read('share-theme',document.documentElement.dataset.theme);shareTheme=preferred==='dark'?'dark':'light';
+  dialog('分享结果',`<div class="share-skins" role="group" aria-label="分享图片外观">${[['light','浅色'],['dark','深色']].map(([theme,label])=>`<button class="share-skin" data-share-theme="${theme}" aria-pressed="${shareTheme===theme}"><span class="share-swatch ${theme}" aria-hidden="true"></span>${label}</button>`).join('')}</div><div id="share-preview" class="share-preview" aria-busy="true"><span class="loader"></span></div><div class="share-buttons"><button class="primary-button" data-action="download" disabled>${icon('download')}保存图片</button><button class="secondary-button" data-action="native-share" disabled>${icon('share')}分享</button></div><button class="text-button full-width" data-action="copy">${icon('copy')}复制文字</button>`);
+  await renderSharePreview();
+}
+async function renderSharePreview(){
+  const preview=$('#share-preview'),currentReport=report,title=resultTitle(report);
+  if(!modal.open||!preview)return;
+  clearShareSurface();preview.setAttribute('aria-busy','true');preview.innerHTML='<span class="loader"></span>';
+  modal.querySelectorAll('.share-buttons button').forEach(b=>b.disabled=true);
+  modal.querySelectorAll('[data-share-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.shareTheme===shareTheme)));
   await sharePreview.show(currentReport,title.title,{
+    theme:shareTheme,
     ready:({url})=>{
       if(!modal.open||!preview.isConnected)return;
-      preview.innerHTML=`<img src="${url}" alt="Apple 冷知识战绩：${currentReport.score} 分，${esc(title.title)}，猜对 ${currentReport.correct}/${currentReport.total} 题，不服来战。">`;
+      preview.setAttribute('aria-busy','false');
+      preview.innerHTML=`<div class="share-card-frame"><img src="${url}" width="1080" height="1440" alt="Apple 冷知识战绩：${currentReport.score} 分，${esc(title.title)}，猜对 ${currentReport.correct}/${currentReport.total} 题，不服来战。"></div>`;
+      disposeShareSurface=mountSurfacePointer(preview,{document,window,selector:'.share-card-frame',tilt:true});
       modal.querySelectorAll('.share-buttons button').forEach(b=>b.disabled=false);
     },
-    fail:()=>{if(modal.open&&preview.isConnected)preview.innerHTML='<p>图片生成失败，请重试或复制文字。</p>';},
+    fail:()=>{if(modal.open&&preview.isConnected){preview.setAttribute('aria-busy','false');preview.innerHTML='<div><p>图片生成失败</p><button class="text-button" data-action="share-retry">重试</button></div>';}},
   });
 }
 async function nativeShare(){const blob=sharePreview.blob;if(!blob)return;const button=$('[data-action="native-share"]');try{const file=new File([blob],'apple-trivia.png',{type:'image/png'});if(navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:'Apple 冷知识，不服来战'});else if(navigator.share)await navigator.share({title:'Apple 冷知识',text:shareText(report,resultTitle(report).title),url:SITE_URL});else{downloadBlob(blob,`apple-trivia-${report.score}.png`);toast('图片已生成');}motion.feedback(button);}catch(e){if(e.name!=='AbortError')toast('分享失败，请保存图片后重试。');}}
@@ -164,11 +181,12 @@ document.addEventListener('click',e=>{
   const exhibit=e.target.closest('[data-gallery-question]');
   if(exhibit){if(followsInPlace(e,exhibit)){e.preventDefault();startGalleryQuestion(exhibit.dataset.galleryQuestion);}return;}
   const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.shareTheme){if(b.dataset.shareTheme!==shareTheme){shareTheme=b.dataset.shareTheme;write('share-theme',shareTheme);void renderSharePreview();}return;}
   if(b.dataset.answer!==undefined){selectAnswer(Number(b.dataset.answer));return;}
   if(b.dataset.topic){start(quickConfig(b.dataset.topic));return;}
   if(b.dataset.count){config.count=Number(b.dataset.count);$('#count-input').value=b.dataset.count;document.querySelectorAll('[data-count]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});updatePool();return;}
   if(b.dataset.jump!==undefined){modal.close();moveQuestion(Number(b.dataset.jump));return;}
-  const actions={home,'replay-hello':()=>{modal.close();replayHello();},quick:()=>start(quickConfig()),custom,resume,about,close:()=>motion.closeDialog(modal),theme:()=>{void switchTheme(b);},next:nextQuestion,previous:()=>moveQuestion(session.index-1),confirm:confirmAnswer,explain,map,'end-round':requestFinish,finish:()=>finish(),results,review,'share-card':showShare,download:()=>{if(sharePreview.blob){downloadBlob(sharePreview.blob,`apple-trivia-${report.score}.png`);motion.feedback(b);}},'native-share':nativeShare,copy,flag:()=>{const id=questions[session.index].id;session.flags=session.flags.includes(id)?session.flags.filter(x=>x!==id):[...session.flags,id];save();b.setAttribute('aria-pressed',String(session.flags.includes(id)));b.setAttribute('aria-label',session.flags.includes(id)?'取消标记':'标记题目');},reload:()=>location.reload()};actions[b.dataset.action]?.();
+  const actions={home,'replay-hello':()=>{modal.close();replayHello();},quick:()=>start(quickConfig()),custom,resume,about,close:()=>motion.closeDialog(modal),theme:()=>{void switchTheme(b);},next:nextQuestion,previous:()=>moveQuestion(session.index-1),confirm:confirmAnswer,explain,map,'end-round':requestFinish,finish:()=>finish(),results,review,'share-card':showShare,'share-retry':renderSharePreview,download:()=>{if(sharePreview.blob){downloadBlob(sharePreview.blob,`apple-trivia-${report.score}.png`);motion.feedback(b);}},'native-share':nativeShare,copy,flag:()=>{const id=questions[session.index].id;session.flags=session.flags.includes(id)?session.flags.filter(x=>x!==id):[...session.flags,id];save();b.setAttribute('aria-pressed',String(session.flags.includes(id)));b.setAttribute('aria-label',session.flags.includes(id)?'取消标记':'标记题目');},reload:()=>location.reload()};actions[b.dataset.action]?.();
 });
 document.addEventListener('submit',e=>{if(e.target.id!=='custom-form')return;e.preventDefault();const next=formConfig();if(!Number.isInteger(next.count)||next.count<5||next.count>500||!next.categories.length)return;config=next;write('config',config);start(config);});
 document.addEventListener('change',e=>{if(e.target.closest('#custom-form')){if(e.target.id==='mode-select')$('.timer-setting').hidden=e.target.value!=='exam';updatePool();}if(e.target.id==='auto-toggle'){write('auto',e.target.checked);paused=false;scheduleNext();}});
@@ -184,8 +202,8 @@ document.addEventListener('keydown',e=>{
   else nextQuestion();
 });
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAuto();else if(view==='quiz'){clock();scheduleNext();}});
-modal.addEventListener('close',()=>{if(modal.open)return;sharePreview.clear();if(view==='quiz'&&session?.config.mode==='quick'&&$('#auto-label'))$('#auto-label').textContent='手动切题';});
-window.addEventListener('pagehide',()=>{save();cancelAuto();sharePreview.clear();clearTimeout(celebrationTimer);});
+modal.addEventListener('close',()=>{if(modal.open)return;clearShareSurface();sharePreview.clear();if(view==='quiz'&&session?.config.mode==='quick'&&$('#auto-label'))$('#auto-label').textContent='手动切题';});
+window.addEventListener('pagehide',()=>{save();cancelAuto();clearShareSurface();sharePreview.clear();clearTimeout(celebrationTimer);});
 const systemTheme=matchMedia('(prefers-color-scheme: dark)');
 function syncBrowserTheme(theme){setBrowserTheme(document,theme);}
 function applyTheme(theme,{syncChrome=true}={}){

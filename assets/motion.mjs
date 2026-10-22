@@ -1,4 +1,4 @@
-import {ICON_MOTIONS} from './icon-motion.mjs?v=3.5.0';
+import {ICON_MOTIONS} from './icon-motion.mjs?v=3.6.0';
 // A small, delegated motion system. Intent, contact, state and completion have
 // separate channels; no interaction waits for a decorative animation to finish.
 // Tuple: pressed scale X/Y, displacement X/Y in px, rotation in degrees,
@@ -17,7 +17,7 @@ export const MOTION_PROFILES = Object.freeze({
   continue:[.98,.94,-1,0,0,280], submit:[.97,.945,0,1,0,380], count:[.92,.91,0,1,0,300], category:[.965,.925,0,.5,.35,320],
   jump:[.88,.88,0,1.3,0,290], external:[.96,.98,1.1,0,0,320], repository:[.97,.94,0,-.5,0,350], source:[.98,.92,0,1.4,0,290],
   footer:[.95,.95,1,-1,0,340], skip:[.98,.96,0,0,0,220], disclosure:[.997,.975,0,.6,0,330],
-  auto:[1,1,0,0,0,350], number:[1,1,0,0,0,200], 'select-difficulty':[1,1,0,0,0,260], 'select-mode':[1,1,0,0,0,310], 'select-timer':[1,1,0,0,0,340], 'copy-field':[1,1,0,0,0,200], control:[.97,.96,0,1,0,280],
+  auto:[1,1,0,0,0,350], number:[1,1,0,0,0,200], 'share-skin':[.96,.96,0,.5,0,260], 'select-difficulty':[1,1,0,0,0,260], 'select-mode':[1,1,0,0,0,310], 'select-timer':[1,1,0,0,0,340], 'copy-field':[1,1,0,0,0,200], control:[.97,.96,0,1,0,280],
 });
 const SELECTOR = 'a[href],button,input:not([type=hidden]),select,textarea,summary,[role=button][tabindex]';
 const EASE = 'cubic-bezier(.2,.8,.25,1)', SETTLE = 'cubic-bezier(.18,.9,.25,1)';
@@ -27,6 +27,7 @@ export function describeMotion(el) {
   const d=el.dataset, tag=el.tagName.toLowerCase(), has=c=>el.classList.contains(c);
   let kind='control', suffix='';
   if (d.device) { kind='product'; suffix=d.device; }
+  else if (d.shareTheme) { kind='share-skin'; suffix=d.shareTheme; }
   else if (d.archivePlayback !== undefined) kind='archive-playback';
   else if (d.archiveStep) kind=Number(d.archiveStep)<0?'archive-prev':'archive-next';
   else if (d.answer!==undefined) { kind='answer'; suffix=d.answer; }
@@ -35,7 +36,7 @@ export function describeMotion(el) {
   else if (d.topic) kind=`topic-${d.topic}`;
   else if (d.action) {
     const action=d.action;
-    const actions={theme:'appearance',custom:'custom',resume:'resume',flag:'flag',map:'map',previous:'previous',confirm:'confirm',explain:'explain','end-round':'end',finish:'finish',results:'results',review:'review','share-card':'share-card',download:'save','native-share':'native',copy:'copy','replay-hello':'rehello',reload:'reload'};
+    const actions={theme:'appearance',custom:'custom',resume:'resume',flag:'flag',map:'map',previous:'previous',confirm:'confirm',explain:'explain','end-round':'end',finish:'finish',results:'results',review:'review','share-card':'share-card','share-retry':'reload',download:'save','native-share':'native',copy:'copy','replay-hello':'rehello',reload:'reload'};
     if (action==='quick') kind=has('hero-start')?'launch':el.closest('.result-actions')?'replay':'restart';
     else if (action==='home') kind=has('back-button')?'home':'home-return';
     else if (action==='about') kind=has('bank-count')?'tally':'about';

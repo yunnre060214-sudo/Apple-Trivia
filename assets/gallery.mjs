@@ -1,6 +1,6 @@
 // Original vector studies of nine Apple silhouettes. No external assets.
-import {devices} from './gallery-data.mjs?v=3.5.0';
-import {icon} from './icons.mjs?v=3.5.0';
+import {devices} from './gallery-data.mjs?v=3.6.0';
+import {icon} from './icons.mjs?v=3.6.0';
 export {devices};
 
 export function archiveMarkup(version) {

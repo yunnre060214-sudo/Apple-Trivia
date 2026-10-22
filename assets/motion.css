@@ -33,6 +33,9 @@ a:not(.brand):not(.skip-link):focus-visible { background-size:100% 1px; }
 .topic-number { transition:opacity 180ms,translate 280ms; }
 .flag-button { transition:background 200ms,color 200ms; }
 .answer { transition:background 210ms,border-color 210ms,color 200ms,box-shadow 220ms; }
+.answer:before { content:""; position:absolute; inset:0; border-radius:inherit; background:radial-gradient(180px circle at var(--spot-x,50%) var(--spot-y,50%),var(--spot-color),transparent 72%); opacity:0; pointer-events:none; transition:opacity 180ms; }
+.answer:after { content:""; position:absolute; inset:-1px; border:1px solid var(--green-line); border-radius:inherit; opacity:0; pointer-events:none; }
+.answer.correct[data-answer-pulse]:after { animation:motion-answer-pulse 440ms var(--motion-soft) both; }
 .answer .letter { transition:background 200ms,color 200ms,border-color 200ms,box-shadow 250ms; }
 .answer.selected .letter { box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 9%,transparent); }
 .answer.correct .letter { box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 9%,transparent); }
@@ -79,6 +82,10 @@ dialog[data-motion-closing] { pointer-events:none; }
 .share-preview img { animation:motion-card-develop 420ms var(--motion-soft) both; }
 
 @media (hover:hover) and (pointer:fine) {
+  .answer[data-surface-active]:not(:disabled):before { opacity:1; }
+  .share-card-frame:after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(ellipse at var(--spot-x,50%) var(--spot-y,50%),#ffffff26,transparent 70%); opacity:0; transition:opacity 200ms; }
+  .share-card-frame[data-surface-active]:after { opacity:1; }
+  .share-skin:hover { color:var(--ink); border-color:var(--line); }
   a:not(.brand):not(.skip-link):hover,[data-motion=about]:hover,[data-motion=custom]:hover,[data-motion=resume]:hover,[data-motion=explain]:hover,[data-motion=review]:hover,[data-motion=home-return]:hover { background-size:100% 1px; }
   .brand:hover b { letter-spacing:-.35px; }
   .hero-start:hover .button-disc { background:color-mix(in srgb,currentColor 8%,transparent); border-color:currentColor; }
@@ -98,6 +105,7 @@ dialog[data-motion-closing] { pointer-events:none; }
 
 
 @keyframes motion-mark { from { opacity:0; scale:.6; } 65% { scale:1.12; } to { opacity:1; scale:1; } }
+@keyframes motion-answer-pulse { from { opacity:.55; scale:1; } to { opacity:0; scale:1.025 1.12; } }
 @keyframes motion-draw { from { stroke-dashoffset:32; } to { stroke-dashoffset:0; } }
 @keyframes motion-icon-draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
 @keyframes motion-feedback { from { opacity:0; translate:0 3px; } to { opacity:1; translate:0 0; } }
@@ -106,6 +114,8 @@ dialog[data-motion-closing] { pointer-events:none; }
 @keyframes motion-card-develop { from { opacity:0; scale:.97; translate:0 8px; } to { opacity:1; scale:1; translate:0 0; } }
 
 @media (prefers-reduced-motion:reduce) {
+  .answer:before,.answer:after,.share-card-frame:after { animation:none!important; transition:none!important; opacity:0!important; }
+  .share-card-frame { transform:none!important; transition:none!important; }
   .icon,.icon [data-icon-idle],.icon [data-icon-part],[data-motion],.motion-select-arrow,.motion-segment,.category-pills span,.auto-switch input:after { animation:none!important; transition:none!important; }
   .motion-status-icon path,.answer-mark path,.share-preview img { animation:none!important; stroke-dashoffset:0!important; }
 }
