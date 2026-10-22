@@ -1,4 +1,4 @@
-import {APPLE_PATH} from './brand.mjs?v=3.6.0';
+import {APPLE_PATH} from './brand.mjs?v=3.7.0';
 // Idle motion lives on the outer group; interaction motion owns the inner group.
 // Both keep the SVG viewport and the button's hit area fixed.
 const part = (name, content, attributes='') => `<g data-icon-idle="${name}"><g data-icon-part="${name}" ${attributes}>${content}</g></g>`;

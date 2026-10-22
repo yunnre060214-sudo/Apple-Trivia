@@ -1,3 +1,4 @@
+import {SURFACE_PROPERTIES} from './surface.mjs?v=3.7.0';
 const SVG='http://www.w3.org/2000/svg';
 let identity=0;
 
@@ -45,6 +46,8 @@ export function createThemeScene({document,window,theme,width,height,duration=78
   const ids=new Map();
   for(let i=0;i<copies.length;i++) {
     const node=copies[i];sourceForCopy.set(node,originals[i]);copyForSource.set(originals[i],node);
+    // A prepared palette must not preserve a pointer light after it has left.
+    if(node.dataset.surfaceActive!==undefined){delete node.dataset.surfaceActive;SURFACE_PROPERTIES.forEach(key=>node.style.removeProperty(key));}
     if(node.id){ids.set(node.id,`${prefix}-${node.id}`);node.dataset.themeCopyId=node.id;node.removeAttribute('id');}
     for(const attribute of ['autofocus','aria-live','aria-labelledby','aria-describedby'])node.removeAttribute(attribute);
     if(node.matches('a,button,input,select,textarea,[tabindex]'))node.setAttribute('tabindex','-1');
@@ -64,7 +67,7 @@ export function createThemeScene({document,window,theme,width,height,duration=78
   surface.style.clipPath='path(evenodd,"M0 0L0 0Z")';surface.style.opacity='0';surface.append(copy);
   document.body.append(surface);
   let animations=surface.getAnimations({subtree:true});
-  const waves=new Set(),shapes=new Set();let frame=null,origin=null,floor=false;
+  const waves=new Set(),shapes=new Set();let frame=null,origin=null,floor=false,scoreObserver=null;
   const now=()=>window.performance.now();
   function draw() {
     const parts=[floor?`M0 0H${width}V${height}H0Z`:'M0 0L0 0Z'];
@@ -96,6 +99,17 @@ export function createThemeScene({document,window,theme,width,height,duration=78
   return {
     theme,
     begin() {
+      // Counter synchronization reads inline values only, without layout reads.
+      const scores=[...source.querySelectorAll('.result-score strong')];
+      const syncScores=()=>scores.forEach(original=>{
+        const node=copyForSource.get(original);if(!node)return;
+        node.textContent=original.textContent;
+        for(const key of ['--score-weight','min-width']){const value=original.style.getPropertyValue(key);if(value)node.style.setProperty(key,value);else node.style.removeProperty(key);}
+        const emblem=source.querySelector('.result-emblem'),alternate=copyForSource.get(emblem);
+        if(alternate&&emblem.dataset.scoreComplete!==undefined)alternate.dataset.scoreComplete='';
+      });
+      syncScores();
+      if(scores.length&&window.MutationObserver){scoreObserver=new window.MutationObserver(syncScores);scores.forEach(node=>scoreObserver.observe(node,{childList:true,attributes:true,attributeFilter:['style']}));}
       for(const original of source.querySelectorAll('.archive-select,input,select,textarea,.archive,.hero-title-line')) {
         const node=copyForSource.get(original);if(!node)continue;
         if(original.matches('.archive-select,textarea')){node.scrollLeft=original.scrollLeft;node.scrollTop=original.scrollTop;}
@@ -119,6 +133,6 @@ export function createThemeScene({document,window,theme,width,height,duration=78
       };
       return {animation,remove:()=>{shapes.delete(wave);draw();}};
     },
-    dispose(){if(frame!==null)window.cancelAnimationFrame(frame);frame=null;waves.forEach(wave=>wave.resolve());waves.clear();shapes.clear();animations.forEach(animation=>animation.cancel());animations=[];surface.remove();},
+    dispose(){scoreObserver?.disconnect();if(frame!==null)window.cancelAnimationFrame(frame);frame=null;waves.forEach(wave=>wave.resolve());waves.clear();shapes.clear();animations.forEach(animation=>animation.cancel());animations=[];surface.remove();},
   };
 }

@@ -1,4 +1,4 @@
-import {ICON_MOTIONS} from './icon-motion.mjs?v=3.6.0';
+import {ICON_MOTIONS} from './icon-motion.mjs?v=3.7.0';
 // A small, delegated motion system. Intent, contact, state and completion have
 // separate channels; no interaction waits for a decorative animation to finish.
 // Tuple: pressed scale X/Y, displacement X/Y in px, rotation in degrees,
@@ -194,13 +194,13 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     }
     if(before.disabled&&!after.disabled)run(surface(el),'enabled',[{opacity:.55,scale:'.985'},{opacity:1,scale:'1'}],{duration:240});
   }
-  function enter(scope,kind='content') {
+  function enter(scope,kind='content',{direction=1}={}) {
     if(!scope||reduced()||document.documentElement.classList.contains('hello-pending'))return;
     refresh(scope);
     if(kind==='result'||kind==='feedback')scope.querySelectorAll('.result-emblem .icon,.feedback-line>.icon').forEach(icon=>animateGlyph(icon));
     const selector=kind==='answers'?'.answer':kind==='dialog'?'#modal-content>h2,#modal-content>p,#modal-content>form>fieldset,#modal-content>form>.form-row,#modal-content>form>.timer-setting,#modal-content>form>[type=submit],.map-grid,.share-preview,.share-buttons,.dialog-actions,.replay-intro':kind==='explanation'?'.explanation p,.source-links a':'.result-actions>button,.result-links>button';
     const nodes=[...scope.querySelectorAll(selector)].filter(el=>!el.hidden).slice(0,16);
-    nodes.forEach((el,i)=>run(el,'entry',[{opacity:0,translate:kind==='answers'?'5px 0px':'0px 6px'},{opacity:1,translate:'0px 0px'}],{duration:kind==='dialog'?340:300,delay:i*(kind==='answers'?24:28)}));
+    nodes.forEach((el,i)=>run(el,'entry',[{opacity:0,translate:kind==='answers'?`${direction<0?-5:5}px 0px`:'0px 6px'},{opacity:1,translate:'0px 0px'}],{duration:kind==='dialog'?340:300,delay:i*(kind==='answers'?24:28)}));
   }
   function prepareDialog(dialog) {cancel(channels.get(dialog)?.get('dialog-close'));delete dialog.dataset.motionClosing;}
   function closeDialog(dialog) {
@@ -208,7 +208,7 @@ export function createInteractionMotion({document,window,reducedMotion=()=>false
     if(dialog.dataset.motionClosing!==undefined)return;
     dialog.dataset.motionClosing='';
     const mobile=window.matchMedia('(max-width:760px)').matches;
-    run(dialog,'dialog-close',[{opacity:1,translate:'0px 0px',scale:'1'},{opacity:0,translate:`0px ${mobile?24:8}px`,scale:mobile?'1':'.985'}],{duration:mobile?190:150,easing:'cubic-bezier(.4,0,1,1)',done:()=>{delete dialog.dataset.motionClosing;dialog.close();}});
+    run(dialog,'dialog-close',[{opacity:1,translate:'0px 0px',scale:'1'},{opacity:0,translate:`0px ${mobile?24:6}px`,scale:mobile?'1':'.97'}],{duration:mobile?190:180,easing:'cubic-bezier(.4,0,1,1)',done:()=>{delete dialog.dataset.motionClosing;dialog.close();}});
   }
   function disclosure(summary,event) {
     const details=summary.closest('details');if(!details||reduced()||typeof details.animate!=='function')return;

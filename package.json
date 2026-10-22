@@ -1,6 +1,6 @@
 {
   "name": "apple-product-knowledge-quiz",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "private": true,
   "type": "module",
   "description": "A playful Apple trivia game with five-question rounds and shareable result cards.",

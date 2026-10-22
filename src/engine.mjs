@@ -1,4 +1,4 @@
-export const VERSION = '3.6.0';
+export const VERSION = '3.7.0';
 export const CATEGORIES = {
   iphone: { name: 'iPhone', short: 'iP', color: '#3478e7' },
   ipad: { name: 'iPad', short: 'iD', color: '#8958c7' },

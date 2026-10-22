@@ -4,7 +4,7 @@
   --browser-bg:#f5f4f0; --page-scheme:light;
   --bg:#f5f4f0; --surface:#fdfcf9; --ink:#222622; --muted:#656b65;
   --line:#d9dcd3; --soft:#eaece5; --ghost:#d9ddd2;
-  --material-line:#d9dcd3; --material-highlight:#ffffffb3; --spot-color:#245abe0d;
+  --material-line:#d9dcd3; --material-highlight:#ffffffb3; --spot-color:#245abe0d; --spot-edge:#678cb7a6;
   --accent:#245abe; --accent-hover:#16499f; --accent-soft:#e8edf8;
   --button:#222622; --button-ink:#fffefa;
   --green:#256744; --green-soft:#eaf2e8; --green-line:#7fa485;
@@ -24,7 +24,7 @@
   --page-scheme:dark;
   --bg:#080d1b; --surface:#111b30; --ink:#edf3ff; --muted:#a2b2ce;
   --line:#283650; --soft:#16223a; --ghost:#374a70;
-  --material-line:#ffffff1c; --material-highlight:#ffffff0d; --spot-color:#a0caff15;
+  --material-line:#ffffff1c; --material-highlight:#ffffff0d; --spot-color:#a0caff15; --spot-edge:#b7d9ffb3;
   --accent:#a0caff; --accent-hover:#c9ddff; --accent-soft:#1a2b49;
   --button:#d4e1ff; --button-ink:#101c38;
   --green:#a5d6a7; --green-soft:#1c3024; --green-line:#4d7959;
@@ -205,6 +205,9 @@ main { width:100%; max-width:1240px; padding:0 var(--edge-right) 0 var(--edge-le
 .auto-switch input:checked:after { transform:translateX(13px); background:var(--bg); }
 .explanation { margin:0 0 24px; padding:20px 24px; border-left:2px solid var(--muted); background:var(--soft); }
 .explanation p { color:var(--ink); font-size:16px; line-height:1.75; text-wrap:pretty; }
+.explanation-drawer { display:grid; grid-template-rows:0fr; opacity:0; transition:grid-template-rows 320ms var(--ease),opacity 200ms; }
+.explanation-drawer.is-open { grid-template-rows:1fr; opacity:1; }
+.explanation-reveal { min-height:0; overflow:hidden; }
 .source-links { display:flex; flex-wrap:wrap; gap:0 16px; margin-top:8px; }
 .source-links a { display:inline-flex; align-items:center; gap:6px; min-height:44px; color:var(--muted); font-size:12px; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px; }
 .source-links a:hover { color:var(--accent); }
@@ -224,7 +227,7 @@ main { width:100%; max-width:1240px; padding:0 var(--edge-right) 0 var(--edge-le
 .result-title { margin:30px 0 12px; font-size:clamp(28px,4vw,44px); font-weight:550; letter-spacing:-.045em; line-height:1.3; }
 .score-row { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0 28px; margin:0 0 20px; }
 .result-score { display:flex; align-items:baseline; gap:8px; }
-.result-score strong { min-width:1.75ch; font-size:clamp(84px,12vw,128px); font-weight:450; letter-spacing:-.075em; line-height:1.25; text-align:right; font-variant-numeric:tabular-nums; }
+.result-score strong { min-width:1.75ch; font-family:Outfit,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:clamp(84px,12vw,128px); font-weight:620; font-variation-settings:"wght" var(--score-weight,620); letter-spacing:-.055em; line-height:1.25; text-align:right; font-variant-numeric:tabular-nums; }
 .result-score>span { color:var(--muted); font-size:14px; }
 .score-divider { width:1px; height:46px; background:var(--line); }
 .result-stats { display:flex; flex-direction:column; align-items:flex-start; gap:10px; color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums; }
@@ -296,7 +299,7 @@ legend .muted { font-weight:400; }
 .share-swatch { width:14px; height:14px; border:1px solid #80808066; border-radius:50%; background:#f5f4f0; }
 .share-swatch.dark { background:#111b30; }
 .share-preview { height:min(420px,42svh); display:flex; align-items:center; justify-content:center; margin:12px 0 20px; padding:14px; border:1px solid var(--line); border-radius:20px; background:var(--soft); overflow:hidden; }
-.share-card-frame { position:relative; height:100%; max-width:100%; aspect-ratio:3/4; border-radius:10px; overflow:hidden; transform:perspective(1000px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg)); transition:transform 240ms var(--ease); }
+.share-card-frame { position:relative; height:100%; max-width:100%; aspect-ratio:3/4; border-radius:10px; overflow:hidden; transform:perspective(1000px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg)); }
 .share-preview img { width:100%; height:100%; object-fit:contain; }
 .share-buttons { display:flex; gap:12px; }
 .share-buttons button { flex:1; min-width:0; padding:0 16px; font-size:14px; }

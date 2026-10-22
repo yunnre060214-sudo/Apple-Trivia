@@ -40,6 +40,12 @@ function fixture({reduce=false}={}) {
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 
+test('answer entry follows the previous/next direction and cancels the prior entry track',()=>{
+  const f=fixture(),answers=f.append('div','answers'),answer=f.append('button','answer',{},answers),motion=f.mount();
+  motion.enter(answers,'answers',{direction:-1});const left=answer.animations.at(-1);assert.equal(left.keyframes[0].translate,'-5px 0px');
+  motion.enter(answers,'answers',{direction:1});assert.equal(left.cancelled,true);assert.equal(answer.animations.at(-1).keyframes[0].translate,'5px 0px');motion.dispose();
+});
+
 test('all current actions have semantic recipes, with separate home, result and navigation variants',()=>{
   const f=fixture();
   const actions=['theme','custom','resume','flag','map','previous','confirm','explain','end-round','finish','results','review','share-card','download','native-share','copy','replay-hello','reload','quick','home','about','next','close'];

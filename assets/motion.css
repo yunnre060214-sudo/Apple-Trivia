@@ -36,6 +36,17 @@ a:not(.brand):not(.skip-link):focus-visible { background-size:100% 1px; }
 .answer:before { content:""; position:absolute; inset:0; border-radius:inherit; background:radial-gradient(180px circle at var(--spot-x,50%) var(--spot-y,50%),var(--spot-color),transparent 72%); opacity:0; pointer-events:none; transition:opacity 180ms; }
 .answer:after { content:""; position:absolute; inset:-1px; border:1px solid var(--green-line); border-radius:inherit; opacity:0; pointer-events:none; }
 .answer.correct[data-answer-pulse]:after { animation:motion-answer-pulse 440ms var(--motion-soft) both; }
+.topic-link[data-topic=surprise] { --spot-color:#d69f5417; --spot-edge:#d69f548c; }
+.topic-link[data-topic=stories] { --spot-color:#6ca58b17; --spot-edge:#6ca58b8c; }
+.topic-link[data-topic=timeline] { --spot-color:#739ed217; --spot-edge:#739ed28c; }
+.topic-link:after { content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none; background:radial-gradient(200px circle at var(--spot-x,50%) var(--spot-y,50%),var(--spot-color),transparent 72%); opacity:0; }
+.result-emblem { position:relative; overflow:hidden; border-radius:50%; }
+.result-emblem:after { content:""; position:absolute; inset:-25%; pointer-events:none; background:linear-gradient(110deg,transparent 34%,color-mix(in srgb,currentColor 45%,transparent) 50%,transparent 66%); translate:-125% 0; opacity:0; }
+.result-emblem[data-score-complete]:after { animation:motion-emblem-light 520ms var(--motion-soft) both; }
+@supports (mask-composite:exclude) or (-webkit-mask-composite:xor) {
+  .answer:before,.topic-link:after { padding:1px; background:radial-gradient(180px circle at var(--spot-x,50%) var(--spot-y,50%),var(--spot-edge),transparent 72%); -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; transition:none; }
+  .answer:before { inset:-1px; }
+}
 .answer .letter { transition:background 200ms,color 200ms,border-color 200ms,box-shadow 250ms; }
 .answer.selected .letter { box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 9%,transparent); }
 .answer.correct .letter { box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 9%,transparent); }
@@ -82,9 +93,10 @@ dialog[data-motion-closing] { pointer-events:none; }
 .share-preview img { animation:motion-card-develop 420ms var(--motion-soft) both; }
 
 @media (hover:hover) and (pointer:fine) {
-  .answer[data-surface-active]:not(:disabled):before { opacity:1; }
-  .share-card-frame:after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(ellipse at var(--spot-x,50%) var(--spot-y,50%),#ffffff26,transparent 70%); opacity:0; transition:opacity 200ms; }
-  .share-card-frame[data-surface-active]:after { opacity:1; }
+  .answer[data-surface-active]:not(:disabled):before,.topic-link[data-surface-active]:after { opacity:var(--surface-light,0); transition:none; }
+  .answer[data-surface-active]:not(:disabled),.topic-link[data-surface-active] { background-image:radial-gradient(180px circle at var(--spot-x,50%) var(--spot-y,50%),color-mix(in srgb,var(--spot-color) calc(var(--surface-light,0)*100%),transparent),transparent 72%); }
+  .share-card-frame:after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(ellipse at var(--spot-x,50%) var(--spot-y,50%),#ffffff26,transparent 70%); opacity:0; }
+  .share-card-frame[data-surface-active]:after { opacity:var(--surface-light,0); }
   .share-skin:hover { color:var(--ink); border-color:var(--line); }
   a:not(.brand):not(.skip-link):hover,[data-motion=about]:hover,[data-motion=custom]:hover,[data-motion=resume]:hover,[data-motion=explain]:hover,[data-motion=review]:hover,[data-motion=home-return]:hover { background-size:100% 1px; }
   .brand:hover b { letter-spacing:-.35px; }
@@ -94,7 +106,7 @@ dialog[data-motion-closing] { pointer-events:none; }
   .archive-select button:hover span { translate:0 -2px; }
   .topic-link:hover .topic-copy strong { translate:4px 0; }
   .topic-link:hover .topic-number { opacity:.6; translate:-2px 0; }
-  .answer:hover:not(:disabled) { border-color:var(--muted); box-shadow:inset 3px 0 0 var(--line); }
+  .answer:hover:not(:disabled):not(.selected) { border-color:var(--muted); }
   .answer:hover:not(:disabled) .letter { border-color:var(--muted); }
   [data-motion=continue]:hover { background:var(--soft); }
   .category-pills label:hover span { border-color:var(--muted); background:var(--soft); }
@@ -105,6 +117,7 @@ dialog[data-motion-closing] { pointer-events:none; }
 
 
 @keyframes motion-mark { from { opacity:0; scale:.6; } 65% { scale:1.12; } to { opacity:1; scale:1; } }
+@keyframes motion-emblem-light { from { translate:-125% 0; opacity:0; } 20% { opacity:.7; } 80% { opacity:.7; } to { translate:125% 0; opacity:0; } }
 @keyframes motion-answer-pulse { from { opacity:.55; scale:1; } to { opacity:0; scale:1.025 1.12; } }
 @keyframes motion-draw { from { stroke-dashoffset:32; } to { stroke-dashoffset:0; } }
 @keyframes motion-icon-draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
@@ -114,7 +127,9 @@ dialog[data-motion-closing] { pointer-events:none; }
 @keyframes motion-card-develop { from { opacity:0; scale:.97; translate:0 8px; } to { opacity:1; scale:1; translate:0 0; } }
 
 @media (prefers-reduced-motion:reduce) {
-  .answer:before,.answer:after,.share-card-frame:after { animation:none!important; transition:none!important; opacity:0!important; }
+  .answer:before,.answer:after,.topic-link:after,.share-card-frame:after,.result-emblem:after { animation:none!important; transition:none!important; opacity:0!important; }
+  .answer,.topic-link { background-image:none!important; }
+  .explanation-drawer { transition:none!important; }
   .share-card-frame { transform:none!important; transition:none!important; }
   .icon,.icon [data-icon-idle],.icon [data-icon-part],[data-motion],.motion-select-arrow,.motion-segment,.category-pills span,.auto-switch input:after { animation:none!important; transition:none!important; }
   .motion-status-icon path,.answer-mark path,.share-preview img { animation:none!important; stroke-dashoffset:0!important; }

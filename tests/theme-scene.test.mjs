@@ -6,7 +6,7 @@ const SVG='http://www.w3.org/2000/svg';
 class Node {
   constructor(tag,namespaceURI='html') {
     this.tag=tag;this.namespaceURI=namespaceURI;this.attrs=new Map();this.dataset={};this.children=[];this.animations=[];
-    this.style={setProperty(k,v){this[k]=v;},getPropertyValue(k){return this[k]||'';}};
+    this.style={setProperty(k,v){this[k]=v;},getPropertyValue(k){return this[k]||'';},removeProperty(k){delete this[k];}};
     this.classList={add:(...names)=>this.className=[this.className,...names].filter(Boolean).join(' ')};
   }
   get id(){return this.attrs.get('id')||'';} set id(v){this.attrs.set('id',v);}
@@ -20,11 +20,12 @@ class Node {
   getAnimations(){return [...this.animations,...this.children.flatMap(n=>n.getAnimations())];}
   animate(keyframes,options){let resolve,reject;const animation={keyframes,options,effect:{target:this},finished:new Promise((ok,no)=>{resolve=ok;reject=no;}),cancel(){this.cancelled=true;reject(Error('cancelled'));},finish:()=>resolve()};this.animations.push(animation);return animation;}
 }
-function fixture() {
+function fixture({pointerLight=false}={}) {
   const body=new Node('body'),source=new Node('div');source.id='site-content';body.append(source);
   const button=new Node('button');button.id='theme-toggle';button.innerHTML='<svg>moon</svg>';source.append(button);
   const svg=new Node('svg',SVG),gradient=new Node('linearGradient',SVG),path=new Node('path',SVG);gradient.id='home-flow';path.setAttribute('stroke','url(#home-flow)');svg.append(gradient,path);source.append(svg);
   const product=new Node('img');source.append(product);
+  if(pointerLight){product.dataset.surfaceActive='';product.style.setProperty('--surface-light','1');product.style.setProperty('--spot-x','80%');}
   product.animations=[{animationName:'home-object-float',effect:{target:product},startTime:-600,currentTime:2500,playState:'running',playbackRate:1,play(){this.playing=true;},pause(){this.paused=true;},cancel(){this.cancelled=true;}}];
   const dialog=new Node('dialog');dialog.id='modal';source.append(dialog);
   const document={body,documentElement:{clientWidth:375},getElementById:id=>[body,...body.querySelectorAll('*')].find(n=>n.id===id),createElement:tag=>new Node(tag),createElementNS:(ns,tag)=>new Node(tag,ns)};
@@ -43,6 +44,11 @@ test('the alternate scene preserves original animation identity, sanitizes dupli
   const gradient=copy.querySelectorAll('linearGradient')[0],path=copy.querySelectorAll('path')[0];assert.equal(path.attrs.get('stroke'),`url(#${gradient.id})`);
   assert.equal(f.surface.inert,true);assert.equal(f.surface.attrs.get('aria-hidden'),'true');
   f.scene.dispose();assert.equal(f.body.children.length,1);assert.equal(alternate.cancelled,true);assert.equal(original.cancelled,undefined);
+});
+test('prepared palettes discard transient pointer light without touching the original surface',()=>{
+  const f=fixture({pointerLight:true}),copy=f.surface.children[0].querySelectorAll('img')[0];
+  assert.equal(copy.dataset.surfaceActive,undefined);assert.equal(copy.style.getPropertyValue('--surface-light'),'');assert.equal(copy.style.getPropertyValue('--spot-x'),'');
+  assert.equal(f.product.dataset.surfaceActive,'');assert.equal(f.product.style.getPropertyValue('--surface-light'),'1');f.scene.dispose();
 });
 test('compound circles reveal and erase through one clip path without allocating DOM nodes',async()=>{
   const f=fixture(),before=f.surface.querySelectorAll('*').length;

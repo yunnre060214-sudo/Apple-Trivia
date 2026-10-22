@@ -1,4 +1,4 @@
-import {createThemeScene} from './theme-scene.mjs?v=3.6.0';
+import {createThemeScene} from './theme-scene.mjs?v=3.7.0';
 
 export function setBrowserTheme(document, theme) {
   const value = theme === 'dark' ? 'dark' : 'light';
