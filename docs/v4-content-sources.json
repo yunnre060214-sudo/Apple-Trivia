@@ -1,0 +1,710 @@
+{
+  "newAuthoredQuestions": 100,
+  "sourceGroups": [
+    {
+      "url": "https://www.apple.com/newsroom/2000/07/19Apple-Introduces-Revolutionary/",
+      "title": "Apple Introduces Revolutionary G4 Cube - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-cube-cooling",
+          "factKeys": [
+            "cube:cooling"
+          ]
+        },
+        {
+          "id": "v4-cube-core",
+          "factKeys": [
+            "cube:core"
+          ]
+        },
+        {
+          "id": "v4-cube-optical",
+          "factKeys": [
+            "cube:optical"
+          ]
+        },
+        {
+          "id": "v4-cube-speakers",
+          "factKeys": [
+            "cube:speakers"
+          ]
+        },
+        {
+          "id": "v4-cube-adc",
+          "factKeys": [
+            "cube:adc"
+          ]
+        },
+        {
+          "id": "v4-cube-shape",
+          "factKeys": [
+            "cube:shape"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2003/01/07Apple-Unveils-Safari/",
+      "title": "Apple Unveils Safari - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-safari-engine",
+          "factKeys": [
+            "safari:engine"
+          ]
+        },
+        {
+          "id": "v4-safari-snapback",
+          "factKeys": [
+            "safari:snapback"
+          ]
+        },
+        {
+          "id": "v4-safari-search",
+          "factKeys": [
+            "safari:search"
+          ]
+        },
+        {
+          "id": "v4-safari-popups",
+          "factKeys": [
+            "safari:popups"
+          ]
+        },
+        {
+          "id": "v4-safari-contacts",
+          "factKeys": [
+            "safari:contacts"
+          ]
+        },
+        {
+          "id": "v4-safari-beta",
+          "factKeys": [
+            "safari:beta"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2005/01/11Apple-Introduces-iPod-shuffle/",
+      "title": "Apple Introduces iPod shuffle - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-shuffle-autofill",
+          "factKeys": [
+            "shuffle:autofill"
+          ]
+        },
+        {
+          "id": "v4-shuffle-order",
+          "factKeys": [
+            "shuffle:order"
+          ]
+        },
+        {
+          "id": "v4-shuffle-usb",
+          "factKeys": [
+            "shuffle:usb"
+          ]
+        },
+        {
+          "id": "v4-shuffle-files",
+          "factKeys": [
+            "shuffle:files"
+          ]
+        },
+        {
+          "id": "v4-shuffle-lanyard",
+          "factKeys": [
+            "shuffle:lanyard"
+          ]
+        },
+        {
+          "id": "v4-shuffle-pack",
+          "factKeys": [
+            "shuffle:pack"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2005/01/11Apple-Introduces-Mac-mini/",
+      "title": "Apple Introduces Mac mini - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-macmini-byod",
+          "factKeys": [
+            "macmini:byod"
+          ]
+        },
+        {
+          "id": "v4-macmini-processor",
+          "factKeys": [
+            "macmini:processor"
+          ]
+        },
+        {
+          "id": "v4-macmini-combo",
+          "factKeys": [
+            "macmini:combo"
+          ]
+        },
+        {
+          "id": "v4-macmini-video",
+          "factKeys": [
+            "macmini:video"
+          ]
+        },
+        {
+          "id": "v4-macmini-wireless",
+          "factKeys": [
+            "macmini:wireless"
+          ]
+        },
+        {
+          "id": "v4-macmini-modem",
+          "factKeys": [
+            "macmini:modem"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2005/09/07Apple-Introduces-iPod-nano/",
+      "title": "Apple Introduces iPod nano - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-nano-pencil",
+          "factKeys": [
+            "nano:pencil"
+          ]
+        },
+        {
+          "id": "v4-nano-colors",
+          "factKeys": [
+            "nano:colors"
+          ]
+        },
+        {
+          "id": "v4-nano-screen",
+          "factKeys": [
+            "nano:screen"
+          ]
+        },
+        {
+          "id": "v4-nano-tubes",
+          "factKeys": [
+            "nano:tubes"
+          ]
+        },
+        {
+          "id": "v4-nano-connector",
+          "factKeys": [
+            "nano:connector"
+          ]
+        },
+        {
+          "id": "v4-nano-extras",
+          "factKeys": [
+            "nano:extras"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2007/09/05Apple-Unveils-iPod-touch/",
+      "title": "Apple Unveils iPod touch - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-ipodtouch-wifi",
+          "factKeys": [
+            "ipodtouch:wifi"
+          ]
+        },
+        {
+          "id": "v4-ipodtouch-coverflow",
+          "factKeys": [
+            "ipodtouch:coverflow"
+          ]
+        },
+        {
+          "id": "v4-ipodtouch-light",
+          "factKeys": [
+            "ipodtouch:light"
+          ]
+        },
+        {
+          "id": "v4-ipodtouch-youtube",
+          "factKeys": [
+            "ipodtouch:youtube"
+          ]
+        },
+        {
+          "id": "v4-ipodtouch-starbucks",
+          "factKeys": [
+            "ipodtouch:starbucks"
+          ]
+        },
+        {
+          "id": "v4-ipodtouch-purchased",
+          "factKeys": [
+            "ipodtouch:purchased"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2007/01/09Apple-TV-Coming-to-Your-Living-Room/",
+      "title": "Apple TV Coming to Your Living Room - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-appletv-harddrive",
+          "factKeys": [
+            "appletv:harddrive"
+          ]
+        },
+        {
+          "id": "v4-appletv-output",
+          "factKeys": [
+            "appletv:output"
+          ]
+        },
+        {
+          "id": "v4-appletv-sync",
+          "factKeys": [
+            "appletv:sync"
+          ]
+        },
+        {
+          "id": "v4-appletv-remote",
+          "factKeys": [
+            "appletv:remote"
+          ]
+        },
+        {
+          "id": "v4-appletv-component",
+          "factKeys": [
+            "appletv:component"
+          ]
+        },
+        {
+          "id": "v4-appletv-pc",
+          "factKeys": [
+            "appletv:pc"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2011/06/21Apple-Revolutionizes-Video-Editing-With-Final-Cut-Pro-X/",
+      "title": "Apple Revolutionizes Video Editing With Final Cut Pro X - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-finalcut-magnetic",
+          "factKeys": [
+            "finalcut:magnetic"
+          ]
+        },
+        {
+          "id": "v4-finalcut-connections",
+          "factKeys": [
+            "finalcut:connections"
+          ]
+        },
+        {
+          "id": "v4-finalcut-compound",
+          "factKeys": [
+            "finalcut:compound"
+          ]
+        },
+        {
+          "id": "v4-finalcut-auditions",
+          "factKeys": [
+            "finalcut:auditions"
+          ]
+        },
+        {
+          "id": "v4-finalcut-analysis",
+          "factKeys": [
+            "finalcut:analysis"
+          ]
+        },
+        {
+          "id": "v4-finalcut-background",
+          "factKeys": [
+            "finalcut:background"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2013/07/16Apple-Unveils-Logic-Pro-X/",
+      "title": "Apple Unveils Logic Pro X - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-logic-drummer",
+          "factKeys": [
+            "logic:drummer"
+          ]
+        },
+        {
+          "id": "v4-logic-flexpitch",
+          "factKeys": [
+            "logic:flexpitch"
+          ]
+        },
+        {
+          "id": "v4-logic-remote",
+          "factKeys": [
+            "logic:remote"
+          ]
+        },
+        {
+          "id": "v4-logic-stacks",
+          "factKeys": [
+            "logic:stacks"
+          ]
+        },
+        {
+          "id": "v4-logic-smart",
+          "factKeys": [
+            "logic:smart"
+          ]
+        },
+        {
+          "id": "v4-logic-arpeggiator",
+          "factKeys": [
+            "logic:arpeggiator"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2003/06/23Apple-Introduces-iChat-AV-and-iSight/",
+      "title": "Apple Introduces iChat AV and iSight - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-isight-cable",
+          "factKeys": [
+            "isight:cable"
+          ]
+        },
+        {
+          "id": "v4-isight-focus",
+          "factKeys": [
+            "isight:focus"
+          ]
+        },
+        {
+          "id": "v4-isight-mic",
+          "factKeys": [
+            "isight:mic"
+          ]
+        },
+        {
+          "id": "v4-isight-mount",
+          "factKeys": [
+            "isight:mount"
+          ]
+        },
+        {
+          "id": "v4-isight-firewirecamera",
+          "factKeys": [
+            "isight:firewirecamera"
+          ]
+        },
+        {
+          "id": "v4-isight-dialup",
+          "factKeys": [
+            "isight:dialup"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2003/01/07Apple-Unveils-Keynote/",
+      "title": "Apple Unveils Keynote - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-keynote-themes",
+          "factKeys": [
+            "keynote:themes"
+          ]
+        },
+        {
+          "id": "v4-keynote-price",
+          "factKeys": [
+            "keynote:price"
+          ]
+        },
+        {
+          "id": "v4-keynote-powerpoint",
+          "factKeys": [
+            "keynote:powerpoint"
+          ]
+        },
+        {
+          "id": "v4-keynote-navigator",
+          "factKeys": [
+            "keynote:navigator"
+          ]
+        },
+        {
+          "id": "v4-keynote-alignment",
+          "factKeys": [
+            "keynote:alignment"
+          ]
+        },
+        {
+          "id": "v4-keynote-charts",
+          "factKeys": [
+            "keynote:charts"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2013/10/23Introducing-the-All-New-Mac-Pro-The-Most-Radical-Mac-Ever/",
+      "title": "Introducing the All New Mac Pro—The Most Radical Mac Ever - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-macpro-thermal",
+          "factKeys": [
+            "macpro:thermal"
+          ]
+        },
+        {
+          "id": "v4-macpro-gpus",
+          "factKeys": [
+            "macpro:gpus"
+          ]
+        },
+        {
+          "id": "v4-macpro-flash",
+          "factKeys": [
+            "macpro:flash"
+          ]
+        },
+        {
+          "id": "v4-macpro-expansion",
+          "factKeys": [
+            "macpro:expansion"
+          ]
+        },
+        {
+          "id": "v4-macpro-ecc",
+          "factKeys": [
+            "macpro:ecc"
+          ]
+        },
+        {
+          "id": "v4-macpro-volume",
+          "factKeys": [
+            "macpro:volume"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2005/08/02Apple-Introduces-Mighty-Mouse/",
+      "title": "Apple Introduces Mighty Mouse - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-mightymouse-ball",
+          "factKeys": [
+            "mightymouse:ball"
+          ]
+        },
+        {
+          "id": "v4-mightymouse-buttons",
+          "factKeys": [
+            "mightymouse:buttons"
+          ]
+        },
+        {
+          "id": "v4-mightymouse-squeeze",
+          "factKeys": [
+            "mightymouse:squeeze"
+          ]
+        },
+        {
+          "id": "v4-mightymouse-shell",
+          "factKeys": [
+            "mightymouse:shell"
+          ]
+        },
+        {
+          "id": "v4-mightymouse-hands",
+          "factKeys": [
+            "mightymouse:hands"
+          ]
+        },
+        {
+          "id": "v4-mightymouse-windows",
+          "factKeys": [
+            "mightymouse:windows"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2006/02/28Apple-Announces-iPod-Hi-Fi/",
+      "title": "Apple Announces iPod Hi-Fi - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-ipodhifi-remote",
+          "factKeys": [
+            "ipodhifi:remote"
+          ]
+        },
+        {
+          "id": "v4-ipodhifi-handles",
+          "factKeys": [
+            "ipodhifi:handles"
+          ]
+        },
+        {
+          "id": "v4-ipodhifi-grille",
+          "factKeys": [
+            "ipodhifi:grille"
+          ]
+        },
+        {
+          "id": "v4-ipodhifi-powersupply",
+          "factKeys": [
+            "ipodhifi:powersupply"
+          ]
+        },
+        {
+          "id": "v4-ipodhifi-input",
+          "factKeys": [
+            "ipodhifi:input"
+          ]
+        },
+        {
+          "id": "v4-ipodhifi-recharge",
+          "factKeys": [
+            "ipodhifi:recharge"
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://www.apple.com/newsroom/2024/05/apple-announces-new-accessibility-features-including-eye-tracking/",
+      "title": "Apple announces new accessibility features, including Eye Tracking - Apple",
+      "checkedAt": "2026-10-24",
+      "questions": [
+        {
+          "id": "v4-a11y24-eyes",
+          "factKeys": [
+            "a11y24:eyes"
+          ]
+        },
+        {
+          "id": "v4-a11y24-camera",
+          "factKeys": [
+            "a11y24:camera"
+          ]
+        },
+        {
+          "id": "v4-a11y24-privacy",
+          "factKeys": [
+            "a11y24:privacy"
+          ]
+        },
+        {
+          "id": "v4-a11y24-dwell",
+          "factKeys": [
+            "a11y24:dwell"
+          ]
+        },
+        {
+          "id": "v4-a11y24-musichaptics",
+          "factKeys": [
+            "a11y24:musichaptics"
+          ]
+        },
+        {
+          "id": "v4-a11y24-taptic",
+          "factKeys": [
+            "a11y24:taptic"
+          ]
+        },
+        {
+          "id": "v4-a11y24-vocal",
+          "factKeys": [
+            "a11y24:vocal"
+          ]
+        },
+        {
+          "id": "v4-a11y24-atypical",
+          "factKeys": [
+            "a11y24:atypical"
+          ]
+        },
+        {
+          "id": "v4-a11y24-motion",
+          "factKeys": [
+            "a11y24:motion"
+          ]
+        },
+        {
+          "id": "v4-a11y24-carplay",
+          "factKeys": [
+            "a11y24:carplay"
+          ]
+        },
+        {
+          "id": "v4-a11y24-colorfilters",
+          "factKeys": [
+            "a11y24:colorfilters"
+          ]
+        },
+        {
+          "id": "v4-a11y24-visioncaptions",
+          "factKeys": [
+            "a11y24:visioncaptions"
+          ]
+        },
+        {
+          "id": "v4-a11y24-hovertyping",
+          "factKeys": [
+            "a11y24:hovertyping"
+          ]
+        },
+        {
+          "id": "v4-a11y24-mandarin",
+          "factKeys": [
+            "a11y24:mandarin"
+          ]
+        },
+        {
+          "id": "v4-a11y24-virtualpad",
+          "factKeys": [
+            "a11y24:virtualpad"
+          ]
+        },
+        {
+          "id": "v4-a11y24-fingertap",
+          "factKeys": [
+            "a11y24:fingertap"
+          ]
+        }
+      ]
+    }
+  ]
+}

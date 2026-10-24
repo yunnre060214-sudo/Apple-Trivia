@@ -1,4 +1,4 @@
-import {ICON_MOTIONS} from './icon-motion.mjs?v=3.7.0';
+import {ICON_MOTIONS} from './icon-motion.mjs?v=__VERSION__';
 // A small, delegated motion system. Intent, contact, state and completion have
 // separate channels; no interaction waits for a decorative animation to finish.
 // Tuple: pressed scale X/Y, displacement X/Y in px, rotation in degrees,
@@ -7,7 +7,8 @@ export const MOTION_PROFILES = Object.freeze({
   brand:[.955,.98,0,-.4,-2,360], about:[.96,.99,0,1,0,260], tally:[.98,.93,0,.6,0,300],
   appearance:[.9,.9,0,0,-8,380], launch:[.975,.94,0,1.3,0,370], custom:[.97,.965,0,1,-.7,330],
   resume:[.98,.95,-1,0,0,340], product:[.96,.9,0,1,0,310], 'archive-prev':[.91,.97,-2,0,0,290], 'archive-next':[.97,.91,2,0,0,320], 'archive-playback':[.88,.96,0,.7,-4,340],
-  'topic-surprise':[.99,.965,0,1,-.25,390], 'topic-stories':[.99,.98,1,0,.2,350], 'topic-timeline':[.995,.96,0,.7,0,410],
+  'topic-surprise':[.99,.965,0,1,-.25,390], 'topic-stories':[.99,.98,1,0,.2,350], 'topic-timeline':[.995,.96,0,.7,0,410], 'topic-visual':[.985,.985,0,.5,0,360],
+  exhibit:[.99,.99,0,.5,0,360], 'challenge-copy':[.98,.96,0,0,0,360],
   home:[.97,.95,-1.5,0,0,280], 'home-return':[.95,.99,0,.7,0,300], map:[.92,.92,0,0,2,330], flag:[.88,.94,0,1,-5,370],
   answer:[.995,.966,0,.8,0,260], previous:[.98,.97,-1,0,0,280], advance:[.975,.96,1,0,0,340], 'quick-next':[.95,.95,1.5,0,0,290],
   confirm:[.97,.93,0,1.4,0,350], explain:[.96,.96,0,.7,0,300], end:[.98,.94,0,1,0,330], finish:[.98,.93,0,-1,0,420],
@@ -36,7 +37,7 @@ export function describeMotion(el) {
   else if (d.topic) kind=`topic-${d.topic}`;
   else if (d.action) {
     const action=d.action;
-    const actions={theme:'appearance',custom:'custom',resume:'resume',flag:'flag',map:'map',previous:'previous',confirm:'confirm',explain:'explain','end-round':'end',finish:'finish',results:'results',review:'review','share-card':'share-card','share-retry':'reload',download:'save','native-share':'native',copy:'copy','replay-hello':'rehello',reload:'reload'};
+    const actions={theme:'appearance',custom:'custom',resume:'resume',flag:'flag',map:'map',previous:'previous',confirm:'confirm',explain:'explain','end-round':'end',finish:'finish',results:'results',review:'review','share-card':'share-card','share-retry':'reload',download:'save','native-share':'native',copy:'copy','copy-challenge':'challenge-copy','challenge-start':'launch','replay-hello':'rehello',reload:'reload'};
     if (action==='quick') kind=has('hero-start')?'launch':el.closest('.result-actions')?'replay':'restart';
     else if (action==='home') kind=has('back-button')?'home':'home-return';
     else if (action==='about') kind=has('bank-count')?'tally':'about';
@@ -44,7 +45,7 @@ export function describeMotion(el) {
     else if (action==='close') kind=has('modal-close')?'dismiss':'continue';
     else kind=actions[action]||'control';
   } else if (tag==='a') {
-    kind=has('brand')?'brand':has('skip-link')?'skip':el.closest('.source-links')?'source':el.closest('.site-footer')?'footer':el.closest('#modal-content')?'repository':'external';
+    kind=has('brand')?'brand':has('skip-link')?'skip':has('archive-object')?'exhibit':el.closest('.source-links')?'source':el.closest('.site-footer')?'footer':el.closest('#modal-content')?'repository':'external';
     suffix=String(hash(el.getAttribute('href'))%997);
   } else if (tag==='summary') { kind='disclosure'; suffix=String(hash(el.textContent)%997); }
   else if (tag==='select') kind=`select-${el.name==='difficulty'?'difficulty':el.name==='mode'?'mode':'timer'}`;

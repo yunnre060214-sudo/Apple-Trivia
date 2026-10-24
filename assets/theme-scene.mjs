@@ -1,4 +1,4 @@
-import {SURFACE_PROPERTIES} from './surface.mjs?v=3.7.0';
+import {SURFACE_PROPERTIES} from './surface.mjs?v=__VERSION__';
 const SVG='http://www.w3.org/2000/svg';
 let identity=0;
 

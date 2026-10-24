@@ -16,7 +16,7 @@ test('gallery includes nine chronological, locally drawn product studies', async
   assert.equal((html.match(/data-device=/g) || []).length, 9);
   assert.equal((html.match(/aria-pressed="true"/g) || []).length, 1);
   assert.equal((html.match(/data-archive-layer=/g) || []).length, 9);
-  assert.equal((html.match(/data-gallery-question=/g) || []).length, 2);
+  assert.equal((html.match(/data-gallery-question=/g) || []).length, 11);
   assert.match(html, /href="#q=gallery-mac-memory"/);
   assert.match(html, /data-archive-step="-1" aria-label="上一款产品"/);
   assert.match(html, /data-archive-step="1" aria-label="下一款产品"/);

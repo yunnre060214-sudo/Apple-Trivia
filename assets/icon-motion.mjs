@@ -6,6 +6,8 @@ const turn = (part, angle, duration=650, delay=0) => track(part,[{rotate:'0deg'}
 const draw = (part, duration=550, delay=0) => track(part,[{strokeDasharray:'1',strokeDashoffset:'1'},{strokeDasharray:'1',strokeDashoffset:'0'}],duration,delay);
 const breathe = (part, scale, duration=620, delay=0) => track(part,[{scale:'1'},{scale:String(scale),offset:.45},{scale:'1'}],duration,delay);
 export const ICON_MOTIONS = Object.freeze({
+ image:[track('mountains',[{translate:'0px 4px',opacity:0},{translate:'0px 0px',opacity:1}],650),track('sun',[{scale:'.2',opacity:0},{scale:'1',opacity:1}],500,80,{origin:'8px 9px'})],
+ link:[move('left',2,-2,680),move('right',-2,2,680,50),draw('join',600,120)],
  arrow:[track('shaft',[{scale:'1 1'},{scale:'.65 1',offset:.25},{scale:'1.12 1',offset:.65},{scale:'1 1'}],520),move('tip',3,0,520)],
  back:[move('tip',-3,0,520),track('shaft',[{scale:'1 1'},{scale:'.7 1',offset:.4},{scale:'1 1'}],520)],
  shuffle:[draw('descending',540),draw('ascending',540,110),move('tips',2,0,480,150)],

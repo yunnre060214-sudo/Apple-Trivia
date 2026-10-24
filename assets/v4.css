@@ -1,0 +1,145 @@
+/* v4. Type, object studies and quiet controls share one spacing system. */
+:root,.theme-palette[data-theme=light] {
+ --measure:740px; --rhythm:8px;
+ --v4-plate:#eaf0f2; --v4-plate-line:#dce3e8;
+ --v4-blue:#477caf; --v4-wash:linear-gradient(130deg,#e5eeeb8c,#eff0f866 52%,#f5e7dc66);
+}
+.home-aurora { filter:none; }
+[data-theme=dark] { --v4-plate:#17263b; --v4-plate-line:#31415b; --v4-blue:#aacdf4; --v4-wash:linear-gradient(130deg,#173b3b50,#25234c55 52%,#3b283855); }
+.hero { min-height:540px; padding-top:24px; padding-bottom:32px; }
+.hero h1 { font-size:clamp(88px,10vw,140px); }
+.hero-title-line { font-weight:500; letter-spacing:.015em; }
+.hero-actions { gap:22px; }
+.hero-start { border-radius:999px; min-height:60px; padding-left:25px; }
+.archive-stage { height:360px; }
+.archive-year { font-weight:350; font-size:clamp(90px,9vw,126px); top:-3px; }
+.archive-story { font-size:13px; gap:12px; }
+.archive-footnote { min-height:71px; }
+.archive-object { display:flex; align-items:center; justify-content:center; }
+.archive-object[data-motion] { background-image:none; }
+.archive-object:focus-visible { outline-offset:-12px; border-radius:24px; }
+.archive-detail-motion { position:absolute; width:100%; height:100%; max-width:480px; pointer-events:none; opacity:0; }
+.archive-object img { width:100%; height:100%; object-fit:contain; }
+.archive-layer { pointer-events:none; }
+.archive-layer.is-active { pointer-events:auto; }
+.archive-layer:not(.is-active) .archive-object { visibility:hidden; }
+.topic-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.topic-link { min-height:108px; padding-inline:20px; }
+.topic-link:first-child { padding-left:0; }
+.topic-copy { gap:12px; }
+.topic-copy strong { font-weight:550; font-size:19px; }
+[data-topic=visual] { --spot-color:#8c6aa00e; --spot-edge:#9b7eb89c; }
+[data-theme=dark] [data-topic=visual] { --spot-color:#b99ddd14; --spot-edge:#c3a7e8a8; }
+.quiz-shell { max-width:var(--measure); }
+.quiz-top { margin-bottom:28px; }
+.question-meta { margin-bottom:16px; }
+.question-card h1 { font-weight:600; line-height:1.4; letter-spacing:-.025em; margin-bottom:28px; min-height:2.8em; }
+.answer { min-height:72px; padding:17px 20px; border-radius:12px; box-shadow:inset 0 1px 0 var(--material-highlight); }
+.answer-text { line-height:1.55; overflow-wrap:anywhere; min-width:0; }
+.answer .letter { font-family:Outfit,sans-serif; font-weight:450; flex-shrink:0; }
+.feedback-line { align-items:center; }
+.explanation p,.review-body>p { line-height:1.8; }
+.explanation { border-top:1px solid var(--line); padding-top:20px; }
+.question-media { margin:0 0 22px; min-width:0; }
+.media-art { width:100%; aspect-ratio:2/1; border:1px solid var(--v4-plate-line); border-radius:14px; overflow:hidden; background:var(--v4-plate); }
+.media-art img { width:100%; height:100%; object-fit:contain; }
+.question-media figcaption { color:var(--muted); font-size:11px; line-height:1.5; margin-top:8px; text-align:right; }
+.media-fallback { padding:20px; margin-top:8px; border:1px dashed var(--line); border-radius:10px; font-size:14px; line-height:1.7; }
+.media-unavailable .media-art { display:none; }
+[data-theme=dark] .media-art img { filter:brightness(.88) saturate(.88); }
+.question-media.is-compact { max-width:480px; margin:8px 0 24px; }
+.result-shell { max-width:800px; }
+.result-ticket { position:relative; padding:36px 40px 32px; background-image:var(--v4-wash); border-radius:20px; border:1px solid var(--material-line); box-shadow:inset 0 1px 0 var(--material-highlight); }
+.result-title { text-wrap:balance; font-weight:600; letter-spacing:-.035em; }
+.result-score { letter-spacing:-.07em; }
+.result-trail { margin-top:28px; }
+.result-trail>span { border-radius:50%; }
+.result-actions { gap:12px; margin-top:28px; }
+.result-links { margin-top:12px; }
+.review-list { border-top:1px solid var(--line); }
+.review-item { padding-block:4px; }
+.review-item summary { padding-block:22px; line-height:1.6; }
+.challenge-shell { max-width:780px; margin:64px auto 96px; padding-block:16px; }
+.challenge-overline { display:inline-flex; align-items:center; gap:10px; font-size:14px; color:var(--muted); }
+.challenge-overline:before { content:''; display:block; width:28px; height:3px; background:var(--spectrum); }
+.challenge-shell h1 { font-size:clamp(34px,6vw,64px); line-height:1.25; font-weight:600; letter-spacing:-.045em; margin:28px 0 20px; }
+.challenge-count { display:flex; gap:12px; align-items:baseline; margin:30px 0 16px; }
+.challenge-count strong { font-family:Outfit,sans-serif; font-size:104px; line-height:1; font-weight:450; letter-spacing:-.06em; color:var(--accent); }
+.challenge-count span { color:var(--muted); font-size:20px; }
+.challenge-shell p { color:var(--muted); font-size:16px; line-height:1.7; margin:16px 0 32px; }
+.challenge-actions { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+.challenge-share { margin-top:14px; padding-top:18px; border-top:1px solid var(--line); }
+.challenge-share p { font-size:12px; line-height:1.6; color:var(--muted); margin-top:10px; }
+.share-preview { max-height:43dvh; }
+.share-card-frame { max-width:100%; }
+.copy-text { overflow-wrap:anywhere; }
+@media (min-width:800px) {
+ .quiz-shell:has(.question-media:not(.is-compact)) { max-width:1000px; }
+ .question-card:has(>.question-media) { display:grid; grid-template-columns:minmax(0,.95fr) minmax(0,1fr); column-gap:36px; }
+ .question-card:has(>.question-media)>:is(.question-meta,h1,.feedback,.explanation-drawer,.question-nav,.quick-controls) { grid-column:1/-1; }
+ .question-card>.question-media { grid-column:1; margin:0; align-self:start; }
+ .question-card:has(>.question-media)>.answers { grid-column:2; grid-row:3; }
+ .question-card>.question-media .media-art { aspect-ratio:1.28; }
+ .question-card>.question-media img { object-fit:cover; }
+}
+@media (max-width:900px) {
+ .topic-copy { gap:8px; }.topic-copy strong { font-size:17px; }.topic-link { padding-inline:14px; gap:10px; }
+}
+@media (max-width:700px) {
+ .hero { min-height:0; gap:14px; padding:18px 0 26px; }
+ .hero h1 { font-size:clamp(82px,19vw,126px); }
+ .hero-title-line { margin-bottom:5px; }
+ .hero-actions { margin-top:16px; }
+ .hero-start { min-height:56px; }
+ .archive-stage { height:clamp(232px,65vw,340px); }
+ .archive-footnote { min-height:64px; margin-inline:0; }
+ .archive-story { grid-template-columns:max-content minmax(0,1fr) 14px; gap:8px; font-size:12px; }
+ .archive-year { font-size:clamp(84px,24vw,112px); }
+ .topic-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .topic-link { min-height:88px; padding:12px 10px 12px 0; }
+ .topic-link:nth-child(2) { border-right:0; padding-left:16px; }
+ .topic-link:nth-child(3) { border-top:1px solid var(--line); padding-left:0; }
+ .topic-link:nth-child(4) { border-top:1px solid var(--line); border-left:1px solid var(--line); padding-left:16px; }
+ .topic-copy strong { font-size:18px; }.topic-number { font-size:11px; }
+ .keyboard-note { display:none; }
+ .quiz-top { margin-bottom:20px; }.question-meta { margin-bottom:8px; }
+ .question-card h1 { font-size:25px; margin-bottom:22px; min-height:2.8em; }
+ .answer { min-height:64px; padding:14px 15px; gap:12px; }
+ .question-media { margin-bottom:18px; }.media-art { max-height:205px; }
+ .question-media figcaption { font-size:10px; margin-top:5px; }
+ .result-ticket { padding:27px 21px 26px; border-radius:16px; }
+ .result-title { font-size:clamp(27px,7.5vw,38px); }
+ .result-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+ .result-actions button { padding-inline:12px; font-size:14px; }
+ .challenge-shell { margin:36px auto 60px; }.challenge-shell h1 { font-size:42px; }
+ .challenge-count strong { font-size:90px; }
+}
+@media (prefers-reduced-motion:no-preference) {
+ .archive-layer.is-active .archive-detail-motion { animation:home-object-float 5.5s ease-in-out infinite; }
+ .archive-object:is(:hover,:focus-visible) .archive-detail-motion { opacity:1; }
+ .archive-object:is(:hover,:focus-visible) .detail-scan { animation:detail-scan 1.15s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-shell { animation:detail-draw 1.3s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-wheel { transform-origin:239px 272px; animation:detail-wheel 1.3s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-selection { animation:detail-selection 1.3s steps(3,end) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-touch { transform-origin:190px 144px; animation:detail-touch 1s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-track { animation:detail-draw 1s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-pinch-a { animation:detail-pinch-a 1.2s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-pinch-b { animation:detail-pinch-b 1.2s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-ring { stroke-dasharray:.7 1; animation:detail-draw 1.2s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-ring-two { animation-delay:80ms; }.archive-object:is(:hover,:focus-visible) .detail-ring-three { animation-delay:160ms; }
+ .archive-object:is(:hover,:focus-visible) .detail-pair { transform-origin:240px 210px; animation:detail-pair 1.3s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-pair-two { animation-delay:180ms; }
+ .archive-object:is(:hover,:focus-visible) .detail-focus { transform-origin:240px 247px; animation:detail-focus 1.3s var(--ease) both; }
+ .archive-object:is(:hover,:focus-visible) .detail-focus-dot { animation:detail-dot 1.3s var(--ease) both; }
+ .challenge-shell { animation:motion-stage-enter 360ms var(--ease) both; }
+}
+@keyframes detail-scan { from { translate:0 -22px; opacity:0; } 30% { opacity:.7; } to { translate:0 65px; opacity:0; } }
+@keyframes detail-draw { from { stroke-dasharray:1; stroke-dashoffset:1; opacity:0; } 25% { opacity:1; } to { stroke-dasharray:1; stroke-dashoffset:0; opacity:.65; } }
+@keyframes detail-wheel { from { rotate:0deg;opacity:0; } 30% {opacity:1;} to { rotate:280deg;opacity:0; } }
+@keyframes detail-selection { from { translate:0 0; } to { translate:0 48px; } }
+@keyframes detail-touch { from { scale:.4; opacity:0; } 40% { opacity:1; } to { scale:1.4;opacity:0; } }
+@keyframes detail-pinch-a { from { translate:-10px 0;opacity:0; } 30% {opacity:1;} to { translate:10px 0;opacity:0; } }
+@keyframes detail-pinch-b { from { translate:10px 0;opacity:0; } 30% {opacity:1;} to { translate:-10px 0;opacity:0; } }
+@keyframes detail-pair { from { scale:.3;opacity:.8; } to { scale:3;opacity:0; } }
+@keyframes detail-focus { from { scale:1.7;opacity:0; } 45% { scale:1;opacity:1; } to { scale:1;opacity:0; } }
+@keyframes detail-dot { from {opacity:0;} 45% {opacity:1;} to {opacity:0;} }

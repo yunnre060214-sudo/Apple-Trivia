@@ -1,9 +1,11 @@
-import {APPLE_PATH} from './brand.mjs?v=3.7.0';
+import {APPLE_PATH} from './brand.mjs?v=__VERSION__';
 // Idle motion lives on the outer group; interaction motion owns the inner group.
 // Both keep the SVG viewport and the button's hit area fixed.
 const part = (name, content, attributes='') => `<g data-icon-idle="${name}"><g data-icon-part="${name}" ${attributes}>${content}</g></g>`;
 const path = (d, extra='') => `<path d="${d}" ${extra}/>`;
 const paths = {
+ image:part('frame','<rect x="3" y="4" width="18" height="16" rx="3"/>')+part('sun','<circle cx="8" cy="9" r="1.5"/>')+part('mountains',path('m4 17 5-5 4 4 3-3 5 5')),
+ link:part('left',path('m10 14-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0'))+part('right',path('m14 10 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0'))+part('join',path('m8 16 8-8','pathLength="1"')),
  arrow:part('shaft',path('M5 12h14'))+part('tip',path('m13 6 6 6-6 6')),
  back:part('shaft',path('M19 12H5'))+part('tip',path('m11 6-6 6 6 6')),
  shuffle:part('descending',path('M3 7h3c5 0 7 10 12 10h3','pathLength="1"'))+part('ascending',path('M3 17h3c2 0 3-2 4-4m3-2c1-2 3-4 5-4h3','pathLength="1"'))+part('tips',path('m17 13 4 4-4 4m0-18 4 4-4 4')),

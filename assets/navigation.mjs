@@ -4,7 +4,7 @@ export function questionFromHash(hash) {
 }
 
 export function clearQuestionUrl({location,history}) {
-  if (location.hash.startsWith('#q=')) history.replaceState(null,'',location.pathname+location.search);
+  if (location.hash.startsWith('#q=')||location.hash.startsWith('#challenge=')) history.replaceState(null,'',location.pathname+location.search);
 }
 
 // Native document anchors, including the accessibility skip link, keep the

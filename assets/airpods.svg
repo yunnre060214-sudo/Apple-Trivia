@@ -55,6 +55,7 @@
   <path d="M136 247q0-22 24-22h161q24 0 24 22l-5 68q-4 35-39 36H180q-35-1-39-36Z" fill="url(#white)" stroke="#c2cccf" stroke-width="1.3" />
   <path d="M146 239q6-7 17-7h153q12 0 18 7" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
   <path d="M140 256h201" stroke="#c6d0d3" stroke-width=".9" />
-  <circle cx="240" cy="273" r="2.5" fill="#a0b982" />
+  <!-- The original 2016 Lightning case has its status light inside, between the earbuds. -->
+  <circle cx="240" cy="210" r="2.5" fill="#a0b982" />
   <path d="M152 269v43q0 26 27 29" stroke="#ffffff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round" />
 </svg>

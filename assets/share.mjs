@@ -1,4 +1,5 @@
-import {APPLE_PATH} from './brand.mjs?v=3.7.0';
+import {APPLE_PATH} from './brand.mjs?v=__VERSION__';
+import {qrMatrix} from './qr.mjs';
 export const SITE_URL = 'https://yunnre060214-sudo.github.io/Apple-Trivia/';
 const PALETTES = {
   perfect:{title:['#88632d','#997645'],darkTitle:['#dec392','#e3cfaa'],wash:['#f3eddf','#f7f2e7'],ink:'#88632d'},
@@ -9,7 +10,7 @@ export function resultPalette(report) {
   return PALETTES[report.total>0&&report.correct===report.total?'perfect':report.score>=60?'regular':'curious'];
 }
 export function shareText(report,title) {
-  return `Apple 冷知识 · ${report.correct}/${report.total} 题 · ${report.score} 分\n「${title}」\n不服来战！\n${SITE_URL}`;
+  return `Apple 冷知识 · ${report.correct}/${report.total} 题 · ${report.score} 分\n「${title}」\n不服来战！\n${report.challengeUrl||SITE_URL}`;
 }
 
 // One renderer per report/title/skin, one owner per visible preview. Closing or replacing
@@ -123,9 +124,14 @@ export async function createShareCard(report,title,{theme=document.documentEleme
     });
   }
   [['答对',colors.green],['答错',colors.red],['未答',muted]].forEach(([label,color],i)=>{const x=397+i*143;circle(x,1180,4,color,i===2);text(label,x+13,1187,19,400,muted);});
-  text('不服来战',88,1323,42,600);
-  text('yunnre060214-sudo.github.io/Apple-Trivia/',88,1380,23,400,muted);
-  stripe(932,1310,60,4);
+  const qr=report.challengeUrl?qrMatrix(report.challengeUrl):null;
+  text(qr?'扫码挑战同一组题':'不服来战',88,1323,qr?36:42,600);
+  text('yunnre060214-sudo.github.io/Apple-Trivia/',88,1380,23,400,muted,'left',qr?690:880);
+  if(qr){
+    const step=Math.max(2,Math.floor(198/(qr.length+8))),size=(qr.length+8)*step,x=1000-size,y=1410-size;
+    c.fillStyle='#fff';c.fillRect(x,y,size,size);c.fillStyle='#101820';
+    qr.forEach((row,r)=>row.forEach((dark,col)=>{if(dark)c.fillRect(x+(col+4)*step,y+(r+4)*step,step,step);}));
+  }else stripe(932,1310,60,4);
   return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG encoding failed')),'image/png'));
 }
 export function downloadBlob(blob,filename) {
