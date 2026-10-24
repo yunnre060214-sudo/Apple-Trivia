@@ -11,8 +11,8 @@
 ## 自动测试与浏览器
 
 - 108 项 Node 测试通过，覆盖原有引擎与动效、100 条新事实、32 张图示、知识点去重、存储回退、1 至 500 题的挑战重建、变更题目失效及有效旧进度兼容。
-- Chromium 与 WebKit 分别通过 12 组真实浏览器流程。测试环境为 Linux Playwright 1.51.1；Chromium 134，WebKit 为该版本随附引擎。包含 320、393、768、1440px 布局检查、20 次连续明暗切换、答题与解析、结算、分享图片下载、挑战链接固定顺序与刷新续答、导航中断、减少动态效果、图片失败、损坏链接、长题干、真实 v3.7.0 进度恢复、500 题导航与分享，以及存储不可用。
-- 1080 × 1440 的实际导出 PNG 已用独立 jsQR 解码，二维码内容与复制的挑战链接完全一致。
+- Chromium 与 WebKit 分别通过 12 组真实浏览器流程。发布验证环境为 Linux Playwright 1.56.1；Chromium 141，WebKit 26.0。CI 固定 Ubuntu 24.04，避免 ubuntu-latest 升级导致浏览器依赖变化。包含 320、393、768、1440px 布局检查、20 次连续明暗切换、答题与解析、结算、分享图片下载、挑战链接固定顺序与刷新续答、导航中断、减少动态效果、图片失败、损坏链接、长题干、真实 v3.7.0 进度恢复、500 题导航与分享，以及存储不可用。
+- 1080 × 1440 的实际导出 PNG 已用独立 jsQR 解码，二维码内容与同题挑战链接完全一致；Chromium 还核对了真实复制到剪贴板的链接。
 - 对 32 张插图进行了总览检查，调整 MacBook Air 键盘与触控板的圈选标记。根据 [Apple 充电说明](https://support.apple.com/en-us/119912) 修正初代 AirPods 充电盒的指示灯到盒内。检查手机答题、桌面双列答题、两种首页外观与分享弹窗截图。
 
 浏览器用例保存在 `scripts/browser-smoke.mjs`，CI 会运行 Chromium 和 WebKit，并上传截图、PNG 与 JSON 报告。运行：
@@ -22,9 +22,12 @@ npm ci
 npx playwright install --with-deps chromium webkit
 npm test
 npm run build
+npm audit
 npm run test:browser
 QA_BROWSER=webkit npm run test:browser
 ```
+
+开发依赖审计 `npm audit`：0 项已知漏洞。
 
 ## 性能诊断
 

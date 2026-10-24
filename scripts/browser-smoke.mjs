@@ -4,6 +4,7 @@ import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
 import {chromium,webkit} from 'playwright';
 import {readChallenge,challengeURL} from '../src/challenge.mjs';
+import {SITE_URL} from '../assets/share.mjs';
 const root=resolve(new URL('../dist/',import.meta.url).pathname),output=process.env.QA_OUTPUT||'/tmp/apple-trivia-qa';await mkdir(output,{recursive:true});
 const bank=JSON.parse(await readFile(resolve(root,'questions.json'),'utf8')).questions;
 const mime={'.mjs':'text/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.ttf':'font/ttf','.html':'text/html'};
@@ -53,7 +54,7 @@ try{
  const [download]=await Promise.all([page.waitForEvent('download'),live(page,'[data-action="download"]').click()]);await download.saveAs(resolve(output,`${name}-share-card.png`));
  let url;
  if(name==='chromium'){await live(page,'[data-action="copy-challenge"]').click();url=await page.evaluate(()=>navigator.clipboard.readText());}
- else{const {challengeURL}=await import('../src/challenge.mjs');url=challengeURL(records,base);}
+ else url=challengeURL(records,SITE_URL);
  const decoded=readChallenge(new URL(url).hash.slice(11),bank);assert.equal(decoded.ok,true);assert.deepEqual(decoded.questions.map(q=>q.options),records.map(q=>q.options));
  await writeFile(resolve(output,`${name}-challenge-url.txt`),url);check('share PNG and exact challenge link');
  await live(page,'.modal-close').click();await live(page,'#modal').waitFor({state:'hidden'});
