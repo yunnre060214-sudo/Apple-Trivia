@@ -1,13 +1,14 @@
+import {galleryDetailMotion} from './gallery-details.mjs';
 // Original vector studies of nine Apple silhouettes. No external assets.
-import {devices} from './gallery-data.mjs?v=3.7.0';
-import {icon} from './icons.mjs?v=3.7.0';
+import {devices} from './gallery-data.mjs?v=__VERSION__';
+import {icon} from './icons.mjs?v=__VERSION__';
 export {devices};
 
 export function archiveMarkup(version) {
   const arrow = icon('arrow');
   const first = devices[0];
   const link = d => `#q=${d.question.id}`;
-  return `<figure class="archive" aria-label="Apple 经典产品"><div class="archive-stage"><a class="archive-year" data-archive-year data-gallery-question="${first.question.id}" href="${link(first)}" aria-label="${first.year} 年，进入 ${first.name} 的画廊考点">${first.year}${icon('external','archive-year-corner')}</a><span class="archive-orbit" aria-hidden="true"></span>${devices.map((d,i)=>`<div class="archive-layer ${i===0?'is-active':''}" data-archive-layer="${d.id}" aria-hidden="true"><div class="archive-object"><img src="./assets/${d.image}?v=${version}" width="480" height="440" alt="" draggable="false" decoding="async" fetchpriority="${i===0?'high':'low'}"></div></div>`).join('')}</div><figcaption class="archive-footnote"><a class="archive-story" data-archive-story-link data-gallery-question="${first.question.id}" href="${link(first)}"><time data-archive-date datetime="${first.iso}">${first.date}</time><span data-archive-story>${first.story}</span>${icon('external','archive-story-arrow')}</a></figcaption><div class="archive-controls"><button type="button" class="archive-arrow" data-archive-step="-1" aria-label="上一款产品">${arrow}</button><div class="archive-select" role="group" aria-label="切换展陈产品，可横向滑动"><div class="archive-select-track">${devices.map((d,i)=>`<button type="button" data-device="${d.id}" aria-pressed="${i===0}"><span>${d.name}</span></button>`).join('')}<i class="archive-indicator" aria-hidden="true"></i></div></div><button type="button" class="archive-arrow" data-archive-step="1" aria-label="下一款产品">${arrow}</button><button type="button" class="archive-playback" data-archive-playback aria-label="暂停自动切换" aria-pressed="false">${icon('playback')}</button></div><span class="sr-only" aria-live="polite" data-archive-caption>Macintosh，1984 年</span></figure>`;
+  return `<figure class="archive" aria-label="Apple 经典产品"><div class="archive-stage"><a class="archive-year" data-archive-year data-gallery-question="${first.question.id}" href="${link(first)}" aria-label="${first.year} 年，进入 ${first.name} 的画廊考点">${first.year}${icon('external','archive-year-corner')}</a><span class="archive-orbit" aria-hidden="true"></span>${devices.map((d,i)=>`<div class="archive-layer ${i===0?'is-active':''}" data-archive-layer="${d.id}" aria-hidden="${i!==0}" ${i!==0?'inert':''}><a class="archive-object" data-gallery-question="${d.question.id}" href="${link(d)}" aria-label="${d.name}，进入画廊考点"><img src="./assets/${d.image}?v=${version}" width="480" height="440" alt="" draggable="false" decoding="async" fetchpriority="${i===0?'high':'low'}">${galleryDetailMotion(d.id)}</a></div>`).join('')}</div><figcaption class="archive-footnote"><a class="archive-story" data-archive-story-link data-gallery-question="${first.question.id}" href="${link(first)}"><time data-archive-date datetime="${first.iso}">${first.date}</time><span data-archive-story>${first.story}</span>${icon('external','archive-story-arrow')}</a></figcaption><div class="archive-controls"><button type="button" class="archive-arrow" data-archive-step="-1" aria-label="上一款产品">${arrow}</button><div class="archive-select" role="group" aria-label="切换展陈产品，可横向滑动"><div class="archive-select-track">${devices.map((d,i)=>`<button type="button" data-device="${d.id}" aria-pressed="${i===0}"><span>${d.name}</span></button>`).join('')}<i class="archive-indicator" aria-hidden="true"></i></div></div><button type="button" class="archive-arrow" data-archive-step="1" aria-label="下一款产品">${arrow}</button><button type="button" class="archive-playback" data-archive-playback aria-label="暂停自动切换" aria-pressed="false">${icon('playback')}</button></div><span class="sr-only" aria-live="polite" data-archive-caption>Macintosh，1984 年</span></figure>`;
 }
 
 export function mountArchive(figure, {reducedMotion = () => false, setTimer = setTimeout, clearTimer = clearTimeout, interval = 5000} = {}) {
@@ -81,7 +82,7 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
     const item = devices[normalized], button = buttons[normalized];
     active = item.id;
     buttons.forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    figure.querySelectorAll('[data-archive-layer]').forEach(layer => layer.classList.toggle('is-active', layer.dataset.archiveLayer === active));
+    figure.querySelectorAll('[data-archive-layer]').forEach(layer => {const selected=layer.dataset.archiveLayer===active;layer.classList.toggle('is-active',selected);layer.setAttribute?.('aria-hidden',String(!selected));layer.inert=!selected;});
     const caption = figure.querySelector('[data-archive-caption]');
     // Automatic updates stay quiet for screen readers.
     caption.setAttribute?.('aria-live', manual ? 'polite' : 'off');
@@ -97,6 +98,7 @@ export function mountArchive(figure, {reducedMotion = () => false, setTimer = se
       figure.querySelectorAll('[data-gallery-question]').forEach(link => {
         link.dataset.galleryQuestion = item.question.id;
         link.setAttribute('href', `#q=${item.question.id}`);
+        if(link.classList?.contains('archive-object'))link.setAttribute('aria-label',`${item.name}，进入画廊考点`);
       });
     }
     // Scroll this rail only. scrollIntoView could also move the whole page.

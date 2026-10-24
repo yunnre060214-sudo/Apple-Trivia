@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" fill="none"><defs><radialGradient id="study-bg"><stop stop-color="#e7edf1"/><stop offset="1" stop-color="#f4f5f2"/></radialGradient></defs><rect width="640" height="320" rx="12" fill="url(#study-bg)"/><path d="M38 269H602M38 53H602" stroke="#dce2e3"/><g transform="translate(145 4) scale(.73)">
+  
+  <defs>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f9faf9" />
+      <stop offset="0.333" stop-color="#c4cbd0" />
+      <stop offset="0.667" stop-color="#f4f6f7" />
+      <stop offset="1.000" stop-color="#a6aeb5" />
+    </linearGradient>
+    <linearGradient id="white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="0.500" stop-color="#f6f7f6" />
+      <stop offset="1.000" stop-color="#d8dfe0" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#353b42" />
+      <stop offset="0.500" stop-color="#11161d" />
+      <stop offset="1.000" stop-color="#252c36" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="1.000" stop-color="#ffffff00" />
+    </linearGradient>
+    <radialGradient id="ground">
+      <stop stop-color="#18232f" stop-opacity=".19" />
+      <stop offset="1" stop-color="#18232f" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="strap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f3f5ed" />
+      <stop offset="0.500" stop-color="#d8e2d5" />
+      <stop offset="1.000" stop-color="#bbcbbd" />
+    </linearGradient>
+    <linearGradient id="watch-glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#252e34" />
+      <stop offset="0.500" stop-color="#080f17" />
+      <stop offset="1.000" stop-color="#17232b" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="240" cy="389" rx="103" ry="17" fill="url(#ground)" />
+  <g transform="rotate(10 240 222)">
+    <path d="M206 70q0-17 18-17h37q17 0 17 17l5 95h-82Z" fill="url(#strap)" stroke="#c5ceca" />
+    <path d="M201 288h82l-5 86q-1 18-19 18h-35q-17 0-18-18Z" fill="url(#strap)" stroke="#c5ceca" />
+    <path d="M212 68q0-8 11-8h37q10 0 10 8" stroke="#fff" stroke-width="2" />
+    <ellipse cx="242" cy="317" rx="3.5" ry="2.8" fill="#b1c0b7" stroke="#e6eee8" stroke-width=".7" />
+    <ellipse cx="242" cy="330" rx="3.5" ry="2.8" fill="#b1c0b7" stroke="#e6eee8" stroke-width=".7" />
+    <ellipse cx="242" cy="343" rx="3.5" ry="2.8" fill="#b1c0b7" stroke="#e6eee8" stroke-width=".7" />
+    <ellipse cx="242" cy="356" rx="3.5" ry="2.8" fill="#b1c0b7" stroke="#e6eee8" stroke-width=".7" />
+    <ellipse cx="242" cy="369" rx="3.5" ry="2.8" fill="#b1c0b7" stroke="#e6eee8" stroke-width=".7" />
+    <rect x="170" y="143" width="145" height="160" rx="35" fill="url(#silver)" stroke="#8a989e" stroke-width="1.2" />
+    <rect x="175" y="148" width="135" height="150" rx="31" fill="#3a4247" stroke="#fcffff" stroke-width="1.2" />
+    <rect x="181" y="154" width="123" height="138" rx="27" fill="url(#watch-glass)" />
+    <rect x="314" y="182" width="10" height="26" rx="5" fill="url(#silver)" stroke="#89969c" />
+    <path d="M317 185v20m3-20v20" stroke="#829096" stroke-width=".8" />
+    <path d="M315 231v24" stroke="#86959c" stroke-width="4" stroke-linecap="round" />
+    <text x="288" y="181" text-anchor="end" font-family="Arial,sans-serif" font-size="11" fill="#e8f0eb">10:09</text>
+    <g transform="rotate(-90 242 229)" stroke-width="9">
+      <circle cx="242" cy="229" r="35" stroke="#492032" />
+      <circle cx="242" cy="229" r="35" stroke="#ef4e7c" stroke-dasharray="189 220" stroke-linecap="round" />
+      <circle cx="242" cy="229" r="24" stroke="#263b21" />
+      <circle cx="242" cy="229" r="24" stroke="#b2d94d" stroke-dasharray="113 151" stroke-linecap="round" />
+      <circle cx="242" cy="229" r="13" stroke="#153640" />
+      <circle cx="242" cy="229" r="13" stroke="#57c8d6" stroke-dasharray="67 82" stroke-linecap="round" />
+    </g>
+    <path d="M189 166q7-9 20-9h64q18 0 23 15" stroke="#fff" stroke-opacity=".15" stroke-width="2" />
+    <path d="M181 277q6 15 25 15" stroke="#ffffff" stroke-opacity=".16" />
+  </g>
+<g transform="rotate(10 240 222)"><circle cx="319" cy="195" r="21" fill="#5d88c517" stroke="#477caf" stroke-width="3" stroke-dasharray="5 4"/><circle cx="335.17" cy="178.82999999999998" r="6" fill="#477caf" stroke="#fff" stroke-width="2"/></g></g></svg>

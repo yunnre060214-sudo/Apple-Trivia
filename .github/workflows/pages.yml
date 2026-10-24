@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   validate-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.release.outputs.version }}
     steps:
@@ -28,6 +28,24 @@ jobs:
         run: npm test
       - name: Build static website
         run: npm run build
+      - name: Install browser test tooling
+        run: |
+          npm ci
+          npx playwright install --with-deps --only-shell chromium webkit
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Verify Chromium interactions
+        run: npm run test:browser
+      - name: Verify WebKit interactions
+        run: npm run test:browser
+        env:
+          QA_BROWSER: webkit
+      - name: Upload browser verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-verification
+          path: /tmp/apple-trivia-qa/
+          retention-days: 7
       - name: Record expected release
         id: release
         run: node -p '"version=" + JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).version' >> "$GITHUB_OUTPUT"
@@ -40,7 +58,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     needs: validate-build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       pages: write
       id-token: write

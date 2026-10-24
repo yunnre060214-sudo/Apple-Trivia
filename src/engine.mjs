@@ -1,4 +1,4 @@
-export const VERSION = '3.7.0';
+export const VERSION = '4.0.0';
 export const CATEGORIES = {
   iphone: { name: 'iPhone', short: 'iP', color: '#3478e7' },
   ipad: { name: 'iPad', short: 'iD', color: '#8958c7' },
@@ -41,7 +41,7 @@ export function shuffle(items, rng = Math.random) {
 export function filterBank(bank, { categories = Object.keys(CATEGORIES), difficulty = 'mixed', ids, topic, casual = false } = {}) {
   const allowed = new Set(categories);
   const allowedIds = ids ? new Set(ids) : null;
-  return bank.filter(q => allowed.has(q.category) && (difficulty === 'mixed' || q.difficulty === difficulty) && (!allowedIds || allowedIds.has(q.id)) && (!topic || (topic === 'timeline' ? q.kind === 'timeline' : q.topic === topic)) && (!casual || q.kind || (!/^(spec|ratio|compare)-/.test(q.id) && ['easy','medium'].includes(q.difficulty))));
+  return bank.filter(q => allowed.has(q.category) && (difficulty === 'mixed' || q.difficulty === difficulty) && (!allowedIds || allowedIds.has(q.id)) && (!topic || (['timeline','visual'].includes(topic) ? q.kind === topic : q.topic === topic)) && (!casual || q.kind || (!/^(spec|ratio|compare)-/.test(q.id) && ['easy','medium'].includes(q.difficulty))));
 }
 // Round-robin across shuffled category/level buckets gives small topics a fair place in a paper.
 export function drawQuestions(bank, config, seed, seen = []) {
@@ -52,7 +52,7 @@ export function drawQuestions(bank, config, seed, seen = []) {
   const positions = new Map(seen.map((id, i) => [id, i]));
   // Quick rounds have their own topic/family policy. Skip the unused balanced
   // shuffle and its allocations for the most common five-question entry point.
-  if (config.mode === 'quick') return quickDraw(pool, wanted, rng, recent, positions).map(q => ({...q, options:shuffle(q.options,rng)}));
+  if (config.mode === 'quick') return quickDraw(pool, wanted, rng, recent, positions,config).map(q => ({...q, options:shuffle(q.options,rng)}));
   const takeBalanced = (items, limit) => {
     const groups = new Map();
     for (const q of shuffle(items, rng)) {
@@ -82,7 +82,7 @@ export function createSession(questions, config, seed, now = Date.now()) {
   };
 }
 export function hydrateSession(saved, bank) {
-  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', '3.3.1', '3.4.0', '3.4.1', '3.4.2', '3.4.3', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || saved.questions.length > Math.min(500,bank.length) || !Number.isFinite(saved.startedAt) || saved.startedAt < 0) return null;
+  if (!saved || saved.schema !== 1 || !['1.0.0', '1.0.1', '2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.0.4', '2.1.0', '2.2.0', '2.2.1', '2.2.2', '2.2.3', '3.0.0', '3.0.1', '3.0.2', '3.1.0', '3.2.0', '3.3.0', '3.3.1', '3.4.0', '3.4.1', '3.4.2', '3.4.3', '3.5.0', '3.6.0', '3.7.0', VERSION].includes(saved.version) || !Array.isArray(saved.questions) || !saved.questions.length || saved.questions.length > Math.min(500,bank.length) || !Number.isFinite(saved.startedAt) || saved.startedAt < 0) return null;
   if (!saved.config || !['quick', 'exam', 'practice'].includes(saved.config.mode)) return null;
   const lookup = new Map(bank.map(q => [q.id, q]));
   const ids = new Set();
@@ -150,6 +150,7 @@ export function validateBank(bank) {
     if (q.options.length !== 4 || new Set(q.options).size !== 4 || !q.options.every(o => typeof o === 'string' && o.trim())) throw new Error(`Invalid options: ${q.id}`);
     if (!q.options.includes(q.answer) || !q.explanation?.trim()) throw new Error(`Missing answer/explanation: ${q.id}`);
     if (!q.sources?.length || !q.sources.every(u => /^https:\/\/(?:(?:[\w-]+\.)?apple\.com(?:\.cn)?|www\.macrumors\.com)\//.test(u))) throw new Error(`Missing cited source: ${q.id}`);
+    if(q.media&&(!/^[a-z0-9-]+\.svg$/.test(q.media.asset)||![q.media.alt,q.media.caption,q.media.fallback].every(v=>typeof v==='string'&&v.trim())))throw Error(`Invalid visual: ${q.id}`);
     ids.add(q.id); prompts.add(q.prompt);
   }
   return { total: bank.length, categories: Object.fromEntries(Object.keys(CATEGORIES).map(c => [c, bank.filter(q => q.category === c).length])), levels: Object.fromEntries(Object.keys(LEVELS).map(l => [l, bank.filter(q => q.difficulty === l).length])) };
@@ -166,18 +167,23 @@ export function updateRecent(existing, visited, limit = 3000) {
   }
   return [...order].slice(-limit);
 }
-function quickDraw(pool, count, rng, recent, positions) {
+function quickDraw(pool, count, rng, recent, positions,config={}) {
   const fresh = shuffle(pool.filter(q => !recent.has(q.id)), rng);
   const old = pool.filter(q => recent.has(q.id)).sort((a,b) => positions.get(a.id)-positions.get(b.id));
-  const picked = [], used = new Set(), families = new Set();
-  const add = q => { picked.push(q); used.add(q.id); (q.families || [q.family || q.id]).forEach(f=>families.add(f)); };
-  const clashes = q => (q.families || [q.family || q.id]).some(f => families.has(f));
-  // Three story/surprise cards, one timeline duel and one wildcard per five.
-  const pattern = ['trivia','trivia','timeline','trivia','classic'];
+  const picked = [], used = new Set(), families = new Set(), facts=new Set();
+  // Recently visited facts stay out of another wording of the same question.
+  const recentFacts=new Set(pool.filter(q=>recent.has(q.id)).flatMap(q=>q.factKeys||[]));
+  const add = q => { picked.push(q); used.add(q.id); (q.families || [q.family || q.id]).forEach(f=>families.add(f));(q.factKeys||[]).forEach(f=>facts.add(f)); };
+  const clashes = q => (q.families || [q.family || q.id]).some(f => families.has(f))||(q.factKeys||[]).some(f=>facts.has(f));
+  // An image, three authored facts and at most one timeline per standard round.
+  const pattern = ['trivia','trivia','visual','trivia','timeline'];
   for (let i=0; i<count; i++) {
     const available = fresh.filter(q=>!used.has(q.id));
     const kind = pattern[i % pattern.length];
-    const q = available.find(q=>(q.kind || 'classic')===kind && !clashes(q)) || available.find(q=>!clashes(q)) || available[0] || old.find(q=>!used.has(q.id));
+    const freshFact=q=>!(q.factKeys||[]).some(f=>recentFacts.has(f));
+    const withinYearBudget=q=>config.topic==='timeline'||q.kind!=='timeline'||picked.filter(x=>x.kind==='timeline').length<Math.ceil(count/5);
+    const candidates=available.filter(q=>withinYearBudget(q));
+    const q = candidates.find(q=>(q.kind || 'classic')===kind && !clashes(q)&&freshFact(q)) || candidates.find(q=>(q.kind || 'classic')===kind && !clashes(q)) || candidates.find(q=>!clashes(q)&&freshFact(q)) || candidates.find(q=>!clashes(q)) || candidates[0] || old.find(q=>!used.has(q.id)&&withinYearBudget(q)) || old.find(q=>!used.has(q.id));
     if(q) add(q);
   }
   return shuffle(picked,rng);

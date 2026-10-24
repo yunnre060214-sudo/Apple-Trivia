@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" fill="none"><defs><radialGradient id="study-bg"><stop stop-color="#e7edf1"/><stop offset="1" stop-color="#f4f5f2"/></radialGradient></defs><rect width="640" height="320" rx="12" fill="url(#study-bg)"/><path d="M38 269H602M38 53H602" stroke="#dce2e3"/><g transform="translate(145 4) scale(.73)">
+  
+  <defs>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f9faf9" />
+      <stop offset="0.333" stop-color="#c4cbd0" />
+      <stop offset="0.667" stop-color="#f4f6f7" />
+      <stop offset="1.000" stop-color="#a6aeb5" />
+    </linearGradient>
+    <linearGradient id="white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="0.500" stop-color="#f6f7f6" />
+      <stop offset="1.000" stop-color="#d8dfe0" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#353b42" />
+      <stop offset="0.500" stop-color="#11161d" />
+      <stop offset="1.000" stop-color="#252c36" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="1.000" stop-color="#ffffff00" />
+    </linearGradient>
+    <radialGradient id="ground">
+      <stop stop-color="#18232f" stop-opacity=".19" />
+      <stop offset="1" stop-color="#18232f" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="aurora" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#101c34" />
+      <stop offset="0.333" stop-color="#324e85" />
+      <stop offset="0.667" stop-color="#7598ab" />
+      <stop offset="1.000" stop-color="#27354d" />
+    </linearGradient>
+    <linearGradient id="deck" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#e5eaed" />
+      <stop offset="0.500" stop-color="#c9d0d5" />
+      <stop offset="1.000" stop-color="#edf1f3" />
+    </linearGradient>
+    <linearGradient id="lip" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0.000" stop-color="#f4f6f7" />
+      <stop offset="0.500" stop-color="#b1bcc5" />
+      <stop offset="1.000" stop-color="#778893" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="240" cy="389" rx="201" ry="17" fill="url(#ground)" />
+  <path d="M85 66h310q11 0 11 12v206H74V78q0-12 11-12Z" fill="url(#silver)" stroke="#929ba3" stroke-width="1.2" />
+  <path d="M85 70h310q7 0 7 8v203H78V78q0-8 7-8Z" stroke="#ffffff" stroke-opacity=".8" />
+  <rect x="96" y="89" width="288" height="180" rx="2" fill="#1c273e" />
+  <clipPath id="display-clip">
+    <rect x="96" y="89" width="288" height="180" rx="2" />
+  </clipPath>
+  <g clip-path="url(#display-clip)">
+    <rect id="macbook-display" x="96" y="89" width="288" height="180" fill="url(#aurora)" />
+    <path d="M67 264q74-91 202-165c-57 83-95 124-143 180Z" fill="#649fae" opacity=".4" />
+    <path d="M108 279Q192 150 371 89q-124 76-179 190Z" fill="#afbee6" opacity=".42" />
+    <path d="M170 279Q242 183 414 128q-121 56-161 151Z" fill="#5e6dca" opacity=".65" />
+    <path d="M89 90h302v7H89Z" fill="#e4e8eb" opacity=".75" />
+    <g fill="#314253" opacity=".8">
+      <rect x="101" y="92" width="3" height="3" rx="1" />
+      <path d="M112 93h12m5 0h15m5 0h13m200 0h17" stroke="#314253" stroke-width="1" />
+    </g>
+    <rect x="164" y="258" width="152" height="12" rx="4" fill="#eef6ff" opacity=".3" />
+    <rect x="170" y="261" width="8" height="8" rx="1.7" fill="#b9def5" />
+    <rect x="182" y="261" width="8" height="8" rx="1.7" fill="#8599bd" />
+    <rect x="194" y="261" width="8" height="8" rx="1.7" fill="#f1e1bf" />
+    <rect x="206" y="261" width="8" height="8" rx="1.7" fill="#e8b066" />
+    <rect x="218" y="261" width="8" height="8" rx="1.7" fill="#bdd8cb" />
+    <rect x="230" y="261" width="8" height="8" rx="1.7" fill="#86c4dc" />
+    <rect x="242" y="261" width="8" height="8" rx="1.7" fill="#aebcda" />
+    <rect x="254" y="261" width="8" height="8" rx="1.7" fill="#d3a2b6" />
+    <rect x="266" y="261" width="8" height="8" rx="1.7" fill="#c6d7df" />
+    <rect x="278" y="261" width="8" height="8" rx="1.7" fill="#edf0ef" />
+    <rect x="290" y="261" width="8" height="8" rx="1.7" fill="#8196b5" />
+    <rect x="302" y="261" width="8" height="8" rx="1.7" fill="#c5dadd" />
+  </g>
+  <circle cx="240" cy="79" r="2.1" fill="#46545c" />
+  <circle cx="240" cy="79" r=".8" fill="#8ca0ad" />
+  <text x="240" y="280" fill="#727b81" font-family="Arial,sans-serif" font-size="5.2" text-anchor="middle" letter-spacing=".4">MacBook Air</text>
+  <rect x="87" y="284" width="306" height="5" rx="2" fill="#7f8991" />
+  <path d="m74 288-39 82q-2 5 6 7h398q8-2 6-7l-39-82Z" fill="url(#deck)" stroke="#9ba5ae" stroke-width="1.2" />
+  <path d="m76 291-35 78h398l-35-78Z" stroke="#ffffff" stroke-opacity=".75" />
+  <g id="keyboard" fill="#3b4349" stroke="#929da5" stroke-width=".4">
+    <path d="M95.00 299.00L 112.00 299.00L 109.13 304.72L 91.74 304.72Z" />
+    <path d="M116.00 299.00L 133.00 299.00L 130.60 304.72L 113.22 304.72Z" />
+    <path d="M137.00 299.00L 154.00 299.00L 152.07 304.72L 134.69 304.72Z" />
+    <path d="M158.00 299.00L 175.00 299.00L 173.54 304.72L 156.16 304.72Z" />
+    <path d="M179.00 299.00L 196.00 299.00L 195.01 304.72L 177.63 304.72Z" />
+    <path d="M200.00 299.00L 217.00 299.00L 216.48 304.72L 199.10 304.72Z" />
+    <path d="M221.00 299.00L 238.00 299.00L 237.96 304.72L 220.57 304.72Z" />
+    <path d="M242.00 299.00L 259.00 299.00L 259.43 304.72L 242.04 304.72Z" />
+    <path d="M263.00 299.00L 280.00 299.00L 280.90 304.72L 263.52 304.72Z" />
+    <path d="M284.00 299.00L 301.00 299.00L 302.37 304.72L 284.99 304.72Z" />
+    <path d="M305.00 299.00L 322.00 299.00L 323.84 304.72L 306.46 304.72Z" />
+    <path d="M326.00 299.00L 343.00 299.00L 345.31 304.72L 327.93 304.72Z" />
+    <path d="M347.00 299.00L 364.00 299.00L 366.78 304.72L 349.40 304.72Z" />
+    <path d="M368.00 299.00L 385.00 299.00L 388.26 304.72L 370.87 304.72Z" />
+    <path d="M90.56 306.80L 108.08 306.80L 105.21 312.52L 87.31 312.52Z" />
+    <path d="M112.20 306.80L 129.72 306.80L 127.32 312.52L 109.42 312.52Z" />
+    <path d="M133.85 306.80L 151.37 306.80L 149.44 312.52L 131.53 312.52Z" />
+    <path d="M155.49 306.80L 173.01 306.80L 171.55 312.52L 153.65 312.52Z" />
+    <path d="M177.13 306.80L 194.65 306.80L 193.67 312.52L 175.76 312.52Z" />
+    <path d="M198.78 306.80L 216.30 306.80L 215.78 312.52L 197.88 312.52Z" />
+    <path d="M220.42 306.80L 237.94 306.80L 237.89 312.52L 219.99 312.52Z" />
+    <path d="M242.06 306.80L 259.58 306.80L 260.01 312.52L 242.11 312.52Z" />
+    <path d="M263.70 306.80L 281.22 306.80L 282.12 312.52L 264.22 312.52Z" />
+    <path d="M285.35 306.80L 302.87 306.80L 304.24 312.52L 286.33 312.52Z" />
+    <path d="M306.99 306.80L 324.51 306.80L 326.35 312.52L 308.45 312.52Z" />
+    <path d="M328.63 306.80L 346.15 306.80L 348.47 312.52L 330.56 312.52Z" />
+    <path d="M350.28 306.80L 367.80 306.80L 370.58 312.52L 352.68 312.52Z" />
+    <path d="M371.92 306.80L 389.44 306.80L 392.69 312.52L 374.79 312.52Z" />
+    <path d="M86.12 314.60L 104.16 314.60L 101.29 320.32L 82.87 320.32Z" />
+    <path d="M108.41 314.60L 126.45 314.60L 124.05 320.32L 105.62 320.32Z" />
+    <path d="M130.69 314.60L 148.73 314.60L 146.80 320.32L 128.38 320.32Z" />
+    <path d="M152.98 314.60L 171.02 314.60L 169.56 320.32L 151.14 320.32Z" />
+    <path d="M175.27 314.60L 193.31 314.60L 192.32 320.32L 173.90 320.32Z" />
+    <path d="M197.55 314.60L 215.59 314.60L 215.08 320.32L 196.65 320.32Z" />
+    <path d="M219.84 314.60L 237.88 314.60L 237.83 320.32L 219.41 320.32Z" />
+    <path d="M242.12 314.60L 260.16 314.60L 260.59 320.32L 242.17 320.32Z" />
+    <path d="M264.41 314.60L 282.45 314.60L 283.35 320.32L 264.92 320.32Z" />
+    <path d="M286.69 314.60L 304.73 314.60L 306.10 320.32L 287.68 320.32Z" />
+    <path d="M308.98 314.60L 327.02 314.60L 328.86 320.32L 310.44 320.32Z" />
+    <path d="M331.27 314.60L 349.31 314.60L 351.62 320.32L 333.20 320.32Z" />
+    <path d="M353.55 314.60L 371.59 314.60L 374.38 320.32L 355.95 320.32Z" />
+    <path d="M375.84 314.60L 393.88 314.60L 397.13 320.32L 378.71 320.32Z" />
+    <path d="M81.68 322.40L 100.24 322.40L 97.37 328.12L 78.43 328.12Z" />
+    <path d="M104.61 322.40L 123.17 322.40L 120.77 328.12L 101.83 328.12Z" />
+    <path d="M127.54 322.40L 146.10 322.40L 144.17 328.12L 125.23 328.12Z" />
+    <path d="M150.47 322.40L 169.03 322.40L 167.57 328.12L 148.63 328.12Z" />
+    <path d="M173.40 322.40L 191.96 322.40L 190.97 328.12L 172.03 328.12Z" />
+    <path d="M196.33 322.40L 214.89 322.40L 214.37 328.12L 195.43 328.12Z" />
+    <path d="M219.26 322.40L 237.82 322.40L 237.77 328.12L 218.83 328.12Z" />
+    <path d="M242.18 322.40L 260.74 322.40L 261.17 328.12L 242.23 328.12Z" />
+    <path d="M265.11 322.40L 283.67 322.40L 284.57 328.12L 265.63 328.12Z" />
+    <path d="M288.04 322.40L 306.60 322.40L 307.97 328.12L 289.03 328.12Z" />
+    <path d="M310.97 322.40L 329.53 322.40L 331.37 328.12L 312.43 328.12Z" />
+    <path d="M333.90 322.40L 352.46 322.40L 354.77 328.12L 335.83 328.12Z" />
+    <path d="M356.83 322.40L 375.39 322.40L 378.17 328.12L 359.23 328.12Z" />
+    <path d="M379.76 322.40L 398.32 322.40L 401.57 328.12L 382.63 328.12Z" />
+    <path d="M77.24 330.20L 96.33 330.20L 93.45 335.92L 73.99 335.92Z" />
+    <path d="M100.82 330.20L 119.90 330.20L 117.50 335.92L 98.03 335.92Z" />
+    <path d="M124.39 330.20L 143.47 330.20L 141.54 335.92L 122.08 335.92Z" />
+    <path d="M147.96 330.20L 167.04 330.20L 165.58 335.92L 146.12 335.92Z" />
+    <path d="M171.53 330.20L 190.61 330.20L 189.62 335.92L 170.16 335.92Z" />
+    <path d="M195.10 330.20L 214.18 330.20L 213.67 335.92L 194.20 335.92Z" />
+    <path d="M218.67 330.20L 237.76 330.20L 237.71 335.92L 218.25 335.92Z" />
+    <path d="M242.24 330.20L 261.33 330.20L 261.75 335.92L 242.29 335.92Z" />
+    <path d="M265.82 330.20L 284.90 330.20L 285.80 335.92L 266.33 335.92Z" />
+    <path d="M289.39 330.20L 308.47 330.20L 309.84 335.92L 290.38 335.92Z" />
+    <path d="M312.96 330.20L 332.04 330.20L 333.88 335.92L 314.42 335.92Z" />
+    <path d="M336.53 330.20L 355.61 330.20L 357.92 335.92L 338.46 335.92Z" />
+    <path d="M360.10 330.20L 379.18 330.20L 381.97 335.92L 362.50 335.92Z" />
+    <path d="M383.67 330.20L 402.76 330.20L 406.01 335.92L 386.55 335.92Z" />
+  </g>
+  <path d="m188 345 104 0 8 22H180Z" fill="#c0c8ce" stroke="#97a3ac" stroke-width=".8" />
+  <path d="M181 366h118" stroke="#e6edf0" />
+  <path d="M36 374h408q-2 12-17 12H53q-14 0-17-12Z" fill="url(#lip)" stroke="#98a4ad" />
+  <path d="M213 374h54q-2 5-7 5h-40q-5 0-7-5Z" fill="#788791" />
+  <path d="M47 385h383" stroke="#697780" stroke-opacity=".5" stroke-width=".8" />
+</g></svg>

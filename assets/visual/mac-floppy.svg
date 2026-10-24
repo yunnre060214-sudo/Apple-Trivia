@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" fill="none"><defs><radialGradient id="study-bg"><stop stop-color="#e7edf1"/><stop offset="1" stop-color="#f4f5f2"/></radialGradient></defs><rect width="640" height="320" rx="12" fill="url(#study-bg)"/><path d="M38 269H602M38 53H602" stroke="#dce2e3"/><g transform="translate(145 4) scale(.73)">
+  
+  <defs>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f9faf9" />
+      <stop offset="0.333" stop-color="#c4cbd0" />
+      <stop offset="0.667" stop-color="#f4f6f7" />
+      <stop offset="1.000" stop-color="#a6aeb5" />
+    </linearGradient>
+    <linearGradient id="white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="0.500" stop-color="#f6f7f6" />
+      <stop offset="1.000" stop-color="#d8dfe0" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#353b42" />
+      <stop offset="0.500" stop-color="#11161d" />
+      <stop offset="1.000" stop-color="#252c36" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="1.000" stop-color="#ffffff00" />
+    </linearGradient>
+    <radialGradient id="ground">
+      <stop stop-color="#18232f" stop-opacity=".19" />
+      <stop offset="1" stop-color="#18232f" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="cabinet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f1eed9" />
+      <stop offset="0.500" stop-color="#d9dac3" />
+      <stop offset="1.000" stop-color="#b9bea7" />
+    </linearGradient>
+    <linearGradient id="crt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#263e35" />
+      <stop offset="0.500" stop-color="#35493c" />
+      <stop offset="1.000" stop-color="#172c24" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="240" cy="389" rx="145" ry="17" fill="url(#ground)" />
+  <path d="m166 69 160 10 20 18-2 251-27 17-151-296Z" fill="#a5a594" stroke="#959988" />
+  <path d="m306 93 25 7-1 235-23 12V93Z" fill="#b4b4a3" />
+  <path d="M156 73q0-12 14-12h132q15 0 16 15l9 267q1 16-15 17H161q-17 0-17-16l3-255q0-10 9-16Z" fill="url(#cabinet)" stroke="#a5a794" stroke-width="1.4" />
+  <path d="M155 84q0-15 14-15h131" stroke="#fffdec" stroke-opacity=".8" stroke-width="2" />
+  <rect x="164" y="96" width="137" height="139" rx="16" fill="#b7b9a7" />
+  <rect x="170" y="102" width="125" height="126" rx="13" fill="#555e56" />
+  <rect x="177" y="110" width="111" height="110" rx="10" fill="url(#crt)" />
+  <path d="M183 120q45-10 97 0v20q-55-17-97-3Z" fill="#edf6d8" opacity=".08" />
+  <g stroke="#c5d3b6" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M218 140h32v36h-32zM214 181h40m-27-5v5m14-5v5M226 148v5m16-5v5m-17 9c4 6 11 6 15 0" />
+  </g>
+  <path d="M169 248h128" stroke="#b5b7a5" />
+  <rect x="228" y="271" width="69" height="6" rx="2" fill="#696f63" />
+  <path d="M231 273h63" stroke="#343b35" stroke-width="2" />
+  <rect x="283" y="280" width="14" height="2" rx="1" fill="#9da18e" />
+  <g stroke="#afb19f" stroke-width="1.4">
+    <path d="M167 294h27" />
+    <path d="M167 298h27" />
+    <path d="M167 302h27" />
+    <path d="M167 306h27" />
+    <path d="M167 310h27" />
+    <path d="M167 314h27" />
+    <path d="M167 318h27" />
+    <path d="M167 322h27" />
+  </g>
+  <path d="M151 338h168" stroke="#b3b6a2" />
+  <rect x="163" y="356" width="19" height="5" rx="1" fill="#777d6e" />
+  <rect x="290" y="356" width="19" height="5" rx="1" fill="#777d6e" />
+  <g transform="translate(169 262) scale(0.58)" fill="#788273">
+    <path d="M10 5c-4-3-9 0-9 5 0 5 3 10 6 10 1 0 2-1 3-1s2 1 3 1c2 0 4-3 5-5-4-2-4-6-1-8-2-3-5-3-7-2Z" />
+    <path d="M10 4c0-3 2-4 5-4 0 2-2 5-5 4Z" />
+  </g>
+  <path d="M180 349c-55 2-63 4-71 18" stroke="#8b9282" stroke-width="3" />
+  <path d="m102 355 207 1 29 33q2 6-5 7H84q-8 0-5-7l23-34Z" fill="#b0b4a3" stroke="#969d8c" />
+  <path d="m104 353 203 1 25 31H85l19-32Z" fill="url(#cabinet)" stroke="#cfd1be" />
+  <g fill="#b5bbaa" stroke="#939b89" stroke-width=".55">
+    <path d="m106.0 358h12l2.8 4.3h-13Z" />
+    <path d="m120.6 358h12l2.8 4.3h-13Z" />
+    <path d="m135.2 358h12l2.8 4.3h-13Z" />
+    <path d="m149.8 358h12l2.8 4.3h-13Z" />
+    <path d="m164.4 358h12l2.8 4.3h-13Z" />
+    <path d="m179.0 358h12l2.8 4.3h-13Z" />
+    <path d="m193.6 358h12l2.8 4.3h-13Z" />
+    <path d="m208.2 358h12l2.8 4.3h-13Z" />
+    <path d="m222.8 358h12l2.8 4.3h-13Z" />
+    <path d="m237.4 358h12l2.8 4.3h-13Z" />
+    <path d="m252.0 358h12l2.8 4.3h-13Z" />
+    <path d="m266.6 358h12l2.8 4.3h-13Z" />
+    <path d="m281.2 358h12l2.8 4.3h-13Z" />
+    <path d="m101.8 364h12l2.8 4.3h-13Z" />
+    <path d="m116.4 364h12l2.8 4.3h-13Z" />
+    <path d="m131.0 364h12l2.8 4.3h-13Z" />
+    <path d="m145.6 364h12l2.8 4.3h-13Z" />
+    <path d="m160.2 364h12l2.8 4.3h-13Z" />
+    <path d="m174.8 364h12l2.8 4.3h-13Z" />
+    <path d="m189.4 364h12l2.8 4.3h-13Z" />
+    <path d="m204.0 364h12l2.8 4.3h-13Z" />
+    <path d="m218.6 364h12l2.8 4.3h-13Z" />
+    <path d="m233.2 364h12l2.8 4.3h-13Z" />
+    <path d="m247.8 364h12l2.8 4.3h-13Z" />
+    <path d="m262.4 364h12l2.8 4.3h-13Z" />
+    <path d="m277.0 364h12l2.8 4.3h-13Z" />
+    <path d="m97.6 370h12l2.8 4.3h-13Z" />
+    <path d="m112.2 370h12l2.8 4.3h-13Z" />
+    <path d="m126.8 370h12l2.8 4.3h-13Z" />
+    <path d="m141.4 370h12l2.8 4.3h-13Z" />
+    <path d="m156.0 370h12l2.8 4.3h-13Z" />
+    <path d="m170.6 370h12l2.8 4.3h-13Z" />
+    <path d="m185.2 370h12l2.8 4.3h-13Z" />
+    <path d="m199.8 370h12l2.8 4.3h-13Z" />
+    <path d="m214.4 370h12l2.8 4.3h-13Z" />
+    <path d="m229.0 370h12l2.8 4.3h-13Z" />
+    <path d="m243.6 370h12l2.8 4.3h-13Z" />
+    <path d="m258.2 370h12l2.8 4.3h-13Z" />
+    <path d="m272.8 370h12l2.8 4.3h-13Z" />
+    <path d="m93.4 376h12l2.8 4.3h-13Z" />
+    <path d="m108.0 376h12l2.8 4.3h-13Z" />
+    <path d="m122.6 376h12l2.8 4.3h-13Z" />
+    <path d="m137.2 376h12l2.8 4.3h-13Z" />
+    <path d="m151.8 376h12l2.8 4.3h-13Z" />
+    <path d="m166.4 376h12l2.8 4.3h-13Z" />
+    <path d="m181.0 376h12l2.8 4.3h-13Z" />
+    <path d="m195.6 376h12l2.8 4.3h-13Z" />
+    <path d="m210.2 376h12l2.8 4.3h-13Z" />
+    <path d="m224.8 376h12l2.8 4.3h-13Z" />
+    <path d="m239.4 376h12l2.8 4.3h-13Z" />
+    <path d="m254.0 376h12l2.8 4.3h-13Z" />
+    <path d="m268.6 376h12l2.8 4.3h-13Z" />
+  </g>
+  <path d="M153 383h107l4 6H149Z" fill="#c7ccba" stroke="#a0a895" stroke-width=".6" />
+<g transform="rotate(0 240 222)"><circle cx="262" cy="274" r="44" fill="#5d88c517" stroke="#477caf" stroke-width="3" stroke-dasharray="5 4"/><circle cx="295.88" cy="240.12" r="6" fill="#477caf" stroke="#fff" stroke-width="2"/></g></g></svg>

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" fill="none"><defs><radialGradient id="study-bg"><stop stop-color="#e7edf1"/><stop offset="1" stop-color="#f4f5f2"/></radialGradient></defs><rect width="640" height="320" rx="12" fill="url(#study-bg)"/><path d="M38 269H602M38 53H602" stroke="#dce2e3"/><g transform="translate(145 4) scale(.73)">
+  
+  <defs>
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#f9faf9" />
+      <stop offset="0.333" stop-color="#c4cbd0" />
+      <stop offset="0.667" stop-color="#f4f6f7" />
+      <stop offset="1.000" stop-color="#a6aeb5" />
+    </linearGradient>
+    <linearGradient id="white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="0.500" stop-color="#f6f7f6" />
+      <stop offset="1.000" stop-color="#d8dfe0" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#353b42" />
+      <stop offset="0.500" stop-color="#11161d" />
+      <stop offset="1.000" stop-color="#252c36" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ffffff" />
+      <stop offset="1.000" stop-color="#ffffff00" />
+    </linearGradient>
+    <radialGradient id="ground">
+      <stop stop-color="#18232f" stop-opacity=".19" />
+      <stop offset="1" stop-color="#18232f" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="knit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#ecf0ef" />
+      <stop offset="0.500" stop-color="#cbd5d6" />
+      <stop offset="1.000" stop-color="#a5b4bb" />
+    </linearGradient>
+    <linearGradient id="visor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#3b414f" />
+      <stop offset="0.333" stop-color="#172437" />
+      <stop offset="0.667" stop-color="#0b1726" />
+      <stop offset="1.000" stop-color="#283946" />
+    </linearGradient>
+    <linearGradient id="reflection" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0.000" stop-color="#accddf" />
+      <stop offset="1.000" stop-color="#7a85ab00" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="240" cy="389" rx="181" ry="17" fill="url(#ground)" />
+  <path d="M163 147c16-57 160-64 194-7l25 96-35 38-30-103c-25-23-98-23-120 0l-15 63-38-16Z" fill="url(#knit)" stroke="#abb5ba" stroke-width="1.2" />
+  <path d="M177 146c33-37 134-41 165-5" stroke="#f5f8f8" stroke-width="4" stroke-linecap="round" />
+  <g stroke="#8d9a9f" stroke-opacity=".45" stroke-width="1.5">
+    <path d="M175 135.0q-10 14-10 30" />
+    <path d="M181 134.2q-10 14-10 30" />
+    <path d="M187 133.4q-10 14-10 30" />
+    <path d="M193 132.6q-10 14-10 30" />
+    <path d="M199 131.8q-10 14-10 30" />
+    <path d="M205 131.0q-10 14-10 30" />
+    <path d="M211 130.2q-10 14-10 30" />
+    <path d="M217 129.4q-10 14-10 30" />
+    <path d="M223 128.6q-10 14-10 30" />
+    <path d="M229 135.0q-10 14-10 30" />
+    <path d="M235 134.2q-10 14-10 30" />
+    <path d="M241 133.4q-10 14-10 30" />
+    <path d="M247 132.6q-10 14-10 30" />
+    <path d="M253 131.8q-10 14-10 30" />
+    <path d="M259 131.0q-10 14-10 30" />
+    <path d="M265 130.2q-10 14-10 30" />
+    <path d="M271 129.4q-10 14-10 30" />
+    <path d="M277 128.6q-10 14-10 30" />
+    <path d="M283 135.0q-10 14-10 30" />
+    <path d="M289 134.2q-10 14-10 30" />
+    <path d="M295 133.4q-10 14-10 30" />
+    <path d="M301 132.6q-10 14-10 30" />
+    <path d="M307 131.8q-10 14-10 30" />
+    <path d="M313 131.0q-10 14-10 30" />
+    <path d="M319 130.2q-10 14-10 30" />
+    <path d="M325 129.4q-10 14-10 30" />
+    <path d="M331 128.6q-10 14-10 30" />
+  </g>
+  <path d="M347 178q36 4 46 34l8 44q-1 26-24 27l-25-7-12-40Z" fill="url(#knit)" stroke="#9fadb3" />
+  <g stroke="#87969e" stroke-opacity=".5">
+    <path d="M360 187.0q16 34 9 78" />
+    <path d="M364 188.5q16 34 9 78" />
+    <path d="M368 190.0q16 34 9 78" />
+    <path d="M372 191.5q16 34 9 78" />
+    <path d="M376 193.0q16 34 9 78" />
+    <path d="M380 194.5q16 34 9 78" />
+    <path d="M384 196.0q16 34 9 78" />
+    <path d="M388 197.5q16 34 9 78" />
+  </g>
+  <path d="M88 181q1-39 44-45c56-12 142-14 202 0q43 8 47 46l-2 64q-5 41-44 50-38 8-72-11l-25-13q-10-5-20 0l-27 14q-36 19-70 9-35-11-37-47Z" fill="url(#silver)" stroke="#99a5ad" stroke-width="1.4" />
+  <path d="M94 182q2-33 39-39c55-12 140-13 199 0q37 7 41 40l-2 60q-4 36-38 45-34 8-66-11l-24-13q-14-7-28 0l-27 14q-32 18-63 9-30-10-32-42Z" fill="url(#visor)" stroke="#eff5f7" stroke-width="1.2" />
+  <clipPath id="visor-clip">
+    <path d="M98 183q2-30 36-36c55-12 138-13 197 0q33 7 37 37l-2 59q-4 33-34 40-33 8-64-10l-24-13q-15-9-31 0l-27 14q-30 17-59 9-27-9-28-39Z" />
+  </clipPath>
+  <g clip-path="url(#visor-clip)">
+    <path d="M88 177q83-41 191-18c61 13 88 37 108 58v-82H88Z" fill="#d7e9ff" opacity=".13" />
+    <path d="M122 295q13-110 102-159-46 71-45 155Z" fill="url(#reflection)" opacity=".55" />
+    <path d="M209 290q29-124 99-154-39 71-24 162Z" fill="#8388b5" opacity=".11" />
+    <path d="M104 218q119-39 260-11" stroke="#d8e4ed" stroke-opacity=".1" stroke-width="1.3" />
+    <ellipse cx="151" cy="265" rx="8" ry="4" fill="#030a11" />
+    <ellipse cx="320" cy="265" rx="8" ry="4" fill="#030a11" />
+  </g>
+  <path d="M112 160q115-32 228-5" stroke="#eaf7ff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round" />
+  <path d="M106 179q-8 9-7 33" stroke="#ffffff" stroke-opacity=".5" stroke-width="2" stroke-linecap="round" />
+  <path d="M130 295q26 11 57-5l31-15q10-5 22 0l29 15q31 15 62 4l-2 12q-34 11-65-5l-27-13q-9-4-17 0l-29 13q-32 14-60 5Z" fill="#75838b" stroke="#b4c0c6" />
+  <rect x="318" y="129" width="27" height="10" rx="5" fill="url(#silver)" stroke="#8b9aa4" />
+  <path d="M323 131v5m4-5v5m4-5v5m4-5v5m4-5v5" stroke="#8b9aa4" stroke-width=".6" />
+  <path d="M128 133h22" stroke="#b5c1c8" stroke-width="6" stroke-linecap="round" />
+  <circle cx="387" cy="252" r="11" fill="#bdc9ce" stroke="#8f9fa8" />
+  <circle cx="387" cy="252" r="7" stroke="#e2e9ec" />
+</g></svg>
